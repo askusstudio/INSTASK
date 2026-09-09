@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
-export const emailOtpCache = new Map<string, { code: string; expiresAt: number }>();
+// export keyword removed so Next.js build passes cleanly
+const emailOtpCache = new Map<string, { code: string; expiresAt: number }>();
 
 export async function POST(req: Request) {
   try {

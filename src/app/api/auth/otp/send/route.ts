@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-export const phoneOtpStore = new Map<string, { code: string; expiresAt: number }>();
+// "export" keyword removed so Next.js build passes cleanly without type error
+const phoneOtpStore = new Map<string, { code: string; expiresAt: number }>();
 
 export async function POST(req: Request) {
   try {
