@@ -5,6 +5,8 @@ import { Sparkles, Check, Instagram, ShieldCheck, ArrowLeft } from "lucide-react
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { PricingCheckoutSection } from "@/components/pricing/PricingCheckoutSection";
 
+import PricingSelector from "@/components/pricing/PricingSelector";
+
 export const dynamic = "force-dynamic";
 
 interface PricingPageProps {
@@ -20,7 +22,7 @@ export default async function PricingPage({ params: { locale } }: PricingPagePro
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* Top Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href={`/${locale}`} className="flex items-center gap-2.5 text-xs font-bold text-slate-700 hover:text-slate-900">
             <ArrowLeft className="w-4 h-4" />
             <span>Back to INSTASK</span>
@@ -37,10 +39,28 @@ export default async function PricingPage({ params: { locale } }: PricingPagePro
         </div>
       </header>
 
-      {/* Main Regional Pricing Container */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-12">
-        <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
-          
+      {/* Main Container: Multi-Tier Autopay Plans + Flexible Monthly Option */}
+      <main className="flex-1 max-w-6xl mx-auto w-full p-4 sm:p-6 lg:p-12 space-y-12">
+        {/* Interactive Multi-Period Selector (3, 6, 12 Months with Autopay & Progressive Discounts) */}
+        <PricingSelector
+          locale={locale}
+          initialCurrency={countryCode.toUpperCase() === 'IN' ? 'inr' : 'usd'}
+        />
+
+        {/* Separator / Alternative Option */}
+        <div className="relative max-w-xl mx-auto text-center my-6">
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div className="w-full border-t border-slate-200"></div>
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-slate-50 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Or Choose Single-Month Plan with First-Month Promotion
+            </span>
+          </div>
+        </div>
+
+        {/* Monthly Plan with 50% Off First Month */}
+        <div className="max-w-md mx-auto w-full bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
           {/* Welcome Tag */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -49,7 +69,7 @@ export default async function PricingPage({ params: { locale } }: PricingPagePro
 
           <div>
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              INSTASK Pro Autopilot
+              INSTASK Pro Autopilot (Monthly)
             </h2>
             <p className="text-slate-500 text-xs mt-1">
               Publishing and competitor intelligence for your Instagram brand.

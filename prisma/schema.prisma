@@ -29,6 +29,13 @@ enum SubscriptionStatus {
   CANCELED
 }
 
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY   // 3 Months
+  SEMI_ANNUAL // 6 Months
+  ANNUAL      // 12 Months
+}
+
 model User {
   id                          String             @id @default(cuid())
   email                       String?            @unique
@@ -47,6 +54,9 @@ model User {
   subscriptionId              String?            @unique
   subscriptionStatus          SubscriptionStatus @default(INACTIVE)
   isFirstMonthDiscountApplied Boolean            @default(false)
+  billingCycle                BillingCycle       @default(MONTHLY)
+  autoRenew                   Boolean            @default(true) // Autopay enabled flag
+  currentPeriodEnd            DateTime?
 
   // Credit & Token Balances
   creditsBalance              Int                @default(60) // Base credits allocated on onboarding

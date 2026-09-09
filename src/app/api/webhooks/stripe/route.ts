@@ -40,24 +40,55 @@ export async function POST(req: Request) {
             });
           }
 
-          // Standard subscription activation
-          const userId = session?.client_reference_id || 'usr_demo_001';
+          // Subscription activation (supports monthly, quarterly, semi_annual, annual)
+          const userId = session?.metadata?.userId || session?.client_reference_id || 'usr_demo_001';
+          const planKey = (session?.metadata?.planKey || 'monthly').toLowerCase();
+          const cycleMap: Record<string, 'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL'> = {
+            monthly: 'MONTHLY',
+            quarterly: 'QUARTERLY',
+            semi_annual: 'SEMI_ANNUAL',
+            annual: 'ANNUAL',
+          };
+          const billingCycle = cycleMap[planKey] || 'MONTHLY';
+
+          let creditsToAdd = 60;
+          if (session?.metadata?.creditsGranted) {
+            creditsToAdd = parseInt(session.metadata.creditsGranted, 10);
+          } else if (planKey === 'quarterly') {
+            creditsToAdd = 180;
+          } else if (planKey === 'semi_annual') {
+            creditsToAdd = 360;
+          } else if (planKey === 'annual') {
+            creditsToAdd = 720;
+          }
+
+          const monthsMap: Record<string, number> = { monthly: 1, quarterly: 3, semi_annual: 6, annual: 12 };
+          const months = monthsMap[planKey] || 1;
+          const currentPeriodEnd = new Date(Date.now() + months * 30 * 24 * 60 * 60 * 1000);
 
           await updateUserSubscription(userId, {
             subscriptionStatus: 'ACTIVE',
             subscriptionId: (session?.subscription as string) || 'sub_sandbox_001',
             stripeCustomerId: (session?.customer as string) || 'cus_sandbox_001',
             isFirstMonthDiscountApplied: true,
+            billingCycle,
+            autoRenew: true,
+            currentPeriodEnd,
           });
 
           await addCredits(
             userId,
-            60,
+            creditsToAdd,
             'MONTHLY_GRANT',
-            'Monthly growth plan subscription credits'
+            `Subscription activated: ${planKey} (${creditsToAdd} credits added)`
           );
 
-          return NextResponse.json({ received: true, mode: 'sandbox' });
+          return NextResponse.json({
+            received: true,
+            mode: 'sandbox',
+            billingCycle,
+            creditsAdded: creditsToAdd,
+          });
         } else if (parsed.type === 'customer.subscription.deleted') {
           const session = parsed.data?.object;
           const subId = session?.id || 'sub_sandbox_001';
@@ -116,7 +147,39 @@ export async function POST(req: Request) {
       }
 
       // Handle subscription activation
-      const userId = session.client_reference_id;
+      const subscriptionId = session.subscription as string;
+      let planKey = session.metadata?.planKey || 'monthly';
+      let userId = session.metadata?.userId || session.client_reference_id;
+      let creditsToAdd = session.metadata?.creditsGranted ? parseInt(session.metadata.creditsGranted, 10) : 60;
+
+      if (stripe && subscriptionId && (!userId || !session.metadata?.planKey)) {
+        try {
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          if (subscription?.metadata) {
+            if (subscription.metadata.userId) userId = subscription.metadata.userId;
+            if (subscription.metadata.planKey) planKey = subscription.metadata.planKey;
+            if (subscription.metadata.creditsGranted) {
+              creditsToAdd = parseInt(subscription.metadata.creditsGranted, 10);
+            }
+          }
+        } catch (subErr) {
+          console.warn('Could not retrieve subscription details from Stripe:', subErr);
+        }
+      }
+
+      const cycleMap: Record<string, 'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL'> = {
+        monthly: 'MONTHLY',
+        quarterly: 'QUARTERLY',
+        semi_annual: 'SEMI_ANNUAL',
+        annual: 'ANNUAL',
+      };
+      const billingCycle = cycleMap[planKey.toLowerCase()] || 'MONTHLY';
+
+      if (!session.metadata?.creditsGranted) {
+        if (planKey === 'quarterly') creditsToAdd = 180;
+        else if (planKey === 'semi_annual') creditsToAdd = 360;
+        else if (planKey === 'annual') creditsToAdd = 720;
+      }
 
       if (userId) {
         await updateUserSubscription(userId, {
@@ -124,13 +187,16 @@ export async function POST(req: Request) {
           stripeCustomerId: session.customer as string,
           subscriptionId: session.subscription as string,
           isFirstMonthDiscountApplied: true,
+          billingCycle,
+          autoRenew: true,
+          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         });
 
         await addCredits(
           userId,
-          60,
+          creditsToAdd,
           'MONTHLY_GRANT',
-          'Monthly growth plan subscription credits'
+          `Subscription activated: ${planKey} (${creditsToAdd} credits added)`
         );
       }
     }

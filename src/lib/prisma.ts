@@ -13,6 +13,7 @@ declare global {
 
 export type AuthProvider = 'EMAIL' | 'PHONE' | 'INSTAGRAM' | 'FACEBOOK';
 export type SubscriptionStatus = 'INACTIVE' | 'TRIAL' | 'ACTIVE' | 'PAST_DUE' | 'CANCELED';
+export type BillingCycle = 'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
 
 export interface UserRecord {
   id: string;
@@ -26,6 +27,9 @@ export interface UserRecord {
   subscriptionId?: string | null;
   subscriptionStatus: SubscriptionStatus;
   isFirstMonthDiscountApplied: boolean;
+  billingCycle?: BillingCycle;
+  autoRenew?: boolean;
+  currentPeriodEnd?: Date | string | null;
   creditsBalance: number;
   monthlyCreditsLimit: number;
   createdAt: Date | string;
@@ -141,6 +145,9 @@ class InMemoryStore {
       role: 'OWNER',
       subscriptionStatus: 'ACTIVE',
       isFirstMonthDiscountApplied: false,
+      billingCycle: 'MONTHLY',
+      autoRenew: true,
+      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       creditsBalance: 60,
       monthlyCreditsLimit: 60,
       stripeCustomerId: 'cus_demo_123',
@@ -411,6 +418,9 @@ export async function updateUserSubscription(
     subscriptionId?: string;
     stripeCustomerId?: string;
     isFirstMonthDiscountApplied?: boolean;
+    billingCycle?: BillingCycle;
+    autoRenew?: boolean;
+    currentPeriodEnd?: Date | string | null;
   }
 ): Promise<UserRecord | null> {
   const now = new Date();
@@ -423,6 +433,9 @@ export async function updateUserSubscription(
           subscriptionId: subData.subscriptionId ?? undefined,
           stripeCustomerId: subData.stripeCustomerId ?? undefined,
           isFirstMonthDiscountApplied: subData.isFirstMonthDiscountApplied ?? undefined,
+          billingCycle: subData.billingCycle ?? undefined,
+          autoRenew: subData.autoRenew ?? undefined,
+          currentPeriodEnd: subData.currentPeriodEnd ? new Date(subData.currentPeriodEnd) : undefined,
         }
       });
       return updated as unknown as UserRecord;
@@ -439,6 +452,9 @@ export async function updateUserSubscription(
     if (subData.isFirstMonthDiscountApplied !== undefined) {
       user.isFirstMonthDiscountApplied = subData.isFirstMonthDiscountApplied;
     }
+    if (subData.billingCycle) user.billingCycle = subData.billingCycle;
+    if (subData.autoRenew !== undefined) user.autoRenew = subData.autoRenew;
+    if (subData.currentPeriodEnd !== undefined) user.currentPeriodEnd = subData.currentPeriodEnd;
     user.updatedAt = now;
     memoryStore.users.set(userId, user);
     return user;
