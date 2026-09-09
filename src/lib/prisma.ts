@@ -426,9 +426,24 @@ export async function updateUserSubscription(
   const now = new Date();
   if (prisma) {
     try {
-      const updated = await prisma.user.update({
+      const updated = await prisma.user.upsert({
         where: { id: userId },
-        data: {
+        create: {
+          id: userId,
+          email: `${userId}@instask.ai`,
+          name: 'INSTASK Subscriber',
+          role: 'OWNER',
+          subscriptionStatus: subData.subscriptionStatus,
+          subscriptionId: subData.subscriptionId ?? undefined,
+          stripeCustomerId: subData.stripeCustomerId ?? undefined,
+          isFirstMonthDiscountApplied: subData.isFirstMonthDiscountApplied ?? false,
+          billingCycle: subData.billingCycle ?? 'MONTHLY',
+          autoRenew: subData.autoRenew ?? true,
+          currentPeriodEnd: subData.currentPeriodEnd ? new Date(subData.currentPeriodEnd) : undefined,
+          creditsBalance: 60,
+          monthlyCreditsLimit: 60,
+        },
+        update: {
           subscriptionStatus: subData.subscriptionStatus,
           subscriptionId: subData.subscriptionId ?? undefined,
           stripeCustomerId: subData.stripeCustomerId ?? undefined,
@@ -444,20 +459,40 @@ export async function updateUserSubscription(
     }
   }
 
-  const user = memoryStore.users.get(userId);
-  if (user) {
-    user.subscriptionStatus = subData.subscriptionStatus;
-    if (subData.subscriptionId) user.subscriptionId = subData.subscriptionId;
-    if (subData.stripeCustomerId) user.stripeCustomerId = subData.stripeCustomerId;
-    if (subData.isFirstMonthDiscountApplied !== undefined) {
-      user.isFirstMonthDiscountApplied = subData.isFirstMonthDiscountApplied;
-    }
-    if (subData.billingCycle) user.billingCycle = subData.billingCycle;
-    if (subData.autoRenew !== undefined) user.autoRenew = subData.autoRenew;
-    if (subData.currentPeriodEnd !== undefined) user.currentPeriodEnd = subData.currentPeriodEnd;
-    user.updatedAt = now;
+  let user = memoryStore.users.get(userId);
+  if (!user) {
+    user = {
+      id: userId,
+      email: `${userId}@instask.ai`,
+      name: 'INSTASK Subscriber',
+      provider: 'EMAIL',
+      role: 'OWNER',
+      subscriptionStatus: subData.subscriptionStatus,
+      subscriptionId: subData.subscriptionId,
+      stripeCustomerId: subData.stripeCustomerId,
+      isFirstMonthDiscountApplied: subData.isFirstMonthDiscountApplied ?? false,
+      billingCycle: subData.billingCycle ?? 'MONTHLY',
+      autoRenew: subData.autoRenew ?? true,
+      currentPeriodEnd: subData.currentPeriodEnd,
+      creditsBalance: 60,
+      monthlyCreditsLimit: 60,
+      createdAt: now,
+      updatedAt: now,
+    };
     memoryStore.users.set(userId, user);
     return user;
   }
-  return null;
+
+  user.subscriptionStatus = subData.subscriptionStatus;
+  if (subData.subscriptionId) user.subscriptionId = subData.subscriptionId;
+  if (subData.stripeCustomerId) user.stripeCustomerId = subData.stripeCustomerId;
+  if (subData.isFirstMonthDiscountApplied !== undefined) {
+    user.isFirstMonthDiscountApplied = subData.isFirstMonthDiscountApplied;
+  }
+  if (subData.billingCycle) user.billingCycle = subData.billingCycle;
+  if (subData.autoRenew !== undefined) user.autoRenew = subData.autoRenew;
+  if (subData.currentPeriodEnd !== undefined) user.currentPeriodEnd = subData.currentPeriodEnd;
+  user.updatedAt = now;
+  memoryStore.users.set(userId, user);
+  return user;
 }

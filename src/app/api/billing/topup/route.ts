@@ -13,9 +13,15 @@ const stripe = stripeSecret && stripeSecret.startsWith('sk_')
 export async function GET(req: Request) {
   let userId = 'usr_demo_001';
   try {
-    const session = await getServerSession(authOptions);
-    if (session?.user && (session.user as { id?: string }).id) {
-      userId = (session.user as { id?: string }).id!;
+    const { searchParams } = new URL(req.url);
+    const paramUserId = searchParams.get('userId');
+    if (paramUserId) {
+      userId = paramUserId;
+    } else {
+      const session = await getServerSession(authOptions);
+      if (session?.user && (session.user as { id?: string }).id) {
+        userId = (session.user as { id?: string }).id!;
+      }
     }
   } catch {
     // Demo fallback

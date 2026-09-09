@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Check, ShieldCheck, Zap, RefreshCw, Sparkles } from 'lucide-react';
-import { SUBSCRIPTION_PLANS, PlanTier } from '@/lib/pricing-plans';
+import { Check, ShieldCheck, Zap, RefreshCw, Sparkles, CreditCard, Smartphone } from 'lucide-react';
+import { SUBSCRIPTION_PLANS } from '@/lib/pricing-plans';
+import RazorpayButton from '@/components/RazorpayButton';
 
 interface PricingSelectorProps {
   locale?: string;
@@ -18,8 +19,18 @@ export default function PricingSelector({
 }: PricingSelectorProps) {
   const [selectedPlan, setSelectedPlan] = useState<'quarterly' | 'semi_annual' | 'annual'>(initialPlan);
   const [currency, setCurrency] = useState<'usd' | 'inr'>(initialCurrency);
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>(
+    initialCurrency === 'inr' ? 'razorpay' : 'stripe'
+  );
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleCurrencyChange = (newCurr: 'usd' | 'inr') => {
+    setCurrency(newCurr);
+    if (newCurr === 'inr') {
+      setPaymentMethod('razorpay');
+    }
+  };
 
   const handleCheckout = async () => {
     if (!termsAccepted) {
@@ -39,7 +50,7 @@ export default function PricingSelector({
       } else if (data.error) {
         alert(`Checkout error: ${data.error}`);
       }
-    } catch (e) {
+    } catch {
       alert('Failed to initiate checkout. Please try again.');
     } finally {
       setLoading(false);
@@ -68,7 +79,7 @@ export default function PricingSelector({
           <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5 text-xs font-bold">
             <button
               type="button"
-              onClick={() => setCurrency('usd')}
+              onClick={() => handleCurrencyChange('usd')}
               className={`px-2.5 py-1 rounded-md transition ${
                 currency === 'usd' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
@@ -77,7 +88,7 @@ export default function PricingSelector({
             </button>
             <button
               type="button"
-              onClick={() => setCurrency('inr')}
+              onClick={() => handleCurrencyChange('inr')}
               className={`px-2.5 py-1 rounded-md transition ${
                 currency === 'inr' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
@@ -162,6 +173,44 @@ export default function PricingSelector({
 
       {/* Autopay Notice & Checkout Action */}
       <div className="max-w-xl mx-auto bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs">
+        {/* Payment Gateway Toggle (Cards / UPI Autopay) */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-slate-700 block">Payment Method:</label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('razorpay')}
+              className={`p-3 rounded-xl border text-left transition flex items-center gap-2.5 ${
+                paymentMethod === 'razorpay'
+                  ? 'border-emerald-600 bg-emerald-50/50 ring-1 ring-emerald-600 text-slate-900'
+                  : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
+              }`}
+            >
+              <Smartphone className={`w-4 h-4 ${paymentMethod === 'razorpay' ? 'text-emerald-600' : 'text-slate-400'}`} />
+              <div>
+                <span className="block text-xs font-bold">UPI Autopay</span>
+                <span className="block text-[10px] text-slate-400">Razorpay / GPay / Paytm</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('stripe')}
+              className={`p-3 rounded-xl border text-left transition flex items-center gap-2.5 ${
+                paymentMethod === 'stripe'
+                  ? 'border-slate-900 bg-slate-100 ring-1 ring-slate-900 text-slate-900'
+                  : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
+              }`}
+            >
+              <CreditCard className={`w-4 h-4 ${paymentMethod === 'stripe' ? 'text-slate-900' : 'text-slate-400'}`} />
+              <div>
+                <span className="block text-xs font-bold">Credit / Debit Card</span>
+                <span className="block text-[10px] text-slate-400">Stripe International</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
         {/* Mandatory Pre-Payment Waiver Checkbox */}
         <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-white border border-slate-200 text-left shadow-xs">
           <input
@@ -193,22 +242,36 @@ export default function PricingSelector({
           </span>
         </div>
 
-        <button
-          type="button"
-          onClick={handleCheckout}
-          disabled={loading || !termsAccepted}
-          className="w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-sm transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            'Redirecting to Secure Checkout...'
-          ) : (
-            `Activate ${SUBSCRIPTION_PLANS[selectedPlan].label} & Enable Autopay`
-          )}
-        </button>
+        {/* Checkout CTA based on chosen gateway */}
+        {paymentMethod === 'razorpay' ? (
+          <RazorpayButton
+            planKey={selectedPlan}
+            planTitle={SUBSCRIPTION_PLANS[selectedPlan].label}
+            amount={SUBSCRIPTION_PLANS[selectedPlan].inr.total}
+            currency={currency.toUpperCase()}
+            disabled={!termsAccepted}
+            className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span>Activate {SUBSCRIPTION_PLANS[selectedPlan].label} via UPI Autopay</span>
+          </RazorpayButton>
+        ) : (
+          <button
+            type="button"
+            onClick={handleCheckout}
+            disabled={loading || !termsAccepted}
+            className="w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-sm transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              'Redirecting to Secure Checkout...'
+            ) : (
+              `Activate ${SUBSCRIPTION_PLANS[selectedPlan].label} & Enable Autopay`
+            )}
+          </button>
+        )}
 
         <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400">
           <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-          <span>256-bit encrypted card billing handled by Stripe. No refunds once assets render.</span>
+          <span>256-bit encrypted card billing handled by Stripe &amp; Razorpay UPI Autopay. No refunds once assets render.</span>
         </div>
       </div>
     </div>

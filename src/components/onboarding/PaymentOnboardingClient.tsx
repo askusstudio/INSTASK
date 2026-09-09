@@ -9,8 +9,10 @@ import {
   Lock,
   ArrowRight,
   CreditCard,
+  Smartphone,
 } from 'lucide-react';
 import { CurrencyConfig } from '@/lib/currency';
+import RazorpayButton from '@/components/RazorpayButton';
 
 interface PaymentOnboardingClientProps {
   locale: string;
@@ -22,6 +24,9 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>(
+    pricing.code === 'INR' ? 'razorpay' : 'stripe'
+  );
 
   // 1. Trigger Stripe Checkout or Sandbox simulation
   const handleCheckout = async () => {
@@ -146,6 +151,44 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
           </div>
         </div>
 
+        {/* Payment Gateway Toggle */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-slate-700 block">Payment Method:</label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('razorpay')}
+              className={`p-3 rounded-xl border text-left transition flex items-center gap-2.5 ${
+                paymentMethod === 'razorpay'
+                  ? 'border-emerald-600 bg-emerald-50/50 ring-1 ring-emerald-600 text-slate-900'
+                  : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
+              }`}
+            >
+              <Smartphone className={`w-4 h-4 ${paymentMethod === 'razorpay' ? 'text-emerald-600' : 'text-slate-400'}`} />
+              <div>
+                <span className="block text-xs font-bold">UPI Autopay</span>
+                <span className="block text-[10px] text-slate-400">Razorpay / GPay / Paytm</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('stripe')}
+              className={`p-3 rounded-xl border text-left transition flex items-center gap-2.5 ${
+                paymentMethod === 'stripe'
+                  ? 'border-slate-900 bg-slate-100 ring-1 ring-slate-900 text-slate-900'
+                  : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
+              }`}
+            >
+              <CreditCard className={`w-4 h-4 ${paymentMethod === 'stripe' ? 'text-slate-900' : 'text-slate-400'}`} />
+              <div>
+                <span className="block text-xs font-bold">Credit / Debit Card</span>
+                <span className="block text-[10px] text-slate-400">Stripe International</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
         {/* Mandatory Pre-Payment Waiver Checkbox */}
         <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left">
           <input
@@ -167,16 +210,30 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
 
         {/* Payment CTA */}
         <div className="space-y-3">
-          <button
-            type="button"
-            onClick={handleCheckout}
-            disabled={loading || !termsAccepted}
-            className="w-full py-4 px-5 bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 hover:from-slate-800 hover:to-slate-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <Lock className="w-4 h-4 text-rose-300" />
-            <span>{loading ? 'Activating Your Growth Plan...' : `Unlock 50% Off (${pricing.symbol}${pricing.discountPrice}) & Activate`}</span>
-            <ArrowRight className="w-4 h-4 text-rose-300" />
-          </button>
+          {paymentMethod === 'razorpay' ? (
+            <RazorpayButton
+              planKey="monthly"
+              planTitle="INSTASK Pro Monthly"
+              amount={pricing.code === 'INR' ? pricing.discountPrice : 1999}
+              currency={pricing.code}
+              disabled={loading || !termsAccepted}
+              className="w-full py-4 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Smartphone className="w-4 h-4" />
+              <span>Unlock 50% Off via UPI Autopay ({pricing.symbol}{pricing.discountPrice})</span>
+            </RazorpayButton>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCheckout}
+              disabled={loading || !termsAccepted}
+              className="w-full py-4 px-5 bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 hover:from-slate-800 hover:to-slate-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Lock className="w-4 h-4 text-rose-300" />
+              <span>{loading ? 'Activating Your Growth Plan...' : `Unlock 50% Off (${pricing.symbol}${pricing.discountPrice}) & Activate`}</span>
+              <ArrowRight className="w-4 h-4 text-rose-300" />
+            </button>
+          )}
 
           {/* Sandbox Indicator */}
           <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
@@ -184,14 +241,14 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               <span className="text-slate-500 font-medium">Instant Sandbox Activation Enabled</span>
             </div>
-            <span className="font-mono text-[10px]">Stripe v2024-06-20</span>
+            <span className="font-mono text-[10px]">Stripe &amp; Razorpay UPI</span>
           </div>
         </div>
 
         {/* Trust Badges */}
         <div className="pt-2 border-t border-slate-100 flex items-center justify-center gap-3 text-xs text-slate-400">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span className="text-[11px]">256-bit SSL encrypted payment • 100% money-back guarantee</span>
+          <span className="text-[11px]">256-bit SSL encrypted payment • Instant Autopilot Activation</span>
         </div>
       </div>
     </div>

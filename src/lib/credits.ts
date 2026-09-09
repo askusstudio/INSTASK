@@ -153,16 +153,16 @@ export async function addCredits(
     try {
       return await prisma.$transaction(async (tx) => {
         let user = await tx.user.findUnique({ where: { id: userId } });
-        if (!user && userId === 'usr_demo_001') {
-          await tx.user.upsert({
-            where: { id: 'usr_demo_001' },
+        if (!user) {
+          user = await tx.user.upsert({
+            where: { id: userId },
             create: {
-              id: 'usr_demo_001',
-              email: 'demo@instask.ai',
-              name: 'Luna Baker',
+              id: userId,
+              email: `${userId}@instask.ai`,
+              name: 'INSTASK Subscriber',
               role: 'OWNER',
               subscriptionStatus: 'ACTIVE',
-              creditsBalance: 60,
+              creditsBalance: 0,
               monthlyCreditsLimit: 60,
             },
             update: {},
@@ -191,12 +191,25 @@ export async function addCredits(
     }
   }
 
-  const user = memoryStore.users.get(userId);
+  let user = memoryStore.users.get(userId);
   if (!user) {
-    return { success: false, error: "User not found." };
+    user = {
+      id: userId,
+      email: `${userId}@instask.ai`,
+      name: 'INSTASK Subscriber',
+      provider: 'EMAIL',
+      role: 'OWNER',
+      subscriptionStatus: 'ACTIVE',
+      isFirstMonthDiscountApplied: false,
+      creditsBalance: 0,
+      monthlyCreditsLimit: 60,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    memoryStore.users.set(userId, user);
   }
 
-  user.creditsBalance = (user.creditsBalance ?? 60) + amount;
+  user.creditsBalance = (user.creditsBalance ?? 0) + amount;
   user.updatedAt = new Date();
 
   memoryStore.creditTransactions.push({

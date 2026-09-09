@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { GuidanceTooltip } from '@/components/ui/GuidanceTooltip';
+import { supabase } from '@/lib/supabaseClient';
 import {
   Building2,
   Globe,
@@ -10,9 +11,10 @@ import {
   Sparkles,
   ArrowRight,
   CheckCircle2,
-  DollarSign,
-  Briefcase,
-  HelpCircle,
+  UploadCloud,
+  Image as ImageIcon,
+  Palette,
+  Check,
 } from 'lucide-react';
 
 const INDUSTRIES = [
@@ -36,12 +38,21 @@ const CURRENCIES = [
   { code: 'JPY', symbol: '¥', label: 'JPY - Japanese Yen' },
 ];
 
+const COLOR_PRESETS = [
+  { name: 'Slate Onyx', primary: '#0F172A', accent: '#F43F5E' },
+  { name: 'Royal Indigo', primary: '#1E1B4B', accent: '#6366F1' },
+  { name: 'Emerald Luxe', primary: '#064E3B', accent: '#10B981' },
+  { name: 'Warm Mocha', primary: '#451A03', accent: '#D97706' },
+  { name: 'Deep Crimson', primary: '#881337', accent: '#FB7185' },
+];
+
 interface BrandOnboardingProps {
   params: { locale: string };
 }
 
 export default function BrandOnboardingPage({ params: { locale } }: BrandOnboardingProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [brandName, setBrandName] = useState('Luna Artisan Bakery');
   const [industry, setIndustry] = useState('Artisan Bakery');
@@ -49,6 +60,11 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
   const [currency, setCurrency] = useState('USD');
   const [website, setWebsite] = useState('https://lunabakery.com');
   const [instagramHandle, setInstagramHandle] = useState('@artisan_luna_bakery');
+  const [primaryColor, setPrimaryColor] = useState('#0F172A');
+  const [accentColor, setAccentColor] = useState('#F43F5E');
+  const [logoUrl, setLogoUrl] = useState('');
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,12 +80,61 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
           if (data.brand.currency) setCurrency(data.brand.currency);
           if (data.brand.website) setWebsite(data.brand.website);
           if (data.brand.instagramHandle) setInstagramHandle(`@${data.brand.instagramHandle.replace(/^@/, '')}`);
+          if (data.brand.logoUrl) {
+            setLogoUrl(data.brand.logoUrl);
+            setLogoPreview(data.brand.logoUrl);
+          }
         }
       })
       .catch(() => {
         // Fallback default is fine
       });
   }, []);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Instant local preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      setLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to Supabase Storage bucket 'brand-assets'
+    try {
+      setUploadingLogo(true);
+      const fileExt = file.name.split('.').pop() || 'png';
+      const cleanFileName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${fileExt}`;
+      const filePath = `logos/${cleanFileName}`;
+
+      const { data, error: uploadErr } = await supabase.storage
+        .from('brand-assets')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+
+      if (!uploadErr && data) {
+        const { data: publicData } = supabase.storage
+          .from('brand-assets')
+          .getPublicUrl(filePath);
+
+        if (publicData?.publicUrl) {
+          setLogoUrl(publicData.publicUrl);
+        }
+      } else {
+        // Fallback gracefully if bucket is private or unprovisioned: use object URL
+        console.warn('Supabase upload notice, using local asset reference:', uploadErr);
+        setLogoUrl(reader.result as string || URL.createObjectURL(file));
+      }
+    } catch (err) {
+      console.warn('Supabase storage exception:', err);
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,17 +147,20 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
 
     setLoading(true);
     try {
-      const res = await fetch('/api/brand', {
+      const res = await fetch('/api/brand/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: 'usr_demo_001',
           brandName,
           industry,
+          primaryColor,
+          accentColor,
           country,
           currency,
           website,
           instagramHandle,
+          logoUrl: logoUrl || logoPreview || '',
         }),
       });
 
@@ -120,7 +188,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
               2
             </span>
             <span className="text-xs font-bold text-slate-700 tracking-wide uppercase">
-              Step 2 of 3: Brand Profile
+              Step 2 of 3: Brand Profile &amp; Assets
             </span>
           </div>
           <span className="text-xs text-slate-400 font-medium">Next: Plan Activation (50% Off)</span>
@@ -176,7 +244,128 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
               />
             </div>
 
-            {/* Field 2: Industry Niche */}
+            {/* Field 2: Logo Asset Upload (Supabase Storage) */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <ImageIcon className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Brand Logo &amp; Watermark</span>
+                </label>
+                <span className="text-[11px] text-slate-400">PNG, SVG, or JPG (max 5MB)</span>
+              </div>
+
+              <div className="flex items-center gap-4 p-4 bg-slate-50 border border-dashed border-slate-300 rounded-2xl">
+                <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+                  {logoPreview ? (
+                    <img src={logoPreview} alt="Logo preview" className="w-full h-full object-contain" />
+                  ) : (
+                    <ImageIcon className="w-6 h-6 text-slate-300" />
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-1">
+                  <p className="text-xs font-semibold text-slate-800">
+                    {uploadingLogo ? 'Uploading to Supabase Storage...' : logoPreview ? 'Logo ready for automated watermarks' : 'Upload your official brand logo'}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Rendered in high-resolution across all generated carousel slides and Reels.
+                  </p>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-3 py-2 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-xs flex items-center gap-1.5 shrink-0"
+                >
+                  <UploadCloud className="w-3.5 h-3.5 text-slate-500" />
+                  <span>{logoPreview ? 'Change' : 'Browse'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Field 3: Brand Colors (Primary & Accent) */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <Palette className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Brand Color Palette</span>
+                </label>
+                <span className="text-[11px] text-slate-400">Controls banner and text styling</span>
+              </div>
+
+              {/* Color Presets */}
+              <div className="grid grid-cols-5 gap-2 mb-3">
+                {COLOR_PRESETS.map((preset) => {
+                  const isSelected = primaryColor === preset.primary && accentColor === preset.accent;
+                  return (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => {
+                        setPrimaryColor(preset.primary);
+                        setAccentColor(preset.accent);
+                      }}
+                      className={`p-2 rounded-xl border text-center transition flex flex-col items-center gap-1.5 ${
+                        isSelected ? 'border-rose-500 bg-rose-50/50' : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center -space-x-1">
+                        <span
+                          className="w-4 h-4 rounded-full border border-white shadow-xs"
+                          style={{ backgroundColor: preset.primary }}
+                        />
+                        <span
+                          className="w-4 h-4 rounded-full border border-white shadow-xs"
+                          style={{ backgroundColor: preset.accent }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-semibold text-slate-700 truncate w-full">
+                        {preset.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Custom Hex Inputs */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl">
+                  <input
+                    type="color"
+                    value={primaryColor}
+                    onChange={(e) => setPrimaryColor(e.target.value)}
+                    className="w-8 h-8 rounded-lg border-0 cursor-pointer p-0 bg-transparent"
+                  />
+                  <div className="text-left">
+                    <span className="block text-[10px] font-semibold text-slate-400">Primary Color</span>
+                    <span className="text-xs font-mono font-bold text-slate-800 uppercase">{primaryColor}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl">
+                  <input
+                    type="color"
+                    value={accentColor}
+                    onChange={(e) => setAccentColor(e.target.value)}
+                    className="w-8 h-8 rounded-lg border-0 cursor-pointer p-0 bg-transparent"
+                  />
+                  <div className="text-left">
+                    <span className="block text-[10px] font-semibold text-slate-400">Accent Color</span>
+                    <span className="text-xs font-mono font-bold text-slate-800 uppercase">{accentColor}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Field 4: Industry Niche */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-bold text-slate-800">
@@ -216,7 +405,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
               </div>
             </div>
 
-            {/* Field 3: Instagram Handle & Website */}
+            {/* Field 5: Instagram Handle & Website */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -277,7 +466,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
               </div>
             </div>
 
-            {/* Field 4: Country & Currency */}
+            {/* Field 6: Country & Currency */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
