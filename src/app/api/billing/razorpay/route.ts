@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { razorpay } from '@/lib/razorpay';
+import Razorpay from 'razorpay';
 import { findUserById, upsertUser } from '@/lib/prisma';
 import { SUBSCRIPTION_PLANS } from '@/lib/pricing-plans';
 
@@ -35,9 +35,7 @@ export async function POST(req: Request) {
     }
 
     const planKey = (body?.planKey || 'monthly').toLowerCase();
-    const selectedPlan = SUBSCRIPTION_PLANS[planKey] || SUBSCRIPTION_PLANS.monthly;
-    const planId = body?.planId || process.env[`RAZORPAY_PLAN_${planKey.toUpperCase()}_ID`] || `plan_${planKey}_inr`;
-    const totalCount = body?.totalCount || (selectedPlan.months === 1 ? 12 : Math.max(1, Math.ceil(12 / selectedPlan.months)));
+    const selectedPlan: any = (SUBSCRIPTION_PLANS as any)[planKey] || (SUBSCRIPTION_PLANS as any).monthly || {};
 
     let user = await findUserById(userId);
     if (!user) {
@@ -49,48 +47,45 @@ export async function POST(req: Request) {
       });
     }
 
-    const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || 'rzp_live_RDTLsgCLL2DhPX';
+    const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || 'rzp_live_Ta09UiD9oNIJhH';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || '0K2FHOypnD6RlbFYZPWDhk1n';
 
-    // Attempt live Razorpay subscription creation if available
-    try {
-      if (razorpay && razorpay.subscriptions) {
-        const subscription = await razorpay.subscriptions.create({
-          plan_id: planId,
-          total_count: totalCount,
-          customer_notify: 1,
-          notes: {
-            userId: user.id,
-            planKey: selectedPlan.id,
-            creditsGranted: selectedPlan.creditsGranted.toString(),
-          },
-        });
+    const rzp = new Razorpay({
+      key_id: keyId,
+      key_secret: keySecret,
+    });
 
-        return NextResponse.json({
-          success: true,
-          subscriptionId: subscription.id,
-          keyId,
-          planKey: selectedPlan.id,
-          creditsGranted: selectedPlan.creditsGranted,
-          mode: 'live',
-        });
-      }
-    } catch (rzpErr: any) {
-      console.warn('Razorpay live subscription error, falling back to simulator:', rzpErr?.message || rzpErr);
-    }
+    // Safely extract price irrespective of property naming
+    const planPrice = Number(selectedPlan.priceInr || selectedPlan.price || selectedPlan.amount || 1999);
+    const amountInRupees = Number(body?.amount) || planPrice;
+    const amountInPaise = Math.round(amountInRupees * 100);
 
-    // Graceful fallback simulator for sandbox/testing/demo
-    const mockSubscriptionId = `sub_rzp_mock_${Date.now()}`;
+    const order = await rzp.orders.create({
+      amount: amountInPaise,
+      currency: 'INR',
+      receipt: `rcpt_${Date.now().toString().slice(-8)}`,
+      notes: {
+        userId: user.id,
+        planKey: selectedPlan.id || planKey,
+        creditsGranted: (selectedPlan.creditsGranted || 60).toString(),
+      },
+    });
+
     return NextResponse.json({
       success: true,
-      subscriptionId: mockSubscriptionId,
+      orderId: order.id,
+      amount: amountInRupees,
+      currency: 'INR',
       keyId,
-      planKey: selectedPlan.id,
-      creditsGranted: selectedPlan.creditsGranted,
-      mode: 'sandbox',
-      message: 'Sandbox subscription generated. Razorpay UPI Autopay simulator ready.',
+      planKey: selectedPlan.id || planKey,
+      creditsGranted: selectedPlan.creditsGranted || 60,
+      mode: 'live',
     });
-  } catch (error: unknown) {
-    const err = error as Error;
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  } catch (error: any) {
+    console.error('Razorpay backend order error:', error);
+    return NextResponse.json(
+      { success: false, error: error?.message || 'Failed to initialize payment' },
+      { status: 500 }
+    );
   }
 }
