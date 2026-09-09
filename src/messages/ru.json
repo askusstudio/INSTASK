@@ -1,0 +1,131 @@
+{
+  "common": {
+    "appName": "INSTASK",
+    "tagline": "Автономный рост в Instagram для малого бизнеса",
+    "demoModeBadge": "Интерактивный демо-режим",
+    "liveModeBadge": "Meta API подключен",
+    "autopilotActive": "Автопилот включен",
+    "autopilotPaused": "Автопилот на паузе",
+    "switchLanguage": "Язык",
+    "save": "Сохранить изменения",
+    "cancel": "Отмена",
+    "approve": "Одобрить",
+    "approved": "Одобрено",
+    "scheduled": "Запланировано",
+    "published": "Опубликовано",
+    "draft": "Черновик",
+    "regenerate": "Пересоздать",
+    "viewDetails": "Открыть и изменить",
+    "loading": "Обработка..."
+  },
+  "nav": {
+    "dashboard": "План роста",
+    "calendar": "Календарь на 30 дней",
+    "analytics": "Прогноз эффективности",
+    "settings": "Настройки бизнеса",
+    "connectedAs": "Подключен как"
+  },
+  "onboarding": {
+    "title": "Запустите ваш 30-дневный план роста за 3 простых шага",
+    "subtitle": "Опыт в маркетинге не требуется. Подключите аккаунт, расскажите о вашем магазине, и ИИ создаст и опубликует контент на весь месяц автоматически.",
+    "step1": {
+      "tab": "1. Подключение",
+      "heading": "Подключите профессиональный аккаунт Instagram",
+      "description": "INSTASK безопасно подключается через официальный Meta Graph API (v21.0). Мы никогда не запрашиваем ваш пароль.",
+      "connectButton": "Подключить Instagram Pro (Meta OAuth 2.0)",
+      "connectedSuccess": "Бизнес-аккаунт Instagram успешно подключен!",
+      "accountTypeNote": "Требуется аккаунт автора или компании, связанный со страницей Facebook."
+    },
+    "step2": {
+      "tab": "2. О бизнесе",
+      "heading": "Расскажите о вашем магазине или деле",
+      "description": "Помогите ИИ понять преимущества вашего бренда, чтобы писать тексты, привлекающие клиентов.",
+      "brandNameLabel": "Название магазина или бренда",
+      "brandNamePlaceholder": "напр., Ремесленная пекарня «Луна»",
+      "locationLabel": "Город и страна",
+      "locationPlaceholder": "напр., Москва, Россия",
+      "productSummaryLabel": "Что вы продаете или предлагаете в одном предложении?",
+      "productSummaryPlaceholder": "напр., Свежий хлеб на закваске и спешелти кофе из органических зерен.",
+      "brandColorLabel": "Основной цвет бренда",
+      "logoUrlLabel": "Ссылка на логотип (необязательно)",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "step3": {
+      "tab": "3. Конкуренты",
+      "heading": "Добавьте от 3 до 5 конкурентов или аккаунтов для вдохновения",
+      "description": "Наш движок аналитики Apify исследует их самые успешные публикации, чтобы выявить работающие формулы в вашей нише.",
+      "handlesLabel": "Instagram-аккаунты (с @ или без)",
+      "handlesPlaceholder": "@bakery_moscow, @coffeeshop, @artisanbread",
+      "quickPresetsLabel": "Или выберите готовый шаблон:",
+      "presets": {
+        "bakery": "Ремесленная пекарня",
+        "cafe": "Кофейня со спешелти кофе",
+        "fashion": "Модный бутик",
+        "fitness": "Фитнес-клуб / Студия",
+        "service": "Локальные услуги / Консалтинг"
+      },
+      "ctaButton": "Сгенерировать 30-дневный план роста",
+      "generatingStatus": {
+        "step1": "Анализ вирусных хуков конкурентов с Apify...",
+        "step2": "Создание 30-дневной стратегии с Gemini 2.5 Flash...",
+        "step3": "Рендеринг визуальных шаблонов в Creatomate (1080x1080 / 1080x1350)...",
+        "almostDone": "Завершение настройки графика публикаций..."
+      }
+    }
+  },
+  "calendar": {
+    "title": "Календарь контента и автопостинг на 30 дней",
+    "subtitle": "Просматривайте визуальные материалы и тексты от ИИ. Одобряйте по отдельности или включите полный автопилот.",
+    "autopilotCta": "Одобрить весь месяц и включить автопилот",
+    "allApprovedSuccess": "Все 30 постов одобрены! Запланированы к автоматической публикации через Meta Graph API.",
+    "filters": {
+      "allThemes": "Все категории",
+      "allStatuses": "Все статусы",
+      "filterBy": "Фильтровать по"
+    },
+    "themes": {
+      "problemSolution": "Проблема и решение",
+      "behindTheScenes": "За кулисами",
+      "socialProof": "Отзывы и доверие",
+      "educational": "Польза и советы",
+      "memes": "Юмор и тренды"
+    },
+    "stats": {
+      "totalPosts": "30 публикаций запланировано",
+      "approvedCount": "Одобрено",
+      "publishedCount": "Опубликовано",
+      "reachEstimate": "Прогноз охвата за 30 дней"
+    }
+  },
+  "editor": {
+    "modalTitle": "Редактирование публикации",
+    "tabContent": "Редактировать текст и визуал",
+    "tabPreview": "Предпросмотр в Instagram",
+    "headlineLabel": "Заголовок на картинке (< 8 слов)",
+    "bulletsLabel": "Ключевые тезисы (внутри картинки)",
+    "captionLabel": "Текст поста (высокая конверсия)",
+    "hashtagsLabel": "Хэштеги (15 целевых тегов)",
+    "scheduledTimeLabel": "Время публикации (UTC)",
+    "aspectRatioLabel": "Соотношение сторон",
+    "aspectRatioSquare": "1:1 Квадрат (1080x1080)",
+    "aspectRatioPortrait": "4:5 Вертикальный (1080x1350)",
+    "regenerateGraphic": "Пересоздать изображение",
+    "regenerateCopy": "Переписать текст через Gemini",
+    "saveAndApprove": "Сохранить и одобрить к публикации"
+  },
+  "mockup": {
+    "sponsored": "Оригинальное аудио",
+    "likedBy": "Нравится",
+    "and": "и",
+    "others": "другим",
+    "viewComments": "Посмотреть все 24 комментария",
+    "addComment": "Добавьте комментарий...",
+    "publishStatus": "Очередь Meta v21.0"
+  },
+  "alerts": {
+    "tokenHealthy": "Токен Meta Graph API активен (осталось 58 дней).",
+    "tokenExpiring": "Срок действия токена истекает. Нажмите для продления.",
+    "rateLimitSafe": "Контроль Apify: задержка 2 сек. между конкурентами.",
+    "creatomateReady": "Движок Creatomate активен с безопасным типографическим резервом."
+  }
+}

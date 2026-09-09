@@ -1,0 +1,131 @@
+{
+  "common": {
+    "appName": "INSTASK",
+    "tagline": "Autonomous Instagram Growth for Small Businesses",
+    "demoModeBadge": "Interactive Demo Mode",
+    "liveModeBadge": "Live Meta API Connected",
+    "autopilotActive": "Autopilot Active",
+    "autopilotPaused": "Autopilot Paused",
+    "switchLanguage": "Language",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "approve": "Approve",
+    "approved": "Approved",
+    "scheduled": "Scheduled",
+    "published": "Published",
+    "draft": "Draft",
+    "regenerate": "Regenerate",
+    "viewDetails": "View & Edit",
+    "loading": "Processing..."
+  },
+  "nav": {
+    "dashboard": "Growth Plan",
+    "calendar": "30-Day Calendar",
+    "analytics": "Performance Forecast",
+    "settings": "Business Settings",
+    "connectedAs": "Connected as"
+  },
+  "onboarding": {
+    "title": "Launch Your 30-Day Growth Plan in 3 Easy Steps",
+    "subtitle": "No marketing experience needed. Connect, describe your shop, and let AI build and publish your monthly content automatically.",
+    "step1": {
+      "tab": "1. Connect",
+      "heading": "Connect Your Instagram Professional Account",
+      "description": "INSTASK securely connects via the official Meta Graph API (v21.0). We never ask for your personal password.",
+      "connectButton": "Connect with Instagram Pro (Meta OAuth 2.0)",
+      "connectedSuccess": "Instagram Business Account Connected!",
+      "accountTypeNote": "Requires an Instagram Creator or Business account linked to a Facebook Page."
+    },
+    "step2": {
+      "tab": "2. Business Info",
+      "heading": "Tell Us About Your Shop or Business",
+      "description": "Help our AI understand what makes your brand special and craft copy that resonates with your local customers.",
+      "brandNameLabel": "Shop or Brand Name",
+      "brandNamePlaceholder": "e.g. Luna Artisan Bakery",
+      "locationLabel": "City & Country",
+      "locationPlaceholder": "e.g. Austin, TX, USA",
+      "productSummaryLabel": "What do you sell or offer in one sentence?",
+      "productSummaryPlaceholder": "e.g. Fresh sourdough pastries and specialty espresso made from organic local grains.",
+      "brandColorLabel": "Primary Brand Color",
+      "logoUrlLabel": "Brand Logo URL (Optional)",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "step3": {
+      "tab": "3. Competitors",
+      "heading": "Add 3 to 5 Competitors or Accounts You Admire",
+      "description": "Our Apify intelligence engine scrapes their top-performing posts to discover what hook formulas work best in your niche.",
+      "handlesLabel": "Instagram Handles (Plain text, with or without @)",
+      "handlesPlaceholder": "@bakery_austin, @sweetcrust, @grainandflour",
+      "quickPresetsLabel": "Or click a quick preset to fill inspiration:",
+      "presets": {
+        "bakery": "Artisan Bakery",
+        "cafe": "Specialty Coffee Shop",
+        "fashion": "Boutique Fashion",
+        "fitness": "Fitness Studio",
+        "service": "Local Service / Consulting"
+      },
+      "ctaButton": "Generate My 30-Day Growth Plan",
+      "generatingStatus": {
+        "step1": "Analyzing competitor engagement hooks with Apify...",
+        "step2": "Synthesizing 30-day viral content strategy with Gemini 2.5 Flash...",
+        "step3": "Rendering visual templates via Creatomate (1080x1080 / 1080x1350)...",
+        "almostDone": "Finalizing your automated growth schedule..."
+      }
+    }
+  },
+  "calendar": {
+    "title": "30-Day Content Calendar & Publishing Pipeline",
+    "subtitle": "Review your AI-generated graphics and copy. Approve individually or turn on full autopilot.",
+    "autopilotCta": "Approve Entire Month & Turn On Auto-Pilot",
+    "allApprovedSuccess": "All 30 posts approved! Scheduled for automated publishing via Meta Graph API.",
+    "filters": {
+      "allThemes": "All Categories",
+      "allStatuses": "All Statuses",
+      "filterBy": "Filter by"
+    },
+    "themes": {
+      "problemSolution": "Problem & Solution",
+      "behindTheScenes": "Behind the Scenes",
+      "socialProof": "Social Proof & Reviews",
+      "educational": "Educational & Tips",
+      "memes": "Community & Trends"
+    },
+    "stats": {
+      "totalPosts": "30 Posts Planned",
+      "approvedCount": "Approved",
+      "publishedCount": "Published",
+      "reachEstimate": "Est. 30-Day Reach"
+    }
+  },
+  "editor": {
+    "modalTitle": "Edit Post for Day",
+    "tabContent": "Edit Text & Graphic",
+    "tabPreview": "Instagram Mockup",
+    "headlineLabel": "Graphic Headline Hook (< 8 words)",
+    "bulletsLabel": "Key Value Bullets (Graphic Content)",
+    "captionLabel": "Instagram Caption (High-Converting Copy)",
+    "hashtagsLabel": "Hashtags (15 reach & niche tags)",
+    "scheduledTimeLabel": "Publishing Time (UTC)",
+    "aspectRatioLabel": "Aspect Ratio",
+    "aspectRatioSquare": "1:1 Square (1080x1080)",
+    "aspectRatioPortrait": "4:5 Portrait (1080x1350)",
+    "regenerateGraphic": "Regenerate Image Asset",
+    "regenerateCopy": "Regenerate Copy with Gemini",
+    "saveAndApprove": "Save & Approve for Publishing"
+  },
+  "mockup": {
+    "sponsored": "Original Audio",
+    "likedBy": "Liked by",
+    "and": "and",
+    "others": "others",
+    "viewComments": "View all 24 comments",
+    "addComment": "Add a comment...",
+    "publishStatus": "Meta v21.0 Queue"
+  },
+  "alerts": {
+    "tokenHealthy": "Meta Graph API token is valid (expires in 58 days).",
+    "tokenExpiring": "Meta token expiring soon. Please click to refresh.",
+    "rateLimitSafe": "Apify rate limiter: 2-second stagger applied between competitor queries.",
+    "creatomateReady": "Creatomate graphic engine active with fallback typographic safety."
+  }
+}

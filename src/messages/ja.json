@@ -1,0 +1,131 @@
+{
+  "common": {
+    "appName": "INSTASK",
+    "tagline": "中小ビジネスのためのInstagram自動成長プラットフォーム",
+    "demoModeBadge": "インタラクティブデモモード",
+    "liveModeBadge": "Meta API 連携中",
+    "autopilotActive": "オートパイロット稼働中",
+    "autopilotPaused": "オートパイロット一時停止",
+    "switchLanguage": "言語",
+    "save": "変更を保存",
+    "cancel": "キャンセル",
+    "approve": "承認する",
+    "approved": "承認済み",
+    "scheduled": "予約済み",
+    "published": "投稿済み",
+    "draft": "下書き",
+    "regenerate": "再生成",
+    "viewDetails": "詳細 & 編集",
+    "loading": "処理中..."
+  },
+  "nav": {
+    "dashboard": "成長プラン",
+    "calendar": "30日間カレンダー",
+    "analytics": "成果予測",
+    "settings": "ビジネス設定",
+    "connectedAs": "接続アカウント:"
+  },
+  "onboarding": {
+    "title": "簡単3ステップで30日間の成長プランを開始",
+    "subtitle": "マーケティング知識は不要です。アカウントを連携し、お店の特徴を入力するだけで、AIが1か月分のコンテンツを自動生成＆自動投稿します。",
+    "step1": {
+      "tab": "1. 連携",
+      "heading": "Instagramプロアカウントを連携",
+      "description": "INSTASKは公式Meta Graph API (v21.0) を通じて安全に接続します。パスワードの入力は一切不要です。",
+      "connectButton": "Instagram Proと連携 (Meta OAuth 2.0)",
+      "connectedSuccess": "Instagramビジネスアカウントの連携が完了しました！",
+      "accountTypeNote": "Facebookページにリンクされたクリエイターまたはビジネスアカウントが必要です。"
+    },
+    "step2": {
+      "tab": "2. お店情報",
+      "heading": "お店やビジネスについて教えてください",
+      "description": "お店のこだわりや特徴をAIに伝えることで、地域のお客様に響く最適な投稿テキストを作成します。",
+      "brandNameLabel": "ショップ・ブランド名",
+      "brandNamePlaceholder": "例: ルナ・アルチザンベーカリー",
+      "locationLabel": "都市・国",
+      "locationPlaceholder": "例: 東京都 渋谷区",
+      "productSummaryLabel": "主な商品やサービスを一言で教えてください",
+      "productSummaryPlaceholder": "例: 国産有機小麦を使用した自家製天然酵母パンとこだわりのスペシャリティコーヒー。",
+      "brandColorLabel": "ブランドカラー",
+      "logoUrlLabel": "ロゴ画像URL (任意)",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "step3": {
+      "tab": "3. 競合・参考アカウント",
+      "heading": "参考にしたい競合や憧れのアカウントを3〜5件追加",
+      "description": "Apify分析エンジンがエンゲージメントの高い投稿を分析し、あなたの業界で効果的な勝ちパターンを抽出します。",
+      "handlesLabel": "Instagramアカウント名 (@有無どちらでも可)",
+      "handlesPlaceholder": "@bakery_tokyo, @coffeestand, @artisanbread",
+      "quickPresetsLabel": "または業界別テンプレートを選択:",
+      "presets": {
+        "bakery": "こだわりベーカリー",
+        "cafe": "スペシャリティカフェ",
+        "fashion": "セレクトショップ",
+        "fitness": "フィットネス・ヨガ",
+        "service": "ローカルサービス・サロン"
+      },
+      "ctaButton": "30日間の成長プランを生成する",
+      "generatingStatus": {
+        "step1": "Apifyで競合のバズ投稿フックを分析中...",
+        "step2": "Gemini 2.5 Flashで30日分の投稿戦略を作成中...",
+        "step3": "Creatomateで画像テンプレートを生成中 (1080x1080 / 1080x1350)...",
+        "almostDone": "自動投稿スケジュールを調整しています..."
+      }
+    }
+  },
+  "calendar": {
+    "title": "30日間コンテンツカレンダー & 自動投稿パイプライン",
+    "subtitle": "AIが生成した画像とテキストを確認できます。個別承認またはワンクリックで全自動化が可能です。",
+    "autopilotCta": "今月分を一括承認してオートパイロットを開始",
+    "allApprovedSuccess": "30日分すべての投稿が承認されました！Meta Graph APIによる自動投稿がセットされました。",
+    "filters": {
+      "allThemes": "すべてのカテゴリ",
+      "allStatuses": "すべてのステータス",
+      "filterBy": "絞り込み"
+    },
+    "themes": {
+      "problemSolution": "課題と解決策",
+      "behindTheScenes": "制作の裏側・こだわり",
+      "socialProof": "お客様の声・実績",
+      "educational": "役立つヒント・豆知識",
+      "memes": "トレンド・親しみコンテンツ"
+    },
+    "stats": {
+      "totalPosts": "作成済み30投稿",
+      "approvedCount": "承認済み",
+      "publishedCount": "投稿済み",
+      "reachEstimate": "推定30日間リーチ数"
+    }
+  },
+  "editor": {
+    "modalTitle": "投稿内容の編集",
+    "tabContent": "テキスト・画像の編集",
+    "tabPreview": "Instagramプレビュー",
+    "headlineLabel": "画像の見出しフック (8語以内)",
+    "bulletsLabel": "ポイント箇条書き (画像内表示)",
+    "captionLabel": "投稿キャプション本文",
+    "hashtagsLabel": "ハッシュタグ (厳選15個)",
+    "scheduledTimeLabel": "投稿予定日時 (UTC)",
+    "aspectRatioLabel": "アスペクト比",
+    "aspectRatioSquare": "1:1 正方形 (1080x1080)",
+    "aspectRatioPortrait": "4:5 縦型 (1080x1350)",
+    "regenerateGraphic": "画像を再生成",
+    "regenerateCopy": "Geminiでテキストを再生成",
+    "saveAndApprove": "保存して承認する"
+  },
+  "mockup": {
+    "sponsored": "オリジナル音源",
+    "likedBy": "いいね！:",
+    "and": "、",
+    "others": "他",
+    "viewComments": "コメント24件をすべて見る",
+    "addComment": "コメントを追加...",
+    "publishStatus": "Meta v21.0 配信キュー"
+  },
+  "alerts": {
+    "tokenHealthy": "Meta Graph APIトークン有効 (残り58日)。",
+    "tokenExpiring": "トークンの期限が近づいています。更新してください。",
+    "rateLimitSafe": "Apifyレート制限保護: 2秒の間隔処理を実行中。",
+    "creatomateReady": "Creatomate画像エンジン稼働中 (代替安全出力対応)。"
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "common": {
+    "appName": "INSTASK",
+    "tagline": "Crecimiento autónomo en Instagram para pequeños negocios",
+    "demoModeBadge": "Modo Demo Interactivo",
+    "liveModeBadge": "Meta API Conectada",
+    "autopilotActive": "Piloto Automático Activo",
+    "autopilotPaused": "Piloto Automático en Pausa",
+    "switchLanguage": "Idioma",
+    "save": "Guardar Cambios",
+    "cancel": "Cancelar",
+    "approve": "Aprobar",
+    "approved": "Aprobado",
+    "scheduled": "Programado",
+    "published": "Publicado",
+    "draft": "Borrador",
+    "regenerate": "Regenerar",
+    "viewDetails": "Ver y Editar",
+    "loading": "Procesando..."
+  },
+  "nav": {
+    "dashboard": "Plan de Crecimiento",
+    "calendar": "Calendario de 30 Días",
+    "analytics": "Pronóstico de Rendimiento",
+    "settings": "Configuración de Negocio",
+    "connectedAs": "Conectado como"
+  },
+  "onboarding": {
+    "title": "Lanza tu plan de crecimiento de 30 días en 3 simples pasos",
+    "subtitle": "Sin experiencia técnica. Conecta tu cuenta, describe tu tienda y deja que la IA genere y publique tu contenido mensual automáticamente.",
+    "step1": {
+      "tab": "1. Conectar",
+      "heading": "Conecta tu cuenta profesional de Instagram",
+      "description": "INSTASK se conecta de forma segura mediante la API oficial de Meta Graph (v21.0). Nunca solicitamos tu contraseña personal.",
+      "connectButton": "Conectar con Instagram Pro (Meta OAuth 2.0)",
+      "connectedSuccess": "¡Cuenta de Instagram Business conectada!",
+      "accountTypeNote": "Requiere una cuenta de Creador o Empresa vinculada a una Página de Facebook."
+    },
+    "step2": {
+      "tab": "2. Información del Negocio",
+      "heading": "Cuéntanos sobre tu tienda o negocio",
+      "description": "Ayuda a nuestra IA a entender lo que hace único a tu negocio para crear textos que conecten con tus clientes locales.",
+      "brandNameLabel": "Nombre de la Tienda o Marca",
+      "brandNamePlaceholder": "p. ej. Panadería Artesanal Luna",
+      "locationLabel": "Ciudad y País",
+      "locationPlaceholder": "p. ej. Madrid, España",
+      "productSummaryLabel": "¿Qué ofreces o vendes en una sola frase?",
+      "productSummaryPlaceholder": "p. ej. Panadería de masa madre artesanal y café de especialidad con ingredientes orgánicos.",
+      "brandColorLabel": "Color Principal de Marca",
+      "logoUrlLabel": "URL del Logotipo (Opcional)",
+      "logoUrlPlaceholder": "https://ejemplo.com/logo.png"
+    },
+    "step3": {
+      "tab": "3. Competidores",
+      "heading": "Agrega de 3 a 5 competidores o cuentas que admires",
+      "description": "Nuestro motor de Apify analiza sus publicaciones con mayor interacción para identificar las fórmulas ganadoras en tu sector.",
+      "handlesLabel": "Cuentas de Instagram (Texto simple, con o sin @)",
+      "handlesPlaceholder": "@panaderia_madrid, @croissant_es, @masamadre",
+      "quickPresetsLabel": "O haz clic en una plantilla rápida para inspirarte:",
+      "presets": {
+        "bakery": "Panadería Artesanal",
+        "cafe": "Cafetería de Especialidad",
+        "fashion": "Boutique de Moda",
+        "fitness": "Gimnasio o Estudio",
+        "service": "Servicios Locales / Consultoría"
+      },
+      "ctaButton": "Generar mi Plan de Crecimiento de 30 Días",
+      "generatingStatus": {
+        "step1": "Analizando ganchos virales con Apify...",
+        "step2": "Sintetizando estrategia mensual con Gemini 2.5 Flash...",
+        "step3": "Renderizando plantillas visuales con Creatomate (1080x1080 / 1080x1350)...",
+        "almostDone": "Finalizando tu calendario de publicación automática..."
+      }
+    }
+  },
+  "calendar": {
+    "title": "Calendario de Contenidos y Publicación de 30 Días",
+    "subtitle": "Revisa las imágenes y textos generados por IA. Aprueba individualmente o activa el piloto automático.",
+    "autopilotCta": "Aprobar Mes Completo y Activar Piloto Automático",
+    "allApprovedSuccess": "¡Las 30 publicaciones han sido aprobadas! Programadas para publicación automática mediante Meta Graph API.",
+    "filters": {
+      "allThemes": "Todas las Categorías",
+      "allStatuses": "Todos los Estados",
+      "filterBy": "Filtrar por"
+    },
+    "themes": {
+      "problemSolution": "Problema y Solución",
+      "behindTheScenes": "Entre Bastidores",
+      "socialProof": "Prueba Social y Reseñas",
+      "educational": "Educación y Consejos",
+      "memes": "Comunidad y Tendencias"
+    },
+    "stats": {
+      "totalPosts": "30 Publicaciones Planificadas",
+      "approvedCount": "Aprobadas",
+      "publishedCount": "Publicadas",
+      "reachEstimate": "Alcance Estimado en 30 Días"
+    }
+  },
+  "editor": {
+    "modalTitle": "Editar Publicación del Día",
+    "tabContent": "Editar Texto y Gráfico",
+    "tabPreview": "Vista Previa de Instagram",
+    "headlineLabel": "Gancho del Gráfico (< 8 palabras)",
+    "bulletsLabel": "Puntos de Valor Clave (En la imagen)",
+    "captionLabel": "Texto de la Publicación (Copy de Alta Conversión)",
+    "hashtagsLabel": "Hashtags (15 etiquetas de nicho y alcance)",
+    "scheduledTimeLabel": "Hora de Publicación (UTC)",
+    "aspectRatioLabel": "Relación de Aspecto",
+    "aspectRatioSquare": "1:1 Cuadrado (1080x1080)",
+    "aspectRatioPortrait": "4:5 Vertical (1080x1350)",
+    "regenerateGraphic": "Regenerar Imagen Visual",
+    "regenerateCopy": "Regenerar Texto con Gemini",
+    "saveAndApprove": "Guardar y Aprobar Publicación"
+  },
+  "mockup": {
+    "sponsored": "Audio original",
+    "likedBy": "Le gusta a",
+    "and": "y",
+    "others": "personas más",
+    "viewComments": "Ver los 24 comentarios",
+    "addComment": "Añade un comentario...",
+    "publishStatus": "Cola de Meta v21.0"
+  },
+  "alerts": {
+    "tokenHealthy": "Token de Meta Graph API válido (expira en 58 días).",
+    "tokenExpiring": "El token de Meta expira pronto. Haz clic para renovar.",
+    "rateLimitSafe": "Límite de Apify: Retardo de 2 segundos aplicado entre competidores.",
+    "creatomateReady": "Motor gráfico Creatomate activo con respaldo tipográfico seguro."
+  }
+}

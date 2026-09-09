@@ -1,0 +1,131 @@
+{
+  "common": {
+    "appName": "INSTASK",
+    "tagline": "Pertumbuhan Instagram Otonom untuk Bisnis Kecil",
+    "demoModeBadge": "Mode Demo Interaktif",
+    "liveModeBadge": "Meta API Terhubung",
+    "autopilotActive": "Autopilot Aktif",
+    "autopilotPaused": "Autopilot Dijeda",
+    "switchLanguage": "Bahasa",
+    "save": "Simpan Perubahan",
+    "cancel": "Batal",
+    "approve": "Setujui",
+    "approved": "Disetujui",
+    "scheduled": "Dijadwalkan",
+    "published": "Dipublikasikan",
+    "draft": "Draf",
+    "regenerate": "Buat Ulang",
+    "viewDetails": "Lihat & Edit",
+    "loading": "Memproses..."
+  },
+  "nav": {
+    "dashboard": "Rencana Pertumbuhan",
+    "calendar": "Kalender 30 Hari",
+    "analytics": "Prakiraan Kinerja",
+    "settings": "Pengaturan Bisnis",
+    "connectedAs": "Terhubung sebagai"
+  },
+  "onboarding": {
+    "title": "Mulai Rencana Pertumbuhan 30 Hari dalam 3 Langkah Mudah",
+    "subtitle": "Tanpa pengalaman pemasaran. Hubungkan akun, jelaskan bisnis Anda, dan biarkan AI membuat serta mempublikasikan konten bulanan secara otomatis.",
+    "step1": {
+      "tab": "1. Hubungkan",
+      "heading": "Hubungkan Akun Instagram Profesional Anda",
+      "description": "INSTASK terhubung secara aman melalui Meta Graph API resmi (v21.0). Kami tidak pernah meminta kata sandi pribadi Anda.",
+      "connectButton": "Hubungkan dengan Instagram Pro (Meta OAuth 2.0)",
+      "connectedSuccess": "Akun Instagram Bisnis Berhasil Terhubung!",
+      "accountTypeNote": "Memerlukan akun Kreator atau Bisnis yang ditautkan ke Halaman Facebook."
+    },
+    "step2": {
+      "tab": "2. Profil Bisnis",
+      "heading": "Ceritakan Tentang Toko atau Bisnis Anda",
+      "description": "Bantu AI kami memahami keunikan brand Anda untuk membuat konten yang memikat pelanggan lokal Anda.",
+      "brandNameLabel": "Nama Toko atau Brand",
+      "brandNamePlaceholder": "cth. Luna Artisan Bakery",
+      "locationLabel": "Kota & Negara",
+      "locationPlaceholder": "cth. Jakarta, Indonesia",
+      "productSummaryLabel": "Apa yang Anda jual atau tawarkan dalam satu kalimat?",
+      "productSummaryPlaceholder": "cth. Roti sourdough organik segar dan kopi espresso spesialti berkualitas tinggi.",
+      "brandColorLabel": "Warna Utama Brand",
+      "logoUrlLabel": "URL Logo (Opsional)",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "step3": {
+      "tab": "3. Kompetitor",
+      "heading": "Tambahkan 3 hingga 5 Kompetitor atau Akun Inspirasi",
+      "description": "Mesin intelijen Apify kami menganalisis postingan dengan interaksi tertinggi mereka untuk menemukan formula konten terbaik di bidang Anda.",
+      "handlesLabel": "Handle Instagram (dengan atau tanpa @)",
+      "handlesPlaceholder": "@bakery_jkt, @kopi_nusantara, @rotisourdough",
+      "quickPresetsLabel": "Atau klik preset cepat untuk inspirasi:",
+      "presets": {
+        "bakery": "Toko Roti & Pastry",
+        "cafe": "Kedai Kopi Spesialti",
+        "fashion": "Butik Busana",
+        "fitness": "Studio Kebugaran / Gym",
+        "service": "Layanan Lokal / Konsultan"
+      },
+      "ctaButton": "Buat Rencana Pertumbuhan 30 Hari",
+      "generatingStatus": {
+        "step1": "Menganalisis hook viral kompetitor dengan Apify...",
+        "step2": "Menyusun strategi konten 30 hari dengan Gemini 2.5 Flash...",
+        "step3": "Merender template visual via Creatomate (1080x1080 / 1080x1350)...",
+        "almostDone": "Menyelesaikan jadwal publikasi otomatis Anda..."
+      }
+    }
+  },
+  "calendar": {
+    "title": "Kalender Konten 30 Hari & Publikasi Otomatis",
+    "subtitle": "Tinjau visual dan teks yang dihasilkan AI. Setujui satu per satu atau aktifkan mode autopilot penuh.",
+    "autopilotCta": "Setujui Seluruh Bulan & Aktifkan Autopilot",
+    "allApprovedSuccess": "Semua 30 postingan disetujui! Dijadwalkan untuk publikasi otomatis via Meta Graph API.",
+    "filters": {
+      "allThemes": "Semua Kategori",
+      "allStatuses": "Semua Status",
+      "filterBy": "Filter berdasarkan"
+    },
+    "themes": {
+      "problemSolution": "Masalah & Solusi",
+      "behindTheScenes": "Di Balik Layar",
+      "socialProof": "Ulasan & Bukti Nyata",
+      "educational": "Tips & Edukasi",
+      "memes": "Komunitas & Tren"
+    },
+    "stats": {
+      "totalPosts": "30 Postingan Direncanakan",
+      "approvedCount": "Disetujui",
+      "publishedCount": "Dipublikasikan",
+      "reachEstimate": "Estimasi Jangkauan 30 Hari"
+    }
+  },
+  "editor": {
+    "modalTitle": "Edit Postingan untuk Hari",
+    "tabContent": "Edit Teks & Gambar",
+    "tabPreview": "Pratinjau Instagram",
+    "headlineLabel": "Judul Hook Gambar (< 8 kata)",
+    "bulletsLabel": "Poin Utama (dalam gambar)",
+    "captionLabel": "Keterangan Instagram (Copy Berkonversi Tinggi)",
+    "hashtagsLabel": "Tagar (15 tagar tertarget)",
+    "scheduledTimeLabel": "Waktu Publikasi (UTC)",
+    "aspectRatioLabel": "Rasio Aspek",
+    "aspectRatioSquare": "1:1 Persegi (1080x1080)",
+    "aspectRatioPortrait": "4:5 Potret (1080x1350)",
+    "regenerateGraphic": "Buat Ulang Gambar",
+    "regenerateCopy": "Buat Ulang Teks dengan Gemini",
+    "saveAndApprove": "Simpan & Setujui untuk Publikasi"
+  },
+  "mockup": {
+    "sponsored": "Audio asli",
+    "likedBy": "Disukai oleh",
+    "and": "dan",
+    "others": "lainnya",
+    "viewComments": "Lihat semua 24 komentar",
+    "addComment": "Tambahkan komentar...",
+    "publishStatus": "Antrean Meta v21.0"
+  },
+  "alerts": {
+    "tokenHealthy": "Token Meta Graph API valid (tersisa 58 hari).",
+    "tokenExpiring": "Token Meta akan segera kedaluwarsa. Klik untuk memperbarui.",
+    "rateLimitSafe": "Pembatas Apify: jeda 2 detik diterapkan antar kompetitor.",
+    "creatomateReady": "Mesin Creatomate aktif dengan perlindungan visual cadangan."
+  }
+}

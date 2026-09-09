@@ -1,0 +1,131 @@
+{
+  "common": {
+    "appName": "أوتوغرام للذكاء الاصطناعي (INSTASK)",
+    "tagline": "نمو إنستغرام الذاتي للشركات والمتاجر الصغيرة",
+    "demoModeBadge": "وضع العرض التوضيحي",
+    "liveModeBadge": "متصل بـ Meta API",
+    "autopilotActive": "الطيار الآلي نشط",
+    "autopilotPaused": "الطيار الآلي متوقف",
+    "switchLanguage": "اللغة",
+    "save": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "approve": "موافقة",
+    "approved": "تمت الموافقة",
+    "scheduled": "مجدول",
+    "published": "تم النشر",
+    "draft": "مسودة",
+    "regenerate": "إعادة توليد",
+    "viewDetails": "عرض وتعديل",
+    "loading": "جاري المعالجة..."
+  },
+  "nav": {
+    "dashboard": "خطة النمو",
+    "calendar": "تقويم 30 يوماً",
+    "analytics": "توقعات الأداء",
+    "settings": "إعدادات النشاط",
+    "connectedAs": "متصل كـ"
+  },
+  "onboarding": {
+    "title": "أطلق خطة نمو لـ 30 يوماً بثلاث خطوات بسيطة",
+    "subtitle": "لا تحتاج لأي خبرة تسويقية. اربط حسابك، عرّف بمتجرك، ودع الذكاء الاصطناعي يصمم وينشر المحتوى تلقائياً.",
+    "step1": {
+      "tab": "1. الربط",
+      "heading": "اربط حساب إنستغرام الاحترافي",
+      "description": "يتصل INSTASK بأمان عبر واجهة Meta Graph API الرسمية (v21.0). نحن لا نطلب كلمة مرورك أبداً.",
+      "connectButton": "ربط مع إنستغرام الاحترافي (Meta OAuth 2.0)",
+      "connectedSuccess": "تم ربط حساب إنستغرام للأعمال بنجاح!",
+      "accountTypeNote": "يتطلب حساب صانع محتوى أو نشاط تجاري مرتبط بصفحة فيسبوك."
+    },
+    "step2": {
+      "tab": "2. معلومات النشاط",
+      "heading": "أخبرنا عن متجرك أو عملك",
+      "description": "ساعد الذكاء الاصطناعي على فهم ميزتك التنافسية لكتابة نصوص تجذب عملائك المحليين.",
+      "brandNameLabel": "اسم المتجر أو العلامة التجارية",
+      "brandNamePlaceholder": "مثال: مخبز لونا الحرفي",
+      "locationLabel": "المدينة والدولة",
+      "locationPlaceholder": "مثال: الرياض، المملكة العربية السعودية",
+      "productSummaryLabel": "ماذا تبيع أو تقدم في جملة واحدة؟",
+      "productSummaryPlaceholder": "مثال: مخبوزات طازجة من الحبوب العضوية وقهوة مختصة محضرة بعناية.",
+      "brandColorLabel": "لون العلامة التجارية الأساسي",
+      "logoUrlLabel": "رابط الشعار (اختياري)",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "step3": {
+      "tab": "3. المنافسون",
+      "heading": "أضف 3 إلى 5 منافسين أو حسابات ملهمة",
+      "description": "يقوم محرك Apify بتحليل أفضل منشوراتهم تفاعلاً لاستخراج الصيغ الأكثر نجاحاً في مجالك.",
+      "handlesLabel": "حسابات إنستغرام (نص عادي مع أو بدون @)",
+      "handlesPlaceholder": "@bakery_riyadh, @sweetcrust, @artisancoffee",
+      "quickPresetsLabel": "أو اختر قالباً سريعاً للإلهام:",
+      "presets": {
+        "bakery": "مخبز حرفي",
+        "cafe": "مقهى مختص",
+        "fashion": "متجر أزياء",
+        "fitness": "نادي رياضي",
+        "service": "خدمات محلية / استشارات"
+      },
+      "ctaButton": "إنشاء خطة النمو لـ 30 يوماً",
+      "generatingStatus": {
+        "step1": "تحليل أفضل خطافات التفاعل مع Apify...",
+        "step2": "صياغة استراتيجية المحتوى لـ 30 يوماً باستخدام Gemini 2.5 Flash...",
+        "step3": "تصميم القوالب البصرية عبر Creatomate (1080x1080 / 1080x1350)...",
+        "almostDone": "وضع اللمسات الأخيرة على جدول النشر الآلي..."
+      }
+    }
+  },
+  "calendar": {
+    "title": "تقويم المحتوى والنشر لـ 30 يوماً",
+    "subtitle": "راجع الصور والنصوص المولدة بالذكاء الاصطناعي. وافق عليها بشكل فردي أو فعّل الطيار الآلي بالكامل.",
+    "autopilotCta": "الموافقة على الشهر بالكامل وتفعيل الطيار الآلي",
+    "allApprovedSuccess": "تمت الموافقة على جميع الـ 30 منشوراً! جاهزة للنشر التلقائي عبر Meta Graph API.",
+    "filters": {
+      "allThemes": "كل الفئات",
+      "allStatuses": "كل الحالات",
+      "filterBy": "تصفية حسب"
+    },
+    "themes": {
+      "problemSolution": "المشكلة والحل",
+      "behindTheScenes": "خلف الكواليس",
+      "socialProof": "آراء وتجارب العملاء",
+      "educational": "نصائح وإرشادات",
+      "memes": "المجتمع والترندات"
+    },
+    "stats": {
+      "totalPosts": "30 منشوراً مخططاً",
+      "approvedCount": "معتمد",
+      "publishedCount": "منشور",
+      "reachEstimate": "الوصول التقديري لـ 30 يوماً"
+    }
+  },
+  "editor": {
+    "modalTitle": "تعديل منشور اليوم",
+    "tabContent": "تعديل النص والتصميم",
+    "tabPreview": "معاينة إنستغرام",
+    "headlineLabel": "عنوان التصميم (< 8 كلمات)",
+    "bulletsLabel": "النقاط الرئيسية (داخل الصورة)",
+    "captionLabel": "نص المنشور (محتوى جذاب)",
+    "hashtagsLabel": "الوسوم (15 وسماً مستهدفاً)",
+    "scheduledTimeLabel": "وقت النشر (UTC)",
+    "aspectRatioLabel": "أبعاد الصورة",
+    "aspectRatioSquare": "1:1 مربع (1080x1080)",
+    "aspectRatioPortrait": "4:5 طولي (1080x1350)",
+    "regenerateGraphic": "إعادة تصميم الصورة",
+    "regenerateCopy": "إعادة صياغة النص مع Gemini",
+    "saveAndApprove": "حفظ والموافقة للنشر"
+  },
+  "mockup": {
+    "sponsored": "صوت أصلي",
+    "likedBy": "أعجب به",
+    "and": "و",
+    "others": "آخرون",
+    "viewComments": "عرض كل التعليقات الـ 24",
+    "addComment": "إضافة تعليق...",
+    "publishStatus": "قائمة انتظار Meta v21.0"
+  },
+  "alerts": {
+    "tokenHealthy": "رمز Meta Graph API صالح (متبقي 58 يوماً).",
+    "tokenExpiring": "رمز Meta سينتهي قريباً. انقر للتحديث.",
+    "rateLimitSafe": "محدد سرعة Apify: تطبيق تأخير 2 ثانية بين استعلامات المنافسين.",
+    "creatomateReady": "محرك Creatomate نشط مع نظام الأمان الاحتياطي."
+  }
+}

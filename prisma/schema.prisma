@@ -1,0 +1,248 @@
+// INSTASK - Production Prisma Database Schema
+// Database provider: PostgreSQL (Supabase compatible)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ------------------------------------------------------------------------------
+// 1. User & Multi-Channel Authentication & Subscription
+// ------------------------------------------------------------------------------
+enum AuthProvider {
+  EMAIL
+  PHONE
+  INSTAGRAM
+  FACEBOOK
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+model User {
+  id                          String             @id @default(cuid())
+  email                       String?            @unique
+  phone                       String?            @unique
+  provider                    AuthProvider       @default(EMAIL)
+  providerAccountId           String?            // Meta / FB / Phone UID
+  name                        String?
+  role                        String             @default("OWNER") // OWNER, MANAGER, VIEWER
+  
+  // Brand Onboarding Relation
+  brand                       Brand?
+  accounts                    Account[]
+
+  // Billing & Subscription
+  stripeCustomerId            String?            @unique
+  subscriptionId              String?            @unique
+  subscriptionStatus          SubscriptionStatus @default(INACTIVE)
+  isFirstMonthDiscountApplied Boolean            @default(false)
+
+  createdAt                   DateTime           @default(now())
+  updatedAt                   DateTime           @updatedAt
+
+  @@map("users")
+}
+
+model Brand {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brandName       String
+  industry        String
+  country         String   @default("US")
+  currency        String   @default("USD")
+  website         String?
+  instagramHandle String?
+  logoUrl         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("brands")
+}
+
+// ------------------------------------------------------------------------------
+// 2. Connected Instagram Business Account & Brand Profile
+// ------------------------------------------------------------------------------
+model Account {
+  id                String       @id @default(cuid())
+  userId            String
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Meta Instagram Graph API details
+  igUserId          String?      // Instagram Business Account ID
+  username          String?      // @handle
+  profilePictureUrl String?
+  accessToken       String?      // 60-day long-lived access token
+  tokenExpiresAt    DateTime?    // For automatic expiry warnings
+
+  // Business Onboarding Metadata
+  brandName         String
+  selectedIndustry  String?      @default("Bakery") // Bakery, Coffee, Fashion, Fitness, etc.
+  city              String?
+  country           String?
+  productSummary    String       // 1-sentence product summary
+  brandColor        String?      @default("#e1306c") // Hex brand accent for templates
+  logoUrl           String?
+  targetTimezone    String       @default("UTC")
+  language          String       @default("en")      // en, es, hi, ar, etc.
+
+  // Autopilot Control
+  autoPilotEnabled  Boolean      @default(false)
+
+  // Relations
+  competitors       Competitor[]
+  posts             Post[]
+  postQueue         PostQueue[]
+
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([igUserId])
+  @@map("accounts")
+}
+
+// ------------------------------------------------------------------------------
+// 3. Competitor Intelligence & Benchmarks
+// ------------------------------------------------------------------------------
+model Competitor {
+  id                String    @id @default(cuid())
+  accountId         String
+  account           Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  handle            String    // @handle
+  scrapedPostsCount Int       @default(0)
+  avgEngagementRate Float?    // e.g. 4.82%
+  hashtagClusters   Json?     // Top performing hashtags analyzed by Apify
+  topHooks          Json?     // Viral caption hooks extracted
+  rawMetrics        Json?     // Likes, comments, format distributions
+
+  lastScrapedAt     DateTime?
+  createdAt         DateTime  @default(now())
+
+  @@index([accountId])
+  @@map("competitors")
+}
+
+// ------------------------------------------------------------------------------
+// 4. Industry Templates (Pre-tuned Niche Visual Styles)
+// ------------------------------------------------------------------------------
+model IndustryTemplate {
+  id                   String   @id @default(cuid())
+  industry             String   // Bakery, Coffee, Fashion, Fitness, Beauty, Restaurant, RealEstate, Consulting
+  templateName         String   // e.g. "Warm Editorial Magazine"
+  stylePreviewUrl      String?  // Thumbnail preview
+  aspectRatio          String   @default("1:1") // "1:1" | "4:5"
+  creatomateTemplateId String
+  colorPalette         Json?    // Array of brand hex codes
+  sampleHeadline       String?
+
+  createdAt            DateTime @default(now())
+
+  @@index([industry])
+  @@map("industry_templates")
+}
+
+// ------------------------------------------------------------------------------
+// 5. Automated Post Queue (Scheduled & Publishing Pipeline)
+// ------------------------------------------------------------------------------
+enum QueueStatus {
+  QUEUED
+  PUBLISHED
+  FAILED
+}
+
+model PostQueue {
+  id               String       @id @default(cuid())
+  accountId        String
+  account          Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  dayNumber        Int
+  scheduledTime    DateTime
+  theme            String
+  headline         String
+  bodyBullets      Json
+  caption          String
+  hashtags         Json
+
+  templateId       String?
+  mediaUrl         String?
+  mediaAspectRatio String       @default("1:1")
+
+  status           QueueStatus  @default(QUEUED)
+  livePostId       String?
+  containerId      String?
+  errorMessage     String?
+  publishedAt      DateTime?
+
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([accountId, status])
+  @@index([scheduledTime, status])
+  @@map("post_queue")
+}
+
+// ------------------------------------------------------------------------------
+// 6. 30-Day Growth Plan Posts
+// ------------------------------------------------------------------------------
+enum PostStatus {
+  DRAFT
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
+enum MediaType {
+  IMAGE
+  CAROUSEL
+  REEL
+}
+
+model Post {
+  id               String      @id @default(cuid())
+  accountId        String
+  account          Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  dayNumber        Int         // 1 to 30
+  scheduledTime    DateTime    // Optimized UTC timestamp
+  theme            String      // Problem-Solution, Behind the Scenes, Social Proof, Educational, Memes
+
+  // Content Craft
+  headline         String      // Viral hook (< 8 words) for graphic
+  bodyBullets      Json        // Array of 3 concise value points
+  caption          String      // High-converting multilingual copy with line breaks
+  hashtags         Json        // Array of 15 niche/reach hashtags
+
+  // Creatomate & Visual Asset
+  templateId       String?     // Creatomate template ID
+  mediaType        MediaType   @default(IMAGE)
+  mediaUrl         String?     // Rendered CDN PNG/MP4 URL or fallback Data-URI
+  mediaAspectRatio String      @default("1:1") // "1:1" (1080x1080) or "4:5" (1080x1350)
+
+  // Publishing State
+  status           PostStatus  @default(DRAFT)
+  containerId      String?     // Meta Graph API container creation ID
+  livePostId       String?     // Meta live Instagram post ID
+  errorMessage     String?     // Error reason if publishing failed
+  publishedAt      DateTime?
+
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([accountId, status])
+  @@index([scheduledTime, status])
+  @@map("posts")
+}

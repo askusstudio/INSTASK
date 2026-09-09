@@ -1,0 +1,131 @@
+{
+  "common": {
+    "appName": "INSTASK",
+    "tagline": "Autonomes Instagram-Wachstum für kleine Unternehmen",
+    "demoModeBadge": "Interaktiver Demo-Modus",
+    "liveModeBadge": "Meta API Verbunden",
+    "autopilotActive": "Autopilot Aktiv",
+    "autopilotPaused": "Autopilot Pausiert",
+    "switchLanguage": "Sprache",
+    "save": "Änderungen speichern",
+    "cancel": "Abbrechen",
+    "approve": "Genehmigen",
+    "approved": "Genehmigt",
+    "scheduled": "Geplant",
+    "published": "Veröffentlicht",
+    "draft": "Entwurf",
+    "regenerate": "Neu generieren",
+    "viewDetails": "Anzeigen & Bearbeiten",
+    "loading": "Wird verarbeitet..."
+  },
+  "nav": {
+    "dashboard": "Wachstumsplan",
+    "calendar": "30-Tage-Kalender",
+    "analytics": "Leistungsprognose",
+    "settings": "Einstellungen",
+    "connectedAs": "Verbunden als"
+  },
+  "onboarding": {
+    "title": "Starten Sie Ihren 30-Tage-Wachstumsplan in 3 einfachen Schritten",
+    "subtitle": "Keine Marketing-Vorkenntnisse nötig. Verbinden Sie Ihr Konto, beschreiben Sie Ihr Geschäft und lassen Sie die KI monatlichen Content vollautomatisch erstellen und veröffentlichen.",
+    "step1": {
+      "tab": "1. Verbinden",
+      "heading": "Instagram Professional-Konto verbinden",
+      "description": "INSTASK verbindet sich sicher über die offizielle Meta Graph API (v21.0). Wir fragen niemals nach Ihrem persönlichen Passwort.",
+      "connectButton": "Mit Instagram Pro verbinden (Meta OAuth 2.0)",
+      "connectedSuccess": "Instagram Business-Konto erfolgreich verbunden!",
+      "accountTypeNote": "Erfordert ein mit einer Facebook-Seite verknüpftes Creator- oder Business-Konto."
+    },
+    "step2": {
+      "tab": "2. Unternehmensprofil",
+      "heading": "Erzählen Sie uns von Ihrem Geschäft",
+      "description": "Helfen Sie unserer KI zu verstehen, was Ihre Marke auszeichnet, um wirkungsvolle Texte für lokale Kunden zu verfassen.",
+      "brandNameLabel": "Geschäfts- oder Markenname",
+      "brandNamePlaceholder": "z.B. Bäckerei & Café Luna",
+      "locationLabel": "Stadt & Land",
+      "locationPlaceholder": "z.B. Berlin, Deutschland",
+      "productSummaryLabel": "Was verkaufen oder bieten Sie in einem Satz an?",
+      "productSummaryPlaceholder": "z.B. Frische Bio-Sauerteigbackwaren und handwerklich gerösteter Espresso aus fairem Anbau.",
+      "brandColorLabel": "Haupt-Markenfarbe",
+      "logoUrlLabel": "Logo-URL (Optional)",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "step3": {
+      "tab": "3. Mitbewerber",
+      "heading": "3 bis 5 Mitbewerber oder Vorbilder hinzufügen",
+      "description": "Unsere Apify-Intelligence analysiert deren Beiträge mit der höchsten Interaktion für erfolgreiche Content-Muster.",
+      "handlesLabel": "Instagram-Handles (mit oder ohne @)",
+      "handlesPlaceholder": "@baeckerei_berlin, @kaffeekultur, @artisanbread",
+      "quickPresetsLabel": "Oder wählen Sie eine Vorlage:",
+      "presets": {
+        "bakery": "Handwerksbäckerei",
+        "cafe": "Spezialitäten-Café",
+        "fashion": "Modeboutique",
+        "fitness": "Fitnessstudio",
+        "service": "Lokale Dienstleistungen / Beratung"
+      },
+      "ctaButton": "Meinen 30-Tage-Wachstumsplan erstellen",
+      "generatingStatus": {
+        "step1": "Erfolgreiche Hooks analysieren mit Apify...",
+        "step2": "30-Tage-Strategie erstellen mit Gemini 2.5 Flash...",
+        "step3": "Vorlagen rendern über Creatomate (1080x1080 / 1080x1350)...",
+        "almostDone": "Veröffentlichungszeitplan wird fertiggestellt..."
+      }
+    }
+  },
+  "calendar": {
+    "title": "30-Tage-Content-Kalender & Veröffentlichungspipeline",
+    "subtitle": "Überprüfen Sie Bildgrafiken und Texte. Genehmigen Sie einzeln oder schalten Sie auf vollen Autopiloten.",
+    "autopilotCta": "Ganzen Monat genehmigen & Autopilot aktivieren",
+    "allApprovedSuccess": "Alle 30 Beiträge genehmigt! Automatische Veröffentlichung via Meta Graph API geplant.",
+    "filters": {
+      "allThemes": "Alle Kategorien",
+      "allStatuses": "Alle Status",
+      "filterBy": "Filtern nach"
+    },
+    "themes": {
+      "problemSolution": "Problem & Lösung",
+      "behindTheScenes": "Hinter den Kulissen",
+      "socialProof": "Kundenstimmen & Beweise",
+      "educational": "Tipps & Wissen",
+      "memes": "Community & Trends"
+    },
+    "stats": {
+      "totalPosts": "30 Beiträge Geplant",
+      "approvedCount": "Genehmigt",
+      "publishedCount": "Veröffentlicht",
+      "reachEstimate": "Geschätzte 30-Tage-Reichweite"
+    }
+  },
+  "editor": {
+    "modalTitle": "Beitrag für Tag bearbeiten",
+    "tabContent": "Text & Bild bearbeiten",
+    "tabPreview": "Instagram-Vorschau",
+    "headlineLabel": "Bild-Schlagzeile (< 8 Wörter)",
+    "bulletsLabel": "Kernaussagen (im Bild)",
+    "captionLabel": "Instagram-Bildunterschrift",
+    "hashtagsLabel": "Hashtags (15 gezielte Tags)",
+    "scheduledTimeLabel": "Veröffentlichungszeit (UTC)",
+    "aspectRatioLabel": "Seitenverhältnis",
+    "aspectRatioSquare": "1:1 Quadrat (1080x1080)",
+    "aspectRatioPortrait": "4:5 Hochformat (1080x1350)",
+    "regenerateGraphic": "Bildgrafik neu rendern",
+    "regenerateCopy": "Text neu generieren mit Gemini",
+    "saveAndApprove": "Speichern & Zur Veröffentlichung freigeben"
+  },
+  "mockup": {
+    "sponsored": "Originalaudio",
+    "likedBy": "Gefällt",
+    "and": "und",
+    "others": "weiteren Personen",
+    "viewComments": "Alle 24 Kommentare ansehen",
+    "addComment": "Kommentieren...",
+    "publishStatus": "Meta v21.0 Warteschlange"
+  },
+  "alerts": {
+    "tokenHealthy": "Meta Graph API-Token gültig (noch 58 Tage).",
+    "tokenExpiring": "Meta-Token läuft bald ab. Bitte erneuern.",
+    "rateLimitSafe": "Apify Ratenbegrenzung: 2 Sekunden Verzögerung aktiv.",
+    "creatomateReady": "Creatomate-Grafikengine aktiv mit typografischer Ausfallsicherung."
+  }
+}

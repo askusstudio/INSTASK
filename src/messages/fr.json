@@ -1,0 +1,131 @@
+{
+  "common": {
+    "appName": "INSTASK",
+    "tagline": "Croissance Instagram autonome pour les petites entreprises",
+    "demoModeBadge": "Mode Démo Interactif",
+    "liveModeBadge": "API Meta Connectée",
+    "autopilotActive": "Pilote automatique actif",
+    "autopilotPaused": "Pilote automatique en pause",
+    "switchLanguage": "Langue",
+    "save": "Enregistrer les modifications",
+    "cancel": "Annuler",
+    "approve": "Approuver",
+    "approved": "Approuvé",
+    "scheduled": "Planifié",
+    "published": "Publié",
+    "draft": "Brouillon",
+    "regenerate": "Régénérer",
+    "viewDetails": "Voir & Modifier",
+    "loading": "Traitement..."
+  },
+  "nav": {
+    "dashboard": "Plan de Croissance",
+    "calendar": "Calendrier 30 Jours",
+    "analytics": "Prévisions",
+    "settings": "Paramètres",
+    "connectedAs": "Connecté en tant que"
+  },
+  "onboarding": {
+    "title": "Lancez votre plan de croissance de 30 jours en 3 étapes",
+    "subtitle": "Aucune compétence requise. Connectez votre compte, décrivez votre boutique et laissez l'IA créer et publier votre contenu mensuel.",
+    "step1": {
+      "tab": "1. Connexion",
+      "heading": "Connectez votre compte Instagram Professionnel",
+      "description": "INSTASK se connecte en toute sécurité via l'API officielle Meta Graph (v21.0). Nous ne demandons jamais votre mot de passe personnel.",
+      "connectButton": "Se connecter avec Instagram Pro (Meta OAuth 2.0)",
+      "connectedSuccess": "Compte Instagram Professionnel connecté !",
+      "accountTypeNote": "Nécessite un compte Créateur ou Professionnel lié à une page Facebook."
+    },
+    "step2": {
+      "tab": "2. Profil",
+      "heading": "Parlez-nous de votre boutique ou activité",
+      "description": "Aidez notre IA à comprendre votre proposition unique pour rédiger des textes qui captivent vos clients locaux.",
+      "brandNameLabel": "Nom de la boutique ou marque",
+      "brandNamePlaceholder": "ex. Boulangerie Artisanale Luna",
+      "locationLabel": "Ville et Pays",
+      "locationPlaceholder": "ex. Paris, France",
+      "productSummaryLabel": "Que vendez-vous ou proposez-vous en une phrase ?",
+      "productSummaryPlaceholder": "ex. Pains au levain biologiques et pâtisseries fraîches accompagnés de cafés de spécialité.",
+      "brandColorLabel": "Couleur principale de la marque",
+      "logoUrlLabel": "URL du logo (Optionnel)",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "step3": {
+      "tab": "3. Concurrents",
+      "heading": "Ajoutez 3 à 5 concurrents ou comptes inspirants",
+      "description": "Notre moteur Apify analyse leurs publications les plus engageantes pour identifier les formules gagnantes de votre secteur.",
+      "handlesLabel": "Comptes Instagram (avec ou sans @)",
+      "handlesPlaceholder": "@boulangerie_paris, @croissant_fr, @artisancafe",
+      "quickPresetsLabel": "Ou choisissez un modèle rapide :",
+      "presets": {
+        "bakery": "Boulangerie Artisanale",
+        "cafe": "Café de Spécialité",
+        "fashion": "Boutique de Mode",
+        "fitness": "Salle de Sport / Studio",
+        "service": "Services Locaux / Conseils"
+      },
+      "ctaButton": "Générer mon plan de croissance 30 jours",
+      "generatingStatus": {
+        "step1": "Analyse des accroches virales avec Apify...",
+        "step2": "Génération de la stratégie 30 jours avec Gemini 2.5 Flash...",
+        "step3": "Rendu des templates visuels via Creatomate (1080x1080 / 1080x1350)...",
+        "almostDone": "Finalisation de votre calendrier de publication..."
+      }
+    }
+  },
+  "calendar": {
+    "title": "Calendrier de Contenu & Pipeline de Publication (30 Jours)",
+    "subtitle": "Consultez les visuels et textes créés par l'IA. Approuvez un par un ou lancez le pilote automatique.",
+    "autopilotCta": "Approuver le mois complet & Activer le pilote automatique",
+    "allApprovedSuccess": "Les 30 publications sont approuvées ! Planifiées pour publication automatique via Meta Graph API.",
+    "filters": {
+      "allThemes": "Toutes les catégories",
+      "allStatuses": "Tous les statuts",
+      "filterBy": "Filtrer par"
+    },
+    "themes": {
+      "problemSolution": "Problème & Solution",
+      "behindTheScenes": "Coulisses",
+      "socialProof": "Témoignages & Avis",
+      "educational": "Conseils & Astuces",
+      "memes": "Tendances & Communauté"
+    },
+    "stats": {
+      "totalPosts": "30 Posts Prévus",
+      "approvedCount": "Approuvés",
+      "publishedCount": "Publiés",
+      "reachEstimate": "Portée estimée (30 j)"
+    }
+  },
+  "editor": {
+    "modalTitle": "Modifier la publication du jour",
+    "tabContent": "Texte & Visuel",
+    "tabPreview": "Aperçu Instagram",
+    "headlineLabel": "Accroche visuelle (< 8 mots)",
+    "bulletsLabel": "Points clés (dans l'image)",
+    "captionLabel": "Légende Instagram (Copywriting haute conversion)",
+    "hashtagsLabel": "Hashtags (15 tags ciblés)",
+    "scheduledTimeLabel": "Heure de publication (UTC)",
+    "aspectRatioLabel": "Format d'image",
+    "aspectRatioSquare": "1:1 Carré (1080x1080)",
+    "aspectRatioPortrait": "4:5 Portrait (1080x1350)",
+    "regenerateGraphic": "Régénérer le visuel",
+    "regenerateCopy": "Régénérer le texte avec Gemini",
+    "saveAndApprove": "Enregistrer & Approuver pour publication"
+  },
+  "mockup": {
+    "sponsored": "Audio d'origine",
+    "likedBy": "Aimé par",
+    "and": "et",
+    "others": "autres personnes",
+    "viewComments": "Voir les 24 commentaires",
+    "addComment": "Ajouter un commentaire...",
+    "publishStatus": "File d'attente Meta v21.0"
+  },
+  "alerts": {
+    "tokenHealthy": "Jeton Meta Graph API valide (expire dans 58 jours).",
+    "tokenExpiring": "Jeton Meta expire bientôt. Cliquez pour renouveler.",
+    "rateLimitSafe": "Limiteur Apify : délai de 2 secondes appliqué entre concurrents.",
+    "creatomateReady": "Moteur graphique Creatomate opérationnel avec sécurité typographique."
+  }
+}
