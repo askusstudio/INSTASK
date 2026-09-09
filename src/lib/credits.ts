@@ -56,10 +56,27 @@ export async function deductCredits(
   if (prisma) {
     try {
       return await prisma.$transaction(async (tx) => {
-        const user = await tx.user.findUnique({
+        let user = await tx.user.findUnique({
           where: { id: userId },
           select: { creditsBalance: true },
         });
+
+        if (!user && userId === 'usr_demo_001') {
+          user = await tx.user.upsert({
+            where: { id: 'usr_demo_001' },
+            create: {
+              id: 'usr_demo_001',
+              email: 'demo@instask.ai',
+              name: 'Luna Baker',
+              role: 'OWNER',
+              subscriptionStatus: 'ACTIVE',
+              creditsBalance: 60,
+              monthlyCreditsLimit: 60,
+            },
+            update: {},
+            select: { creditsBalance: true },
+          });
+        }
 
         if (!user) {
           return { success: false, error: "User not found." };
@@ -135,6 +152,23 @@ export async function addCredits(
   if (prisma) {
     try {
       return await prisma.$transaction(async (tx) => {
+        let user = await tx.user.findUnique({ where: { id: userId } });
+        if (!user && userId === 'usr_demo_001') {
+          await tx.user.upsert({
+            where: { id: 'usr_demo_001' },
+            create: {
+              id: 'usr_demo_001',
+              email: 'demo@instask.ai',
+              name: 'Luna Baker',
+              role: 'OWNER',
+              subscriptionStatus: 'ACTIVE',
+              creditsBalance: 60,
+              monthlyCreditsLimit: 60,
+            },
+            update: {},
+          });
+        }
+
         const updatedUser = await tx.user.update({
           where: { id: userId },
           data: { creditsBalance: { increment: amount } },
@@ -183,10 +217,26 @@ export async function addCredits(
 export async function getUserCredits(userId: string): Promise<number> {
   if (prisma) {
     try {
-      const user = await prisma.user.findUnique({
+      let user = await prisma.user.findUnique({
         where: { id: userId },
         select: { creditsBalance: true },
       });
+      if (!user && userId === 'usr_demo_001') {
+        user = await prisma.user.upsert({
+          where: { id: 'usr_demo_001' },
+          create: {
+            id: 'usr_demo_001',
+            email: 'demo@instask.ai',
+            name: 'Luna Baker',
+            role: 'OWNER',
+            subscriptionStatus: 'ACTIVE',
+            creditsBalance: 60,
+            monthlyCreditsLimit: 60,
+          },
+          update: {},
+          select: { creditsBalance: true },
+        });
+      }
       if (user) return user.creditsBalance;
     } catch {
       // Fall back
