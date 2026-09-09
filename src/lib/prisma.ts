@@ -26,8 +26,27 @@ export interface UserRecord {
   subscriptionId?: string | null;
   subscriptionStatus: SubscriptionStatus;
   isFirstMonthDiscountApplied: boolean;
+  creditsBalance: number;
+  monthlyCreditsLimit: number;
   createdAt: Date | string;
   updatedAt: Date | string;
+}
+
+export type TransactionType =
+  | 'MONTHLY_GRANT'
+  | 'PAID_TOPUP'
+  | 'COMPETITOR_SCRAPE'
+  | 'COPY_GENERATION'
+  | 'IMAGE_RENDER'
+  | 'REGENERATION';
+
+export interface CreditTransactionRecord {
+  id: string;
+  userId: string;
+  amount: number;
+  type: TransactionType;
+  description?: string | null;
+  createdAt: Date | string;
 }
 
 export interface BrandRecord {
@@ -108,6 +127,7 @@ class InMemoryStore {
   accounts: Map<string, AccountRecord> = new Map();
   competitors: Map<string, CompetitorRecord> = new Map();
   posts: Map<string, PostRecord> = new Map();
+  creditTransactions: CreditTransactionRecord[] = [];
 
   constructor() {
     // Seed default demo user
@@ -121,6 +141,8 @@ class InMemoryStore {
       role: 'OWNER',
       subscriptionStatus: 'ACTIVE',
       isFirstMonthDiscountApplied: false,
+      creditsBalance: 60,
+      monthlyCreditsLimit: 60,
       stripeCustomerId: 'cus_demo_123',
       subscriptionId: 'sub_demo_123',
       createdAt: new Date(),
@@ -282,6 +304,8 @@ export async function upsertUser(data: {
     role: 'OWNER',
     subscriptionStatus: data.subscriptionStatus || 'INACTIVE',
     isFirstMonthDiscountApplied: false,
+    creditsBalance: 60,
+    monthlyCreditsLimit: 60,
     createdAt: now,
     updatedAt: now,
   };

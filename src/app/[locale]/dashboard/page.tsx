@@ -40,6 +40,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const [strategyBlueprint, setStrategyBlueprint] = useState<StrategyBlueprint | null>(null);
   const [showBlueprintModal, setShowBlueprintModal] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
+  const [creditsBalance, setCreditsBalance] = useState<number>(60);
 
   // Active business context
   const [pendingProfile, setPendingProfile] = useState<BusinessProfileData | null>(null);
@@ -80,10 +81,27 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
 
   useEffect(() => {
     fetchPosts();
+
+    const fetchCredits = async () => {
+      try {
+        const res = await fetch('/api/billing/topup');
+        const data = await res.json();
+        if (data.creditsBalance !== undefined) {
+          setCreditsBalance(data.creditsBalance);
+        }
+      } catch {
+        // Fallback
+      }
+    };
+    fetchCredits();
+
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('payment') === 'success' || params.get('activated') === 'true') {
         setIsPaymentSuccess(true);
+      }
+      if (params.get('credits_added') === 'true') {
+        fetchCredits();
       }
     }
   }, []);
@@ -173,6 +191,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         currentLocale={locale}
         autoPilotEnabled={autoPilotEnabled}
         onToggleAutopilot={handleToggleAutopilot}
+        creditsBalance={creditsBalance}
         connectedAccount={account}
       />
 

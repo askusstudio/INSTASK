@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { updateUserSubscription, prisma, memoryStore } from '@/lib/prisma';
+import { addCredits } from '@/lib/credits';
 
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeSecret && stripeSecret.startsWith('sk_')
@@ -18,6 +19,28 @@ export async function POST(req: Request) {
         const parsed = JSON.parse(payload);
         if (parsed.type === 'checkout.session.completed') {
           const session = parsed.data?.object;
+
+          // Check if this was a one-time credit pack top-up
+          if (session?.metadata?.type === 'CREDIT_TOPUP') {
+            const userId = session.metadata.userId || session.client_reference_id || 'usr_demo_001';
+            const creditsToAdd = parseInt(session.metadata.creditsToAdd, 10) || 75;
+
+            const res = await addCredits(
+              userId,
+              creditsToAdd,
+              'PAID_TOPUP',
+              `Purchased pack of ${creditsToAdd} credits`
+            );
+
+            return NextResponse.json({
+              received: true,
+              mode: 'sandbox_topup',
+              creditsAdded: creditsToAdd,
+              balanceRemaining: res.balanceRemaining,
+            });
+          }
+
+          // Standard subscription activation
           const userId = session?.client_reference_id || 'usr_demo_001';
 
           await updateUserSubscription(userId, {
@@ -26,6 +49,13 @@ export async function POST(req: Request) {
             stripeCustomerId: (session?.customer as string) || 'cus_sandbox_001',
             isFirstMonthDiscountApplied: true,
           });
+
+          await addCredits(
+            userId,
+            60,
+            'MONTHLY_GRANT',
+            'Monthly growth plan subscription credits'
+          );
 
           return NextResponse.json({ received: true, mode: 'sandbox' });
         } else if (parsed.type === 'customer.subscription.deleted') {
@@ -64,9 +94,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `Webhook error: ${e.message}` }, { status: 400 });
     }
 
-    // 3. Handle successful initial subscription checkout
+    // 3. Handle successful checkout session (Top-Up or Subscription)
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
+
+      // Check if this was a one-time credit pack top-up
+      if (session.metadata?.type === 'CREDIT_TOPUP') {
+        const userId = session.metadata.userId || session.client_reference_id;
+        const creditsToAdd = parseInt(session.metadata.creditsToAdd, 10);
+
+        if (userId && creditsToAdd) {
+          await addCredits(
+            userId,
+            creditsToAdd,
+            'PAID_TOPUP',
+            `Purchased pack of ${creditsToAdd} credits`
+          );
+        }
+
+        return NextResponse.json({ received: true, topupFulfilled: true, creditsAdded: creditsToAdd });
+      }
+
+      // Handle subscription activation
       const userId = session.client_reference_id;
 
       if (userId) {
@@ -76,6 +125,13 @@ export async function POST(req: Request) {
           subscriptionId: session.subscription as string,
           isFirstMonthDiscountApplied: true,
         });
+
+        await addCredits(
+          userId,
+          60,
+          'MONTHLY_GRANT',
+          'Monthly growth plan subscription credits'
+        );
       }
     }
 

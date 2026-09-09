@@ -6,6 +6,7 @@ import { generate30DayGrowthPlan } from '@/lib/gemini';
 import { renderPostAsset } from '@/lib/creatomate';
 import { scrapeCompetitorInstagram } from '@/lib/apify';
 import { prisma, memoryStore, PostRecord } from '@/lib/prisma';
+import { deductCredits } from '@/lib/credits';
 
 export async function POST(request: Request) {
   try {
@@ -20,12 +21,28 @@ export async function POST(request: Request) {
       language = 'en',
       handle = 'my_artisan_shop',
       igUserId,
+      userId = 'usr_demo_001',
     } = body;
 
     if (!brandName || !productSummary) {
       return NextResponse.json(
         { error: 'Brand name and product summary are required.' },
         { status: 400 }
+      );
+    }
+
+    // Enforce Credit Gatekeeper (10 credits for 30-Day Strategy & Copy)
+    const deduction = await deductCredits(
+      userId,
+      10,
+      'COPY_GENERATION',
+      `Monthly Strategy & 30-Day Copy generation for ${brandName}`
+    );
+
+    if (!deduction.success) {
+      return NextResponse.json(
+        { error: deduction.error, code: 'CREDITS_EXHAUSTED' },
+        { status: 402 } // Payment Required
       );
     }
 

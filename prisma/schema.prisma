@@ -48,10 +48,39 @@ model User {
   subscriptionStatus          SubscriptionStatus @default(INACTIVE)
   isFirstMonthDiscountApplied Boolean            @default(false)
 
+  // Credit & Token Balances
+  creditsBalance              Int                @default(60) // Base credits allocated on onboarding
+  monthlyCreditsLimit         Int                @default(60)
+
+  // Relations
+  creditTransactions          CreditTransaction[]
+
   createdAt                   DateTime           @default(now())
   updatedAt                   DateTime           @updatedAt
 
   @@map("users")
+}
+
+enum TransactionType {
+  MONTHLY_GRANT
+  PAID_TOPUP
+  COMPETITOR_SCRAPE
+  COPY_GENERATION
+  IMAGE_RENDER
+  REGENERATION
+}
+
+model CreditTransaction {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int             // Positive for top-ups, negative for deductions
+  type        TransactionType
+  description String?
+  createdAt   DateTime        @default(now())
+
+  @@index([userId])
+  @@map("credit_transactions")
 }
 
 model Brand {

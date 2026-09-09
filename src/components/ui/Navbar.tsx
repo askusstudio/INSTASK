@@ -5,11 +5,13 @@ import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useGuidance } from '@/context/GuidanceContext';
 import { Sparkles, ShieldCheck, Zap, Instagram, HelpCircle } from 'lucide-react';
+import CreditBadge from '@/components/credits/CreditBadge';
 
 interface NavbarProps {
   currentLocale: string;
   autoPilotEnabled: boolean;
   onToggleAutopilot: (enabled: boolean) => void;
+  creditsBalance?: number;
   connectedAccount?: {
     username?: string | null;
     brandName?: string | null;
@@ -20,6 +22,7 @@ export function Navbar({
   currentLocale,
   autoPilotEnabled,
   onToggleAutopilot,
+  creditsBalance = 60,
   connectedAccount,
 }: NavbarProps) {
   const t = useTranslations('common');
@@ -55,8 +58,11 @@ export function Navbar({
             </div>
           </div>
 
-          {/* Right Controls: Plan Status + Guidance Mode + Autopilot Switch + Language Picker */}
+          {/* Right Controls: Credits Badge + Plan Status + Guidance Mode + Autopilot Switch + Language Picker */}
           <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Credit & Token Balance Badge */}
+            <CreditBadge balance={creditsBalance} />
+
             {/* Pro Plan Active Badge */}
             <a
               href={`/${currentLocale}/onboarding/payment`}
