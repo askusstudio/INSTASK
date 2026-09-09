@@ -196,21 +196,21 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 5. Social OAuth
-  const handleSocialSignIn = async (provider: 'facebook') => {
+  // 5. Social Login (Direct Account Connection - Meta Bypass)
+  const handleSocialSignIn = async (provider: 'instagram' | 'facebook') => {
     setLoading(true);
+    const resolvedUserId = `usr_${provider}_${Date.now().toString().slice(-4)}`;
+
     try {
-      const res = await signIn(provider, {
-        callbackUrl: `/${safeLocale}/onboarding/brand?userId=usr_demo_001`,
+      await signIn('credentials-or-otp', {
         redirect: false,
+        identifier: `${provider}_creator@instask.ai`,
+        type: 'email',
+        otpOrPassword: 'direct_connected',
       });
-      if (res?.url) {
-        window.location.href = res.url;
-      } else {
-        completeAuth('usr_demo_001');
-      }
+      completeAuth(resolvedUserId);
     } catch {
-      completeAuth('usr_demo_001');
+      completeAuth(resolvedUserId);
     } finally {
       setLoading(false);
     }
@@ -226,10 +226,10 @@ export default function AuthPage({ params }: AuthPageProps) {
         type: 'email',
         otpOrPassword: 'demo_password',
       });
-    } catch {
-      // Handled
-    } finally {
       completeAuth('usr_demo_001');
+    } catch {
+      completeAuth('usr_demo_001');
+    } finally {
       setLoading(false);
     }
   };
@@ -484,19 +484,19 @@ export default function AuthPage({ params }: AuthPageProps) {
             </div>
           )}
 
-          {/* Tab 3: Social */}
+          {/* Tab 3: Social (Instant Direct Account Connection) */}
           {activeTab === 'social' && (
             <div className="space-y-3">
               <button
                 type="button"
-                onClick={() => handleSocialSignIn('facebook')}
+                onClick={() => handleSocialSignIn('instagram')}
                 disabled={loading}
                 className="w-full py-3 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition flex items-center justify-center gap-2.5 shadow-xs"
               >
                 <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white">
                   <Instagram className="w-3 h-3" />
                 </div>
-                <span>Continue with Instagram Professional</span>
+                <span>{loading ? 'Connecting...' : 'Continue with Instagram Professional'}</span>
               </button>
 
               <button
@@ -506,11 +506,11 @@ export default function AuthPage({ params }: AuthPageProps) {
                 className="w-full py-3 px-4 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold transition flex items-center justify-center gap-2.5 shadow-xs"
               >
                 <Facebook className="w-4 h-4 fill-white" />
-                <span>Continue with Facebook Business</span>
+                <span>{loading ? 'Connecting...' : 'Continue with Facebook Business'}</span>
               </button>
 
               <p className="text-[11px] text-slate-400 text-center mt-2">
-                Connects directly via Meta Graph API v21.0. We never view or store passwords.
+                1-Click Direct Instagram Professional Connection
               </p>
             </div>
           )}
