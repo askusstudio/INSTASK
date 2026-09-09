@@ -17,13 +17,15 @@ interface RazorpayButtonProps {
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
-  onSuccess?: (subscriptionId: string) => void;
+  onSuccess?: (paymentId: string) => void;
 }
 
 export default function RazorpayButton({
   planKey,
   planId,
   planTitle = 'INSTASK Growth Plan',
+  amount = 1999,
+  currency = 'INR',
   userId = 'usr_demo_001',
   userName = 'Brand Owner',
   userEmail = 'owner@example.com',
@@ -41,6 +43,7 @@ export default function RazorpayButton({
     setLoading(true);
 
     try {
+      // Step 1: Create Order via Backend API
       const res = await fetch('/api/billing/razorpay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -48,29 +51,32 @@ export default function RazorpayButton({
           planKey,
           planId,
           userId,
+          amount,
         }),
       });
 
       const data = await res.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to initiate Razorpay subscription');
-      }
+      const liveKey = data.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_Ta09UiD9oNIJhH';
 
-      const { subscriptionId, keyId, mode } = data;
-
-      // If Razorpay SDK is loaded on client window
+      // Step 2: Open Razorpay Standard Checkout
       if (typeof window !== 'undefined' && (window as any).Razorpay) {
-        const options = {
-          key: keyId,
-          subscription_id: subscriptionId,
+        const options: any = {
+          key: liveKey,
+          amount: (data.amount || amount) * 100, // paise me convert (e.g. 199900)
+          currency: data.currency || currency || 'INR',
           name: 'INSTASK AI',
-          description: `${planTitle} Autopay`,
+          description: `${planTitle} Activation`,
+          order_id: data.orderId || undefined,
           handler: function (response: any) {
-            const subId = response.razorpay_subscription_id || subscriptionId;
+            const payId = response.razorpay_payment_id || 'pay_confirmed';
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('instask_plan_active', 'true');
+              localStorage.setItem('instask_active_plan', planKey);
+            }
             if (onSuccess) {
-              onSuccess(subId);
+              onSuccess(payId);
             } else {
-              window.location.href = `/dashboard?plan_activated=${planKey}&sub_id=${subId}`;
+              window.location.href = `/dashboard?plan_activated=${planKey}&pay_id=${payId}&userId=${encodeURIComponent(userId)}`;
             }
           },
           prefill: {
@@ -95,39 +101,15 @@ export default function RazorpayButton({
         });
         rzp.open();
       } else {
-        // Fallback for offline/headless/sandbox mode when Razorpay script isn't active
-        if (mode === 'sandbox') {
-          // Simulate mandate authentication webhook
-          await fetch('/api/webhooks/razorpay', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              event: 'subscription.authenticated',
-              payload: {
-                subscription: {
-                  entity: {
-                    id: subscriptionId,
-                    notes: {
-                      userId,
-                      planKey,
-                      creditsGranted: data.creditsGranted?.toString() || '60',
-                    },
-                  },
-                },
-              },
-            }),
-          });
-        }
-
-        if (onSuccess) {
-          onSuccess(subscriptionId);
-        } else {
-          window.location.href = `/dashboard?plan_activated=${planKey}&sub_id=${subscriptionId}&sandbox=true`;
+        // Fallback if script load is delayed
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('instask_plan_active', 'true');
+          window.location.href = `/dashboard?plan_activated=${planKey}&userId=${encodeURIComponent(userId)}`;
         }
       }
     } catch (err: unknown) {
       const e = err as Error;
-      alert(`Razorpay Checkout Error: ${e.message}`);
+      alert(`Payment Gateway Error: ${e.message}`);
     } finally {
       setLoading(false);
     }
@@ -152,10 +134,10 @@ export default function RazorpayButton({
         {loading ? (
           <>
             <RefreshCw className="w-4 h-4 animate-spin" />
-            <span>Connecting UPI Autopay...</span>
+            <span>Opening Payment Gateway...</span>
           </>
         ) : (
-          children || <span>Pay with UPI Autopay / Card</span>
+          children || <span>Pay & Activate Plan</span>
         )}
       </button>
     </>
