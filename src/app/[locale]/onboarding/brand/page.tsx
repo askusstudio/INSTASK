@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GuidanceTooltip } from '@/components/ui/GuidanceTooltip';
 import { supabase } from '@/lib/supabaseClient';
 import {
@@ -14,7 +14,7 @@ import {
   UploadCloud,
   Image as ImageIcon,
   Palette,
-  Check,
+  Loader2,
 } from 'lucide-react';
 
 const INDUSTRIES = [
@@ -52,57 +52,77 @@ interface BrandOnboardingProps {
 
 export default function BrandOnboardingPage({ params: { locale } }: BrandOnboardingProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [brandName, setBrandName] = useState('Luna Artisan Bakery');
-  const [industry, setIndustry] = useState('Artisan Bakery');
-  const [country, setCountry] = useState('United States');
+  // Identify user from URL or session storage or fallback
+  const resolvedUserId = searchParams.get('userId') || (typeof window !== 'undefined' ? localStorage.getItem('instask_user_id') : null) || 'usr_demo_001';
+
+  // State defaults to empty (null representation) for first-time users
+  const [brandName, setBrandName] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [country, setCountry] = useState('');
   const [currency, setCurrency] = useState('USD');
-  const [website, setWebsite] = useState('https://lunabakery.com');
-  const [instagramHandle, setInstagramHandle] = useState('@artisan_luna_bakery');
+  const [website, setWebsite] = useState('');
+  const [instagramHandle, setInstagramHandle] = useState('');
   const [primaryColor, setPrimaryColor] = useState('#0F172A');
   const [accentColor, setAccentColor] = useState('#F43F5E');
   const [logoUrl, setLogoUrl] = useState('');
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load existing brand if present
+  // Load existing brand: If repeat user, pre-fill; if first time, remains empty
   useEffect(() => {
-    fetch('/api/brand?userId=usr_demo_001')
-      .then((res) => res.json())
-      .then((data) => {
+    async function loadBrandProfile() {
+      setIsInitialLoading(true);
+      try {
+        const res = await fetch(`/api/brand?userId=${encodeURIComponent(resolvedUserId)}`);
+        const data = await res.json();
+
         if (data.success && data.brand) {
-          if (data.brand.brandName) setBrandName(data.brand.brandName);
-          if (data.brand.industry) setIndustry(data.brand.industry);
-          if (data.brand.country) setCountry(data.brand.country);
-          if (data.brand.currency) setCurrency(data.brand.currency);
-          if (data.brand.website) setWebsite(data.brand.website);
-          if (data.brand.instagramHandle) setInstagramHandle(`@${data.brand.instagramHandle.replace(/^@/, '')}`);
+          // Returning user: autofill with existing saved records
+          setBrandName(data.brand.brandName || '');
+          setIndustry(data.brand.industry || '');
+          setCountry(data.brand.country || '');
+          setCurrency(data.brand.currency || 'USD');
+          setWebsite(data.brand.website || '');
+          setInstagramHandle(
+            data.brand.instagramHandle
+              ? `@${data.brand.instagramHandle.replace(/^@/, '')}`
+              : ''
+          );
+          if (data.brand.primaryColor) setPrimaryColor(data.brand.primaryColor);
+          if (data.brand.accentColor) setAccentColor(data.brand.accentColor);
           if (data.brand.logoUrl) {
             setLogoUrl(data.brand.logoUrl);
             setLogoPreview(data.brand.logoUrl);
           }
         }
-      })
-      .catch(() => {
-        // Fallback default is fine
-      });
-  }, []);
+        // If data.brand is null (first-time user), states stay blank as initialized
+      } catch (err) {
+        console.warn('Could not load existing brand profile:', err);
+      } finally {
+        setIsInitialLoading(false);
+      }
+    }
+
+    loadBrandProfile();
+  }, [resolvedUserId]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Instant local preview
     const reader = new FileReader();
     reader.onload = () => {
       setLogoPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
 
-    // Upload to Supabase Storage bucket 'brand-assets'
     try {
       setUploadingLogo(true);
       const fileExt = file.name.split('.').pop() || 'png';
@@ -125,12 +145,10 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
           setLogoUrl(publicData.publicUrl);
         }
       } else {
-        // Fallback gracefully if bucket is private or unprovisioned: use object URL
-        console.warn('Supabase upload notice, using local asset reference:', uploadErr);
-        setLogoUrl(reader.result as string || URL.createObjectURL(file));
+        setLogoUrl((reader.result as string) || URL.createObjectURL(file));
       }
     } catch (err) {
-      console.warn('Supabase storage exception:', err);
+      console.warn('Storage exception, using local preview reference:', err);
     } finally {
       setUploadingLogo(false);
     }
@@ -147,26 +165,26 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
 
     setLoading(true);
     try {
-      const res = await fetch('/api/brand/save', {
+      const res = await fetch('/api/brand', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: 'usr_demo_001',
+          userId: resolvedUserId,
           brandName,
-          industry,
+          industry: industry || 'Artisan Bakery',
           primaryColor,
           accentColor,
-          country,
+          country: country || 'United States',
           currency,
           website,
-          instagramHandle,
+          instagramHandle: instagramHandle.replace(/^@/, ''),
           logoUrl: logoUrl || logoPreview || '',
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        router.push(`/${locale}/onboarding/payment`);
+        router.push(`/${locale}/onboarding/payment?userId=${encodeURIComponent(resolvedUserId)}`);
       } else {
         setError(data.error || 'Failed to save brand profile');
       }
@@ -177,6 +195,17 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
       setLoading(false);
     }
   };
+
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2 text-slate-500">
+          <Loader2 className="w-6 h-6 animate-spin text-rose-500" />
+          <p className="text-xs font-semibold">Loading profile data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
@@ -244,7 +273,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
               />
             </div>
 
-            {/* Field 2: Logo Asset Upload (Supabase Storage) */}
+            {/* Field 2: Logo Asset Upload */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -265,7 +294,11 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
 
                 <div className="flex-1 space-y-1">
                   <p className="text-xs font-semibold text-slate-800">
-                    {uploadingLogo ? 'Uploading to Supabase Storage...' : logoPreview ? 'Logo ready for automated watermarks' : 'Upload your official brand logo'}
+                    {uploadingLogo
+                      ? 'Uploading to Storage...'
+                      : logoPreview
+                      ? 'Logo ready for automated watermarks'
+                      : 'Upload your official brand logo'}
                   </p>
                   <p className="text-[11px] text-slate-500">
                     Rendered in high-resolution across all generated carousel slides and Reels.
@@ -291,7 +324,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
               </div>
             </div>
 
-            {/* Field 3: Brand Colors (Primary & Accent) */}
+            {/* Field 3: Brand Colors */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -301,7 +334,6 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                 <span className="text-[11px] text-slate-400">Controls banner and text styling</span>
               </div>
 
-              {/* Color Presets */}
               <div className="grid grid-cols-5 gap-2 mb-3">
                 {COLOR_PRESETS.map((preset) => {
                   const isSelected = primaryColor === preset.primary && accentColor === preset.accent;
@@ -335,7 +367,6 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                 })}
               </div>
 
-              {/* Custom Hex Inputs */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl">
                   <input
