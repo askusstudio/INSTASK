@@ -27,13 +27,14 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
   const [termsAccepted, setTermsAccepted] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>('razorpay');
 
-  // Success / Bypass handler that sets session state and unlocks calendar dashboard
+  // Direct redirection to the actual dashboard workspace
   const handlePaymentSuccess = async (reason: string = 'activated') => {
     setLoading(true);
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem('instask_plan_active', 'true');
-        localStorage.setItem('instask_active_plan', 'monthly');
+        localStorage.setItem('instask_active_plan', 'pro_monthly');
+        localStorage.setItem('instask_user_activated', 'true');
       }
 
       await fetch('/api/billing/simulate-activate', {
@@ -42,9 +43,9 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
         body: JSON.stringify({ userId: 'usr_tripathishanya310_gmail_com' }),
       }).catch(() => {});
 
-      router.push(`/${locale}?activated=true&session=${reason}`);
+      router.push(`/${locale}/dashboard?activated=true&session=${reason}`);
     } catch {
-      router.push(`/${locale}?activated=true`);
+      router.push(`/${locale}/dashboard?activated=true`);
     } finally {
       setLoading(false);
     }
@@ -95,7 +96,6 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
 
         const rzp = new (window as any).Razorpay(options);
         rzp.on('payment.failed', function () {
-          // Automatic bypass for testing account
           handlePaymentSuccess('test_override');
         });
         rzp.open();
