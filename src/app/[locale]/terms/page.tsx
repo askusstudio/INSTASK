@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, Scale, FileText } from 'lucide-react';
+import { ArrowLeft, Scale } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 interface PolicyPageProps {
@@ -42,21 +42,25 @@ export default function TermsPage({ params: { locale } }: PolicyPageProps) {
               <span>Legal Agreement</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Terms of Service
+              Terms &amp; Conditions
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              INSTASK • Last Updated: September 2026
+              Effective Date: January 1, 2024 • Last Updated: 2024
             </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed">
+            This document is an electronic record under the Information Technology Act, 2000, and rules thereunder. This website, <strong>instask.in</strong> (alongside its official domains), is operated by <strong>askus studio</strong> under the brand name <strong>Instask</strong> (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). By accessing or using our platform, services, and automated software, you agree to be bound by these Terms and Conditions.
           </div>
 
           {/* Section 1 */}
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">1</span>
-              <span>Service Scope &amp; Role of INSTASK</span>
+              <span>Service Scope</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              All services, compute processing, and subscription memberships are provided directly by <strong>INSTASK</strong>. All transactions made on INSTASK are strictly final and non-refundable. INSTASK is an autonomous software tool that integrates approved third-party APIs (including Meta Platforms, Inc., Stripe, Google AI, Apify, and Creatomate) to streamline social media research, design generation, and publishing automation for businesses.
+              Instask provides cloud-based autonomous software-as-a-service (SaaS) that assists users in competitor research, automated social media content generation, visual asset rendering, and schedule management via official platform APIs.
             </p>
           </section>
 
@@ -64,51 +68,73 @@ export default function TermsPage({ params: { locale } }: PolicyPageProps) {
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">2</span>
-              <span>Meta / Instagram Platform Compliance</span>
+              <span>Account Registration and Security</span>
             </h2>
-            <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-              <p>
-                • You warrant that you are the verified administrator or authorized operator of the connected Instagram Business or Creator account and associated Facebook Page.
-              </p>
-              <p>
-                • You agree not to use Instask to post spam, copyright-infringing media, hate speech, or content that violates the Meta Community Standards or Instagram Platform Terms.
-              </p>
-              <p>
-                • INSTASK holds no liability for actions taken by Meta against your social account (e.g., account flags, shadowbans, or rate restrictions) resulting from your chosen brand prompts or excessive API calls.
-              </p>
-            </div>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              You must provide accurate, current, and complete details during registration. You are solely responsible for maintaining the confidentiality of your credentials and tokens. Users must be at least 18 years of age or possess legal business authority to enter into these terms.
+            </p>
           </section>
 
           {/* Section 3 */}
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">3</span>
-              <span>AI-Generated Output &amp; Review Obligation</span>
+              <span>Intellectual Property Rights</span>
             </h2>
-            <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-              <p>
-                • Content copy, captions, keywords, and graphical outputs are generated autonomously via AI models (including Gemini 2.5 Flash and Creatomate).
-              </p>
-              <p>
-                • While Instask provides automated scheduling, the <strong>user maintains full legal editorial responsibility</strong> for reviewing, approving, and verifying that all generated copy and graphics are factual, original, and compliant with local advertising guidelines before publication.
-              </p>
-            </div>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              All software, interfaces, algorithms, trademarks, and codebases remain the exclusive property of <strong>askus studio</strong>. Content, logos, brand colors, and assets uploaded by the user remain the property of the respective user.
+            </p>
           </section>
 
           {/* Section 4 */}
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">4</span>
-              <span>Chargebacks and Disputes</span>
+              <span>Acceptable Use and Third-Party Compliance</span>
+            </h2>
+            <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p>
+                Users agree not to use Instask for publishing defamatory, infringing, obscene, hateful, or unlawful material.
+              </p>
+              <p>
+                Users warrant compliance with the platform terms of any integrated services (including Meta Platform Terms and Instagram Community Guidelines).
+              </p>
+              <p>
+                We reserve the right to immediately suspend or terminate accounts engaging in abusive behavior, unauthorized scraping, or API spamming.
+              </p>
+            </div>
+          </section>
+
+          {/* Section 5 */}
+          <section className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">5</span>
+              <span>Limitation of Liability</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Initiating an unjustified dispute or credit card chargeback through your financial institution instead of utilizing standard account cancellation violates these Terms. In the event of an illegitimate chargeback, Instask reserves the right to immediately terminate the user account, ban associated Meta credentials, and submit server access logs, IP verification, and API generation records to the processing bank as conclusive proof of delivery.
+              To the maximum extent permitted by applicable law, <strong>askus studio</strong> shall not be liable for any indirect, incidental, or consequential damages, including loss of profits, data, reach, account restrictions, or business interruptions arising out of the use of our services.
             </p>
           </section>
 
+          {/* Section 6 */}
+          <section className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">6</span>
+              <span>Governing Law and Jurisdiction</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              These Terms are governed by and construed in accordance with the laws of India. Any disputes arising hereunder shall be subject to the exclusive jurisdiction of the competent courts in <strong>Uttar Pradesh, India</strong>.
+            </p>
+          </section>
+
+          {/* Contact Details */}
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900">
+            Support contact: <a href="mailto:support@instask.in" className="font-bold underline">support@instask.in</a> • Operational: <a href="mailto:askusstudio@gmail.com" className="font-bold underline">askusstudio@gmail.com</a> • Helpline: <span className="font-bold">+91 8009227002</span>
+          </div>
+
           {/* Legal Footer Attribution */}
           <div className="pt-8 border-t border-slate-100 text-xs text-slate-400 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span>Operated by <strong>INSTASK</strong> • All Rights Reserved</span>
+            <span>Operated by <strong>askus studio</strong> • Brand: <strong>Instask</strong></span>
             <div className="flex items-center gap-4">
               <Link href={`/${locale}/refund-policy`} className="hover:underline">Refund Policy</Link>
               <Link href={`/${locale}/privacy`} className="hover:underline">Privacy Policy</Link>

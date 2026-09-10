@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldAlert, Instagram, Lock, FileText, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ShieldAlert } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 interface PolicyPageProps {
@@ -39,104 +39,82 @@ export default function RefundPolicyPage({ params: { locale } }: PolicyPageProps
           <div className="border-b border-slate-100 pb-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold mb-3">
               <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-              <span>Contractual Consumer Waiver</span>
+              <span>Consumer Cancellation &amp; Refund Policy</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Refund &amp; Cancellation Policy
+              Cancellation and Refund Policy
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Strict No-Refund Policy for INSTASK • Last Updated: September 2026
+              Effective Date: January 1, 2024 • Last Updated: 2024
             </p>
           </div>
 
-          {/* Critical Notice Alert */}
-          <div className="bg-amber-50/80 border-2 border-amber-300 rounded-2xl p-5 text-amber-950 text-xs leading-relaxed space-y-2">
-            <p className="font-extrabold text-sm flex items-center gap-2">
-              <Lock className="w-4 h-4 text-amber-700" />
-              <span>Important Notice: Immediate Computational Delivery &amp; Waiver</span>
-            </p>
-            <p>
-              All services, compute processing, and subscription memberships are provided directly by <strong>INSTASK</strong>. All transactions made on INSTASK are strictly final and non-refundable. INSTASK provides immediate, automated computational execution (AI copy generation via Google Gemini, competitor scraping via Apify, and high-resolution rendering via Creatomate). By initiating subscription checkout, you explicitly consent to immediate service activation and contractually waive any statutory cooling-off or withdrawal refund rights under the EU/UK Consumer Rights Directives and global consumer protection statutes.
-            </p>
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed">
+            This policy outlines the terms of subscription cancellation, credit provisioning, and refund requests for services provided by <strong>askus studio</strong> under the brand <strong>Instask</strong> at <strong>instask.in</strong>.
           </div>
 
           {/* Section 1 */}
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">1</span>
-              <span>General Policy Overview</span>
+              <span>Subscription Cancellations</span>
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              All services, compute processing, and subscription memberships are provided directly by <strong>INSTASK</strong>. All transactions made on INSTASK are strictly final and non-refundable. INSTASK delivers instantaneous digital assets, computational API services, automated competitor data intelligence, and third-party media scheduling upon subscription activation. Because computational resources, AI tokens (Gemini), scraping credits (Apify), and visual rendering servers (Creatomate) are consumed immediately upon onboarding, <strong>all purchases, monthly subscriptions, and renewal transactions are strictly non-refundable</strong>.
-            </p>
+            <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p>
+                Users can cancel their recurring subscription (monthly, quarterly, semi-annual, or annual) at any time through their dashboard settings or customer billing portal.
+              </p>
+              <p>
+                Upon cancellation, automated recurring debits will stop immediately. You will retain full access to Instask until the conclusion of your current paid billing period.
+              </p>
+            </div>
           </section>
 
           {/* Section 2 */}
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">2</span>
-              <span>First-Month Promotional Rate &amp; Renewal</span>
+              <span>Strict No-Refund Policy for Digital Services</span>
             </h2>
-            <ul className="text-xs sm:text-sm text-slate-600 space-y-2 leading-relaxed list-disc list-inside">
-              <li>
-                The introductory 50% discount (applied with code <strong>FIRST50</strong>) applies strictly to your first 30-day billing cycle.
-              </li>
-              <li>
-                Following the first cycle, subscriptions renew automatically at the full published recurring rate unless cancelled prior to the renewal billing timestamp.
-              </li>
-              <li>
-                Failure to cancel before the billing cycle date does not qualify for a retroactive refund.
-              </li>
-            </ul>
+            <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p>
+                Instask provides immediate access to digital infrastructure, automated scraping pipelines, AI generation tokens, and third-party media rendering compute upon payment confirmation.
+              </p>
+              <p>
+                Because system resources, compute units, and API access are provisioned instantly: <strong>All transactions, subscription fees, credit pack purchases, and renewals are final and non-refundable.</strong>
+              </p>
+              <p>
+                No prorated or partial refunds are provided for unused portions of an active subscription cycle or unused generation credits.
+              </p>
+              <p>
+                Dissatisfaction with social media reach, follower growth, or third-party platform algorithm fluctuations does not constitute grounds for a monetary refund.
+              </p>
+            </div>
           </section>
 
           {/* Section 3 */}
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">3</span>
-              <span>Digital Delivery &amp; Immediate Consumption Waiver</span>
+              <span>Billing Errors &amp; Chargebacks</span>
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              By completing the Stripe checkout flow and submitting your brand details, you explicitly consent to the immediate provision of digital content and acknowledge that you forfeit any statutory right of withdrawal or cooling-off period (including rights under the EU/UK Consumer Rights Directives and similar global consumer protection laws). Once your 30-day queue is initialized, computational delivery is deemed 100% complete.
-            </p>
-          </section>
-
-          {/* Section 4 */}
-          <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">4</span>
-              <span>External Platform Disclaimers &amp; Algorithm Caveats</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Instask does not issue refunds based on:
-            </p>
-            <div className="space-y-2 text-xs sm:text-sm text-slate-600 pl-4 border-l-2 border-slate-200">
+            <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
               <p>
-                <strong>Account Reach or Engagement Variance:</strong> Social media algorithms, follower growth, reach, impressions, and viral outcomes remain subject to Instagram/Meta platform discretion. We do not guarantee arbitrary quantitative growth metrics.
+                In the event of an accidental double debit or technical payment processing error verified by our payment gateway partners, the duplicate charge will be refunded back to the original source payment method within <strong>5–7 business days</strong>.
               </p>
               <p>
-                <strong>User-Initiated Token Disconnection:</strong> If you disconnect your Instagram account, change your Facebook password, or revoke OAuth tokens, Instask remains available and your subscription stays active; unposted days due to user disconnection are non-refundable.
-              </p>
-              <p>
-                <strong>Third-Party Service Outages:</strong> Occasional downtime or rate limiting caused by Meta Graph API, Apify, or Creatomate does not entitle the subscriber to monetary refunds.
+                For transaction inquiries, write to <a href="mailto:support@instask.in" className="font-bold underline text-slate-900">support@instask.in</a> before contacting card networks or initiating formal disputes.
               </p>
             </div>
           </section>
 
-          {/* Section 5 */}
-          <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">5</span>
-              <span>How to Cancel</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              You may cancel your subscription at any time via your Instask Account Billing Settings or directly through your Stripe customer portal. Upon cancellation, auto-billing halts immediately, and your dashboard access remains active until the end of your current paid billing period.
-            </p>
-          </section>
+          {/* Contact Details */}
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900">
+            Support contact: <a href="mailto:support@instask.in" className="font-bold underline">support@instask.in</a> • Operational: <a href="mailto:askusstudio@gmail.com" className="font-bold underline">askusstudio@gmail.com</a> • Helpline: <span className="font-bold">+91 8009227002</span>
+          </div>
 
           {/* Legal Footer Attribution */}
           <div className="pt-8 border-t border-slate-100 text-xs text-slate-400 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span>Operated by <strong>INSTASK</strong> • All Rights Reserved</span>
+            <span>Operated by <strong>askus studio</strong> • Brand: <strong>Instask</strong></span>
             <div className="flex items-center gap-4">
               <Link href={`/${locale}/terms`} className="hover:underline">Terms of Service</Link>
               <Link href={`/${locale}/privacy`} className="hover:underline">Privacy Policy</Link>

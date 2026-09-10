@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, Lock, Eye } from 'lucide-react';
+import { ArrowLeft, ShieldCheck } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 interface PolicyPageProps {
@@ -45,8 +45,12 @@ export default function PrivacyPolicyPage({ params: { locale } }: PolicyPageProp
               Privacy Policy
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              INSTASK • Last Updated: September 2026
+              Effective Date: January 1, 2024 • Last Updated: 2024
             </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed">
+            <strong>askus studio</strong> (&quot;Instask&quot;, &quot;we&quot;, &quot;our&quot;) values your trust and is committed to protecting your privacy. This Privacy Policy details how we collect, store, and process personal and business data across our website <strong>instask.in</strong> and related software services.
           </div>
 
           {/* Section 1 */}
@@ -57,13 +61,13 @@ export default function PrivacyPolicyPage({ params: { locale } }: PolicyPageProp
             </h2>
             <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
               <p>
-                • <strong>Account Identifiers:</strong> Email address, mobile phone number, and basic billing metadata processed through Stripe. (Instask never views, logs, or stores raw credit card details).
+                • <strong>Account Information:</strong> Name, email address, phone number (+91), and billing information provided during registration.
               </p>
               <p>
-                • <strong>Meta Account Data:</strong> Instagram Business ID, Facebook Page Access Tokens, and profile usernames authorized securely via Meta OAuth 2.0.
+                • <strong>Brand Assets:</strong> Business handles, brand colors, uploaded logos, and target competitor account identifiers.
               </p>
               <p>
-                • <strong>Brand Strategy Data:</strong> Submitted competitor account handles, brand color hex codes, uploaded logos, and generated asset history.
+                • <strong>System Identifiers:</strong> IP addresses, browser types, session tokens, and access timestamps.
               </p>
             </div>
           </section>
@@ -72,18 +76,12 @@ export default function PrivacyPolicyPage({ params: { locale } }: PolicyPageProp
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">2</span>
-              <span>How Data Is Handled with Third Parties</span>
+              <span>How We Use Your Information</span>
             </h2>
             <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-              <p>
-                • <strong>Stripe:</strong> Utilized for 256-bit encrypted payment processing and subscription billing state management.
-              </p>
-              <p>
-                • <strong>Meta Graph API:</strong> Directly utilized to create media containers and publish authorized content to your Instagram professional feed.
-              </p>
-              <p>
-                • <strong>LLM &amp; Rendering Engines:</strong> Copy prompts and brand data are routed via encrypted endpoints (Gemini API &amp; Creatomate) solely for dynamic graphic and copy creation. <strong>Your data is never sold to external third-party data brokers or ad networks.</strong>
-              </p>
+              <p>• To provision your automated marketing calendar and process graphic rendering.</p>
+              <p>• To manage recurring billing, authentication, and token deductions.</p>
+              <p>• To communicate platform alerts, queue updates, and support notices.</p>
             </div>
           </section>
 
@@ -91,16 +89,46 @@ export default function PrivacyPolicyPage({ params: { locale } }: PolicyPageProp
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">3</span>
-              <span>Data Retention and Account Disconnection</span>
+              <span>Data Protection and Third-Party Disclosures</span>
+            </h2>
+            <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p>We do not sell or rent user data to third parties or data brokers.</p>
+              <p>Necessary metadata is transmitted via secure, encrypted protocols to verified infrastructure providers:</p>
+              <p>• <strong>Payment Gateways:</strong> Razorpay / Stripe (for encrypted payment and autopay processing).</p>
+              <p>• <strong>API Integrations:</strong> Meta Graph API, rendering servers, and language model providers solely for post execution.</p>
+            </div>
+          </section>
+
+          {/* Section 4 */}
+          <section className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">4</span>
+              <span>Data Security</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              You can disconnect Instask from your Meta account at any moment through Instagram Settings -&gt; &quot;Apps and Websites&quot; or directly via the Instask dashboard. All cached access tokens are revoked immediately upon disconnection.
+              We maintain industry-standard administrative, technical, and physical safeguards (including SSL/TLS encryption and restricted database access) to protect against unauthorized access or alteration of your personal data.
             </p>
           </section>
 
+          {/* Section 5 */}
+          <section className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center">5</span>
+              <span>User Rights and Data Erasure</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Users may request access to, correction of, or permanent deletion of their account data by contacting our grievance team at <a href="mailto:support@instask.in" className="font-bold underline text-slate-900">support@instask.in</a>.
+            </p>
+          </section>
+
+          {/* Contact Details */}
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900">
+            Support contact: <a href="mailto:support@instask.in" className="font-bold underline">support@instask.in</a> • Operational: <a href="mailto:askusstudio@gmail.com" className="font-bold underline">askusstudio@gmail.com</a> • Helpline: <span className="font-bold">+91 8009227002</span>
+          </div>
+
           {/* Legal Footer Attribution */}
           <div className="pt-8 border-t border-slate-100 text-xs text-slate-400 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span>Operated by <strong>INSTASK</strong> • All Rights Reserved</span>
+            <span>Operated by <strong>askus studio</strong> • Brand: <strong>Instask</strong></span>
             <div className="flex items-center gap-4">
               <Link href={`/${locale}/terms`} className="hover:underline">Terms of Service</Link>
               <Link href={`/${locale}/refund-policy`} className="hover:underline">Refund Policy</Link>
