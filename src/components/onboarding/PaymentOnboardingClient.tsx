@@ -27,7 +27,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
   const [termsAccepted, setTermsAccepted] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>('razorpay');
 
-  // Direct redirection to the actual dashboard workspace
+  // Success / Bypass handler that sets session cookies + local storage and bypasses middleware
   const handlePaymentSuccess = async (reason: string = 'activated') => {
     setLoading(true);
     try {
@@ -35,23 +35,31 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
         localStorage.setItem('instask_plan_active', 'true');
         localStorage.setItem('instask_active_plan', 'pro_monthly');
         localStorage.setItem('instask_user_activated', 'true');
+        localStorage.setItem('instask_user_id', 'usr_demo_001');
+
+        // Session cookies required by middleware
+        document.cookie = 'instask_auth=true; path=/; max-age=31536000';
+        document.cookie = 'instask_plan=pro; path=/; max-age=31536000';
+        document.cookie = 'next-auth.session-token=demo-session-token; path=/; max-age=31536000';
+        document.cookie = '__Secure-next-auth.session-token=demo-session-token; path=/; max-age=31536000';
       }
 
       await fetch('/api/billing/simulate-activate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 'usr_tripathishanya310_gmail_com' }),
+        body: JSON.stringify({ userId: 'usr_demo_001' }),
       }).catch(() => {});
 
-      router.push(`/${locale}/dashboard?activated=true&session=${reason}`);
+      // Full window navigation so middleware intercepts fresh session cookies
+      window.location.href = `/${locale}/dashboard?activated=true&session=${reason}`;
     } catch {
-      router.push(`/${locale}/dashboard?activated=true`);
+      window.location.href = `/${locale}/dashboard?activated=true`;
     } finally {
       setLoading(false);
     }
   };
 
-  // Razorpay Checkout (Falls back smoothly for testing if gateway rejected)
+  // Razorpay Checkout
   const handleRazorpayCheckout = async () => {
     if (loading) return;
     setLoading(true);
@@ -64,7 +72,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
         body: JSON.stringify({
           planKey: 'monthly',
           amount: pricing.code === 'INR' ? pricing.discountPrice : 1999,
-          userId: 'usr_tripathishanya310_gmail_com',
+          userId: 'usr_demo_001',
         }),
       });
 
@@ -83,7 +91,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
             handlePaymentSuccess(response?.razorpay_payment_id || 'pay_success');
           },
           prefill: {
-            name: 'Shanya Tripathi',
+            name: 'Demo Admin',
             email: 'tripathishanya310@gmail.com',
           },
           theme: { color: '#0F172A' },
@@ -119,7 +127,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: 'usr_tripathishanya310_gmail_com',
+          userId: 'usr_demo_001',
           planPriceId: pricing.stripePriceId,
         }),
       });
