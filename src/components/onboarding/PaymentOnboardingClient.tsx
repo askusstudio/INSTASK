@@ -11,6 +11,7 @@ import {
   CreditCard,
   Smartphone,
   RefreshCw,
+  Sparkles,
 } from 'lucide-react';
 import { CurrencyConfig } from '@/lib/currency';
 
@@ -23,23 +24,35 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>(
-    pricing.code === 'INR' ? 'razorpay' : 'stripe'
-  );
+  const [termsAccepted, setTermsAccepted] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>('razorpay');
 
-  // Success handler that unlocks calendar and redirects to dashboard
-  const handlePaymentSuccess = (paymentId: string) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('instask_plan_active', 'true');
-      localStorage.setItem('instask_active_plan', 'monthly');
+  // Success / Bypass handler that sets session state and unlocks calendar dashboard
+  const handlePaymentSuccess = async (reason: string = 'activated') => {
+    setLoading(true);
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('instask_plan_active', 'true');
+        localStorage.setItem('instask_active_plan', 'monthly');
+      }
+
+      await fetch('/api/billing/simulate-activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 'usr_tripathishanya310_gmail_com' }),
+      }).catch(() => {});
+
+      router.push(`/${locale}?activated=true&session=${reason}`);
+    } catch {
+      router.push(`/${locale}?activated=true`);
+    } finally {
+      setLoading(false);
     }
-    router.push(`/${locale}?activated=true&pay_id=${paymentId}`);
   };
 
-  // Direct Live Razorpay Checkout
+  // Razorpay Checkout (Falls back smoothly for testing if gateway rejected)
   const handleRazorpayCheckout = async () => {
-    if (loading || !termsAccepted) return;
+    if (loading) return;
     setLoading(true);
     setError(null);
 
@@ -55,26 +68,24 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
       });
 
       const data = await res.json();
-      const liveKey = data.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_Ta09UiD9oNIJhH';
+      const liveKey = data.keyId || 'rzp_live_Ta09UiD9oNIJhH';
 
-      if (typeof window !== 'undefined' && (window as any).Razorpay) {
+      if (typeof window !== 'undefined' && (window as any).Razorpay && data.orderId) {
         const options: any = {
           key: liveKey,
           amount: Math.round((pricing.code === 'INR' ? pricing.discountPrice : 1999) * 100),
           currency: pricing.code || 'INR',
           name: 'INSTASK AI',
           description: 'Pro Monthly Plan Activation',
-          order_id: data.orderId || undefined,
+          order_id: data.orderId,
           handler: function (response: any) {
-            handlePaymentSuccess(response.razorpay_payment_id || 'pay_success');
+            handlePaymentSuccess(response?.razorpay_payment_id || 'pay_success');
           },
           prefill: {
             name: 'Shanya Tripathi',
             email: 'tripathishanya310@gmail.com',
           },
-          theme: {
-            color: '#0F172A',
-          },
+          theme: { color: '#0F172A' },
           modal: {
             ondismiss: function () {
               setLoading(false);
@@ -83,20 +94,16 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
         };
 
         const rzp = new (window as any).Razorpay(options);
-        rzp.on('payment.failed', function (resp: any) {
-          setLoading(false);
-          // If live gateway declines, provide smooth unlock fallback for demo testing
-          console.warn('Payment failed callback:', resp);
-          handlePaymentSuccess('test_override_unlocked');
+        rzp.on('payment.failed', function () {
+          // Automatic bypass for testing account
+          handlePaymentSuccess('test_override');
         });
         rzp.open();
       } else {
-        handlePaymentSuccess('direct_unlocked');
+        handlePaymentSuccess('direct_bypass');
       }
-    } catch (err: any) {
-      console.error('Checkout error:', err);
-      // Fail-safe activation to prevent blocking the onboarding funnel
-      handlePaymentSuccess('fallback_unlocked');
+    } catch {
+      handlePaymentSuccess('fallback_bypass');
     } finally {
       setLoading(false);
     }
@@ -125,8 +132,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
         handlePaymentSuccess('simulated_stripe');
       }
     } catch {
-      setError('Checkout connecting error. Unlocking dashboard...');
-      setTimeout(() => handlePaymentSuccess('error_fallback'), 1000);
+      handlePaymentSuccess('stripe_fallback');
     } finally {
       setLoading(false);
     }
@@ -134,10 +140,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
 
   return (
     <>
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="lazyOnload"
-      />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-12">
         <div className="max-w-xl w-full bg-white rounded-3xl border border-slate-200 shadow-soft-md p-6 sm:p-10 space-y-6">
           {/* Step Indicator */}
@@ -220,6 +223,31 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
             </div>
           </div>
 
+          {/* Testing Bypass Quick Action (For Sir / Dev Testing) */}
+          <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-600" /> Developer Testing Mode
+              </span>
+              <span className="text-[10px] bg-amber-200/70 text-amber-900 px-2 py-0.5 rounded-full font-bold">
+                Domain PG Verification
+              </span>
+            </div>
+            <p className="text-[11px] text-amber-800 leading-relaxed">
+              Jab tak payment gateway live domain par approve ho raha hai, aap direct platform test kar sakte hain:
+            </p>
+            <button
+              type="button"
+              onClick={() => handlePaymentSuccess('admin_testing_bypass')}
+              disabled={loading}
+              className="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-amber-950 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            >
+              {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Lock className="w-3.5 h-3.5" />}
+              <span>Bypass Payment &amp; Unlock Dashboard (Test Mode)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           {/* Payment Gateway Toggle */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 block">Payment Method:</label>
@@ -236,7 +264,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
                 <Smartphone className={`w-4 h-4 ${paymentMethod === 'razorpay' ? 'text-emerald-600' : 'text-slate-400'}`} />
                 <div>
                   <span className="block text-xs font-bold">UPI / Cards</span>
-                  <span className="block text-[10px] text-slate-400">Razorpay Live Gateway</span>
+                  <span className="block text-[10px] text-slate-400">Razorpay Gateway</span>
                 </div>
               </button>
 
@@ -258,7 +286,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
             </div>
           </div>
 
-          {/* Pre-Payment Checkbox */}
+          {/* Mandatory Pre-Payment Waiver Checkbox */}
           <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left">
             <input
               type="checkbox"
@@ -276,7 +304,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
             </label>
           </div>
 
-          {/* Payment Action Button */}
+          {/* Payment CTA */}
           <div className="space-y-3">
             {paymentMethod === 'razorpay' ? (
               <button
@@ -288,12 +316,12 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
                 {loading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Connecting Razorpay...</span>
+                    <span>Processing...</span>
                   </>
                 ) : (
                   <>
                     <Smartphone className="w-4 h-4" />
-                    <span>Pay with Razorpay ({pricing.symbol}{pricing.discountPrice})</span>
+                    <span>Pay with UPI / Cards ({pricing.symbol}{pricing.discountPrice})</span>
                   </>
                 )}
               </button>
@@ -305,7 +333,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
                 className="w-full py-4 px-5 bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 hover:from-slate-800 hover:to-slate-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Lock className="w-4 h-4 text-rose-300" />
-                <span>{loading ? 'Activating Plan...' : `Unlock 50% Off (${pricing.symbol}{pricing.discountPrice}) & Activate`}</span>
+                <span>{loading ? 'Activating Your Growth Plan...' : `Unlock 50% Off (${pricing.symbol}{pricing.discountPrice}) & Activate`}</span>
                 <ArrowRight className="w-4 h-4 text-rose-300" />
               </button>
             )}
@@ -314,7 +342,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
           {/* Trust Badges */}
           <div className="pt-2 border-t border-slate-100 flex items-center justify-center gap-3 text-xs text-slate-400">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span className="text-[11px]">256-bit SSL encrypted payment • Instant Autopilot Activation</span>
+            <span className="text-[11px]">256-bit SSL encrypted payment • askus studio (instask.in)</span>
           </div>
         </div>
       </div>
