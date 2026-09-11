@@ -33,8 +33,10 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem('instask_plan_active', 'true');
+        localStorage.setItem('instask_plan_activated', 'true');
         localStorage.setItem('instask_active_plan', 'pro_monthly');
         localStorage.setItem('instask_user_activated', 'true');
+        localStorage.setItem('instask_wizard_completed', 'true');
         localStorage.setItem('instask_payment_id', paymentId);
 
         // Session cookies required by middleware
@@ -50,9 +52,9 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
         body: JSON.stringify({ userId: 'usr_demo_001', paymentId }),
       }).catch(() => {});
 
-      window.location.href = `/${locale}/dashboard?activated=true&session=paid_${paymentId}`;
+      window.location.href = `/${locale}/dashboard?activated=true&view=calendar&session=paid_${paymentId}`;
     } catch {
-      window.location.href = `/${locale}/dashboard?activated=true`;
+      window.location.href = `/${locale}/dashboard?activated=true&view=calendar`;
     } finally {
       setLoading(false);
     }
@@ -79,13 +81,11 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
     setError(null);
 
     try {
-      // 1. Ensure Razorpay SDK is loaded
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
         throw new Error('Razorpay SDK failed to load. Please check your internet connection.');
       }
 
-      // 2. Call backend order creation API
       const res = await fetch('/api/billing/razorpay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -102,7 +102,6 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
         throw new Error(data.error || 'Failed to create payment order with Razorpay.');
       }
 
-      // 3. Use the new active Live Razorpay Key
       const activeKey = data.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_Taeho8Zjy6LgGW';
 
       const options: any = {

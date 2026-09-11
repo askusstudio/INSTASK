@@ -52,7 +52,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const { dismissAllGuidance } = useGuidance();
   const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('wizard');
+  const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('calendar');
 
   const [posts, setPosts] = useState<PostRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -131,15 +131,16 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     };
     fetchCredits();
 
-    const hasPaid =
-      searchParams.get('payment') === 'success' ||
+    const isActivated =
       searchParams.get('activated') === 'true' ||
+      searchParams.get('payment') === 'success' ||
       (typeof window !== 'undefined' && localStorage.getItem('instask_plan_activated') === 'true');
 
-    if (hasPaid) {
+    if (isActivated) {
       setIsPaymentSuccess(true);
       if (typeof window !== 'undefined') {
         localStorage.setItem('instask_plan_activated', 'true');
+        localStorage.setItem('instask_wizard_completed', 'true');
       }
     }
 
@@ -147,13 +148,12 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       fetchCredits();
     }
 
-    if (typeof window !== 'undefined') {
-      const isCompleted = localStorage.getItem('instask_wizard_completed') === 'true';
-      if (searchParams.get('view') === 'calendar' && isCompleted && hasPaid) {
-        setActiveTab('calendar');
-      } else {
-        setActiveTab('wizard');
-      }
+    // Directly open calendar if activated or requested via view param
+    const viewParam = searchParams.get('view');
+    if (viewParam === 'wizard' && !isActivated) {
+      setActiveTab('wizard');
+    } else {
+      setActiveTab('calendar');
     }
   }, [searchParams]);
 
@@ -173,7 +173,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     setShowBlueprintModal(true);
   };
 
-  // Enforce Paywall: Blueprint select hote hi payment route par bhejega
   const handleApplyStrategy = async (selectedTemplateId: string) => {
     dismissAllGuidance();
 
@@ -189,7 +188,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     const handle = pendingMetaAccount?.username || account?.username || profile.brandName.toLowerCase().replace(/\s+/g, '_');
     const igUserId = pendingMetaAccount?.igUserId || `ig_${Date.now()}`;
 
-    // Brand metadata save karein
     if (typeof window !== 'undefined') {
       localStorage.setItem('instask_brand_name', profile.brandName);
       localStorage.setItem('instask_ig_handle', handle);
@@ -197,7 +195,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       localStorage.setItem('instask_wizard_completed', 'true');
     }
 
-    // Plan generate trigger background mein karein
     fetch('/api/generate-plan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -216,14 +213,11 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }).catch((err) => console.warn('Plan generation initiated:', err));
 
     setShowBlueprintModal(false);
-
-    // Payment compulsory: seedha payment checkout page par redirect
     router.push(`/${locale}/onboarding/payment?userId=usr_main&plan=pro_monthly`);
   };
 
   const handleSelectTab = (tab: 'calendar' | 'wizard') => {
     if (tab === 'calendar' && !isPaymentSuccess) {
-      // Bina payment calendar dekhne par paywall par redirect karega
       router.push(`/${locale}/onboarding/payment?userId=usr_main&required=true`);
       return;
     }
