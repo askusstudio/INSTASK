@@ -1,11 +1,9 @@
 // INSTASK - Posts Management & Batch Autopilot Route
-// GET /api/posts - list all 30 posts
+// GET /api/posts - list all posts
 // POST /api/posts - batch approve all posts and activate autopilot
 
 import { NextResponse } from 'next/server';
 import { memoryStore, prisma, PostRecord } from '@/lib/prisma';
-import { generateDeterministicGrowthPlan } from '@/lib/gemini';
-import { renderPostAsset } from '@/lib/creatomate';
 
 export async function GET(request: Request) {
   try {
@@ -41,75 +39,20 @@ export async function GET(request: Request) {
     // Check memory store
     if (posts.length === 0) {
       for (const p of Array.from(memoryStore.posts.values())) {
-        if (p.accountId === accountId || accountId === 'acc_user_main') {
+        if (p.accountId === accountId) {
           posts.push(p);
         }
       }
     }
 
-    // If still empty, auto-generate default 30-day sample plan so the user immediately sees the calendar!
-    if (posts.length === 0) {
-      const defaultAccount = memoryStore.accounts.get('acc_demo_001') || {
-        brandName: 'Luna Artisan Bakery',
-        city: 'Austin, TX',
-        productSummary: 'Fresh sourdough breads, handcrafted viennoiseries, and specialty pour-over coffee.',
-        brandColor: '#e1306c',
-        language: 'en',
-      };
-
-      const planItems = generateDeterministicGrowthPlan({
-        brandName: defaultAccount.brandName,
-        location: defaultAccount.city || 'Austin, TX',
-        productSummary: defaultAccount.productSummary,
-        competitors: ['@tartinebakery', '@lafamille', '@sweetcrust'],
-        language: defaultAccount.language,
-      });
-
-      const now = new Date();
-
-      for (const item of planItems) {
-        const postId = `post_day_${item.day}`;
-        const renderResult = await renderPostAsset({
-          templateId: item.template_id,
-          aspectRatio: item.aspect_ratio,
-          brandName: defaultAccount.brandName,
-          brandColor: defaultAccount.brandColor || '#e1306c',
-          handle: 'luna_artisan_bakery',
-          headline: item.headline,
-          bullets: item.body_bullets,
-          theme: item.theme,
-          dayNumber: item.day,
-        });
-
-        const record: PostRecord = {
-          id: postId,
-          accountId: 'acc_user_main',
-          dayNumber: item.day,
-          scheduledTime: new Date(item.scheduled_time),
-          theme: item.theme,
-          headline: item.headline,
-          bodyBullets: item.body_bullets,
-          caption: item.caption,
-          hashtags: item.hashtags,
-          templateId: item.template_id,
-          mediaType: 'IMAGE',
-          mediaUrl: renderResult.mediaUrl,
-          mediaAspectRatio: renderResult.aspectRatio,
-          status: item.day <= 2 ? 'PUBLISHED' : item.day <= 5 ? 'APPROVED' : 'DRAFT',
-          publishedAt: item.day <= 2 ? new Date(Date.now() - (3 - item.day) * 86400000) : null,
-          livePostId: item.day <= 2 ? `178414${item.day}9283746` : null,
-          createdAt: now,
-          updatedAt: now,
-        };
-
-        memoryStore.posts.set(postId, record);
-        posts.push(record);
-      }
-    }
-
     posts.sort((a, b) => a.dayNumber - b.dayNumber);
 
-    const account = memoryStore.accounts.get(accountId) || memoryStore.accounts.get('acc_demo_001');
+    // Only return the user's actual registered account; do not fall back to acc_demo_001
+    let account = memoryStore.accounts.get(accountId) || null;
+
+    if (account && (account.username?.includes('artisan_luna') || account.brandName?.includes('Luna Artisan'))) {
+      account = null;
+    }
 
     return NextResponse.json({
       success: true,
@@ -171,7 +114,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'All 30 posts approved for publishing and autopilot activated.',
+      message: 'All posts approved for publishing and autopilot activated.',
       approvedCount: updatedCount,
       autoPilotEnabled: enableAutopilot,
     });
