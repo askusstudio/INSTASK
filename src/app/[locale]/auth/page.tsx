@@ -45,7 +45,8 @@ export default function AuthPage({ params }: AuthPageProps) {
       localStorage.setItem('instask_user_email', email || 'user@instask.ai');
       document.cookie = 'instask_auth=true; path=/; max-age=31536000';
     }
-    router.push(`/${safeLocale}/onboarding/brand?userId=${encodeURIComponent(userId)}`);
+    // Direct 3-step setup wizard dashboard par redirect
+    router.push(`/${safeLocale}/dashboard?activated=true&session=paid_admin_testing_bypass`);
   };
 
   // 1. Send Direct 6-Digit Email OTP
@@ -120,7 +121,7 @@ export default function AuthPage({ params }: AuthPageProps) {
       const { error: sbError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/${safeLocale}/onboarding/brand`,
+          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/${safeLocale}/dashboard?activated=true&session=paid_admin_testing_bypass`,
         },
       });
 
