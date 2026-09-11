@@ -10,13 +10,11 @@ import {
   Edit3,
   ImagePlus,
   Lock,
-  Sparkles,
   X,
-  Check,
   Zap,
-  QrCode,
-  ArrowRight,
   ShieldCheck,
+  Smartphone,
+  RefreshCw,
 } from 'lucide-react';
 import { PostRecord } from '@/lib/prisma';
 
@@ -41,9 +39,8 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
   const [currentMedia, setCurrentMedia] = useState<string | null>(post.mediaUrl || null);
   const [isVideo, setIsVideo] = useState(false);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
-  
-  // Strict check: testing me compulsory QR khule
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const themeStyle = THEME_STYLES[post.theme] || {
     bg: 'bg-slate-50',
@@ -62,26 +59,93 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
   const isDraft = post.status === 'DRAFT';
   const isFailed = post.status === 'FAILED';
 
-  // Click handler for Replace / Gallery: turant QR open karega
-  const handleReplaceClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!isUnlocked) {
-      setShowPaywallModal(true);
-    } else {
-      fileInputRef.current?.click();
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (typeof window !== 'undefined' && (window as any).Razorpay) {
+        return resolve(true);
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleOpenLivePayment = async () => {
+    setIsProcessingPayment(true);
+    setPaymentError(null);
+
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error('Payment gateway failed to load. Please check internet connection.');
+      }
+
+      // Order creation
+      const res = await fetch('/api/billing/razorpay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planKey: 'addon_custom_media',
+          amount: 2000,
+          userId: 'usr_main',
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.orderId) {
+        throw new Error(data.error || 'Failed to create ₹2,000 order.');
+      }
+
+      const activeKey = data.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_Taeho8Zjy6LgGW';
+
+      const options: any = {
+        key: activeKey,
+        amount: 2000 * 100,
+        currency: 'INR',
+        name: 'INSTASK Studio',
+        description: 'Unlock Custom Gallery Upload (+₹2,000)',
+        order_id: data.orderId,
+        handler: function () {
+          // PAYMENT COMPLETE: Sirf yahan aane par hi gallery open hogi
+          setShowPaywallModal(false);
+          setIsProcessingPayment(false);
+          setTimeout(() => {
+            fileInputRef.current?.click();
+          }, 300);
+        },
+        prefill: {
+          name: 'INSTASK Client',
+          email: 'tripathishanya310@gmail.com',
+          contact: '918429451312',
+        },
+        theme: { color: '#059669' },
+        modal: {
+          ondismiss: function () {
+            setIsProcessingPayment(false);
+          },
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        setPaymentError(response.error?.description || 'Payment failed. Please try again.');
+        setIsProcessingPayment(false);
+      });
+
+      rzp.open();
+    } catch (err: any) {
+      setPaymentError(err.message || 'Payment initiation failed.');
+      setIsProcessingPayment(false);
     }
   };
 
-  // ₹2,000 QR Code Payment Complete & Instant Gallery Open
-  const handleUnlockPayment = () => {
-    setIsUnlocked(true);
-    setShowPaywallModal(false);
-    setTimeout(() => {
-      fileInputRef.current?.click();
-    }, 250);
+  const handleReplaceClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowPaywallModal(true);
   };
 
-  // File Upload and Live Preview Replacement
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -93,7 +157,6 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
 
   return (
     <>
-      {/* Hidden File Input */}
       <input
         type="file"
         ref={fileInputRef}
@@ -106,19 +169,17 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
         onClick={onClick}
         className="group relative bg-white rounded-2xl border border-slate-200 hover:border-slate-300 shadow-soft hover:shadow-soft-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer transform hover:-translate-y-0.5 gpu-layer touch-manipulation active:scale-[0.99]"
       >
-        {/* Card Header: Day & Schedule Time */}
         <div className="p-3 pb-2 flex items-center justify-between border-b border-slate-100">
           <div className="flex items-center gap-1.5">
             <span className="w-6 h-6 rounded-lg bg-slate-900 text-white text-[11px] font-extrabold flex items-center justify-center">
               {post.dayNumber}
             </span>
             <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-              <Clock className="w-3 3 text-slate-400" />
+              <Clock className="w-3 h-3 text-slate-400" />
               {formattedTime}
             </span>
           </div>
 
-          {/* Status Badge */}
           <div>
             {isPublished && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
@@ -146,7 +207,6 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
           </div>
         </div>
 
-        {/* Visual Thumbnail */}
         <div className="relative aspect-square w-full bg-slate-900 overflow-hidden">
           {currentMedia ? (
             isVideo ? (
@@ -174,7 +234,6 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
             </div>
           )}
 
-          {/* Theme Pill Overlay */}
           <div className="absolute top-2 left-2">
             <span
               className={`px-2 py-0.5 rounded-md text-[10px] font-bold border backdrop-blur-md shadow-sm ${themeStyle.bg} ${themeStyle.text} ${themeStyle.border}`}
@@ -183,7 +242,6 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
             </span>
           </div>
 
-          {/* Quick Replace Button on Top Right of Media */}
           <button
             type="button"
             onClick={handleReplaceClick}
@@ -192,11 +250,10 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
           >
             <ImagePlus className="w-3.5 h-3.5 text-rose-400" />
             <span>Replace</span>
-            {!isUnlocked && <Lock className="w-2.5 h-2.5 text-amber-400 ml-0.5" />}
+            <Lock className="w-2.5 h-2.5 text-amber-400 ml-0.5" />
           </button>
         </div>
 
-        {/* Content Summary */}
         <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
           <div>
             <h4 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-rose-600 transition">
@@ -207,7 +264,6 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
             </p>
           </div>
 
-          {/* Footer Actions */}
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
             <button
               type="button"
@@ -216,11 +272,9 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
             >
               <ImagePlus className="w-3.5 h-3.5 text-rose-500" />
               <span>Gallery</span>
-              {!isUnlocked && (
-                <span className="text-[9px] font-extrabold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300">
-                  +₹2,000
-                </span>
-              )}
+              <span className="text-[9px] font-extrabold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300">
+                +₹2,000
+              </span>
             </button>
 
             <div className="flex items-center gap-1.5">
@@ -247,86 +301,77 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
         </div>
       </div>
 
-      {/* ₹2,000 UPI QR Code Paywall Modal */}
       {showPaywallModal && (
         <div
           onClick={(e) => {
             e.stopPropagation();
             setShowPaywallModal(false);
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-sm w-full p-5 sm:p-6 text-center relative animate-in fade-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto gpu-layer space-y-3.5"
+            className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-sm w-full p-6 text-center relative space-y-4"
           >
-            {/* Close Button */}
             <button
               type="button"
               onClick={() => setShowPaywallModal(false)}
-              className="w-9 h-9 flex items-center justify-center absolute top-3.5 right-3.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition touch-manipulation cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center absolute top-3.5 right-3.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
               aria-label="Close paywall modal"
             >
               <X className="w-4 h-4" />
             </button>
 
-            {/* Icon */}
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center text-white mx-auto shadow-sm">
-              <QrCode className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+              <Smartphone className="w-6 h-6" />
             </div>
 
             <div>
               <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-extrabold mb-1">
                 <Zap className="w-3 h-3 text-rose-600" />
-                CUSTOM MEDIA ADD-ON
+                MANDATORY ADD-ON
               </div>
               <h3 className="text-lg font-black text-slate-900 tracking-tight">
-                Scan QR to Unlock Gallery
+                Unlock Custom Gallery Upload
               </h3>
-              <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                Scan with Google Pay, PhonePe, ya Paytm to upload your custom 4K photos &amp; Reels videos.
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                Scan UPI QR (GPay / PhonePe / Paytm) or pay via Card. Gallery triggers automatically once payment is verified.
               </p>
             </div>
 
-            {/* Live Dynamic UPI QR Code for ₹2000 */}
-            <div className="p-3.5 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 inline-block">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                  'upi://pay?pa=tripathishanya310@okaxis&pn=INSTASK%20Studio&am=2000.00&cu=INR&tn=INSTASK%20Custom%20Media%20Upload'
-                )}`}
-                alt="Scan to Pay ₹2,000"
-                className="w-44 h-44 mx-auto rounded-xl shadow-sm border border-slate-100"
-              />
-              <div className="text-xs font-black text-slate-800 mt-2">
-                Amount to Pay: <span className="text-emerald-600 text-sm font-black">₹2,000</span>
+            {paymentError && (
+              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-[11px] text-rose-700 font-medium">
+                {paymentError}
               </div>
+            )}
+
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <span className="text-xs text-slate-500 block">Required Payment</span>
+              <span className="text-2xl font-black text-slate-900">₹2,000</span>
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-2 pt-1">
-              <button
-                type="button"
-                onClick={handleUnlockPayment}
-                className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-md cursor-pointer"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>I Have Paid ₹2,000 (Open Gallery Now)</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+            <button
+              type="button"
+              onClick={handleOpenLivePayment}
+              disabled={isProcessingPayment}
+              className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+            >
+              {isProcessingPayment ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>Opening Secure Razorpay UPI...</span>
+                </>
+              ) : (
+                <>
+                  <Smartphone className="w-4 h-4" />
+                  <span>Pay ₹2,000 via UPI QR / Card</span>
+                </>
+              )}
+            </button>
 
-              <button
-                type="button"
-                onClick={handleUnlockPayment}
-                className="w-full py-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 rounded-xl text-[11px] font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>Developer Test Bypass (Instant Unlock)</span>
-              </button>
-            </div>
-
-            <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 pt-1">
+            <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Instant Gallery Trigger Upon Confirmation</span>
+              <span>Gallery triggers automatically upon verified payment</span>
             </div>
           </div>
         </div>
