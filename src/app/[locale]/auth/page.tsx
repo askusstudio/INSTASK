@@ -34,6 +34,7 @@ export default function AuthPage({ params }: AuthPageProps) {
   const [email, setEmail] = useState('');
   const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [emailOtpCode, setEmailOtpCode] = useState('');
+  const [otpSession, setOtpSession] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +65,8 @@ export default function AuthPage({ params }: AuthPageProps) {
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
       const data = await res.json();
-      if (data?.success) {
+      if (data?.success && data?.otpSession) {
+        setOtpSession(data.otpSession);
         setEmailOtpSent(true);
         setEmailOtpCode('');
       } else {
@@ -93,7 +95,8 @@ export default function AuthPage({ params }: AuthPageProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email: email.trim().toLowerCase(),
-          code: emailOtpCode.trim() 
+          code: emailOtpCode.trim(),
+          otpSession,
         }),
       });
       const data = await res.json();
@@ -268,7 +271,7 @@ export default function AuthPage({ params }: AuthPageProps) {
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => { setEmailOtpSent(false); setEmailOtpCode(''); }}
+                      onClick={() => { setEmailOtpSent(false); setEmailOtpCode(''); setOtpSession(''); }}
                       className="w-1/3 py-2.5 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold cursor-pointer"
                     >
                       Change Email
