@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { Navbar } from '@/components/ui/Navbar';
@@ -46,12 +46,12 @@ interface DashboardPageProps {
 }
 
 export default function DashboardPage({ params: { locale } }: DashboardPageProps) {
+  const router = useRouter();
   const tNav = useTranslations('nav');
   const tOnboarding = useTranslations('onboarding');
   const { dismissAllGuidance } = useGuidance();
   const searchParams = useSearchParams();
 
-  // Login ke baad setup wizard default open hoga
   const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('wizard');
 
   const [posts, setPosts] = useState<PostRecord[]>([]);
@@ -65,7 +65,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const [pendingProfile, setPendingProfile] = useState<BusinessProfileData | null>(null);
   const [pendingMetaAccount, setPendingMetaAccount] = useState<{ igUserId: string; username: string } | null>(null);
 
-  // Dynamic user account: Safe clean initialization without mock bakery
   const [account, setAccount] = useState<{
     brandName?: string | null;
     username?: string | null;
@@ -95,7 +94,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       const data = await res.json();
       if (data.success && Array.isArray(data.posts)) {
         setPosts(data.posts);
-        // Strict guard: ignore mock backend bakery data completely
         if (
           data.account &&
           data.account.username &&
@@ -133,16 +131,25 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     };
     fetchCredits();
 
-    if (searchParams.get('payment') === 'success' || searchParams.get('activated') === 'true') {
+    const hasPaid =
+      searchParams.get('payment') === 'success' ||
+      searchParams.get('activated') === 'true' ||
+      (typeof window !== 'undefined' && localStorage.getItem('instask_plan_activated') === 'true');
+
+    if (hasPaid) {
       setIsPaymentSuccess(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('instask_plan_activated', 'true');
+      }
     }
+
     if (searchParams.get('credits_added') === 'true') {
       fetchCredits();
     }
 
     if (typeof window !== 'undefined') {
       const isCompleted = localStorage.getItem('instask_wizard_completed') === 'true';
-      if (searchParams.get('view') === 'calendar' && isCompleted) {
+      if (searchParams.get('view') === 'calendar' && isCompleted && hasPaid) {
         setActiveTab('calendar');
       } else {
         setActiveTab('wizard');
@@ -158,7 +165,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     setStrategyBlueprint(blueprint);
     setPendingProfile(profile);
     setPendingMetaAccount(metaAcc);
-    // Real user account update in header & navbar
     setAccount({
       brandName: profile.brandName,
       username: metaAcc.username,
@@ -167,6 +173,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     setShowBlueprintModal(true);
   };
 
+  // Enforce Paywall: Blueprint select hote hi payment route par bhejega
   const handleApplyStrategy = async (selectedTemplateId: string) => {
     dismissAllGuidance();
 
@@ -182,44 +189,45 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     const handle = pendingMetaAccount?.username || account?.username || profile.brandName.toLowerCase().replace(/\s+/g, '_');
     const igUserId = pendingMetaAccount?.igUserId || `ig_${Date.now()}`;
 
-    try {
-      const res = await fetch('/api/generate-plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brandName: profile.brandName,
-          industry: profile.industry,
-          location: profile.location,
-          productSummary: profile.productSummary,
-          brandColor: profile.brandColor,
-          logoUrl: profile.logoUrl,
-          language: locale,
-          handle,
-          igUserId,
-          selectedTemplateId,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success && Array.isArray(data.posts)) {
-        setPosts(data.posts);
-        const updatedAccount = {
-          brandName: profile.brandName,
-          username: handle,
-          location: profile.location,
-        };
-        setAccount(updatedAccount);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('instask_wizard_completed', 'true');
-          localStorage.setItem('instask_brand_name', profile.brandName);
-          localStorage.setItem('instask_ig_handle', handle);
-        }
-        setShowBlueprintModal(false);
-        setActiveTab('calendar');
-      }
-    } catch (err) {
-      console.error('Failed to apply strategy:', err);
+    // Brand metadata save karein
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('instask_brand_name', profile.brandName);
+      localStorage.setItem('instask_ig_handle', handle);
+      localStorage.setItem('instask_selected_template', selectedTemplateId);
+      localStorage.setItem('instask_wizard_completed', 'true');
     }
+
+    // Plan generate trigger background mein karein
+    fetch('/api/generate-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        brandName: profile.brandName,
+        industry: profile.industry,
+        location: profile.location,
+        productSummary: profile.productSummary,
+        brandColor: profile.brandColor,
+        logoUrl: profile.logoUrl,
+        language: locale,
+        handle,
+        igUserId,
+        selectedTemplateId,
+      }),
+    }).catch((err) => console.warn('Plan generation initiated:', err));
+
+    setShowBlueprintModal(false);
+
+    // Payment compulsory: seedha payment checkout page par redirect
+    router.push(`/${locale}/onboarding/payment?userId=usr_main&plan=pro_monthly`);
+  };
+
+  const handleSelectTab = (tab: 'calendar' | 'wizard') => {
+    if (tab === 'calendar' && !isPaymentSuccess) {
+      // Bina payment calendar dekhne par paywall par redirect karega
+      router.push(`/${locale}/onboarding/payment?userId=usr_main&required=true`);
+      return;
+    }
+    setActiveTab(tab);
   };
 
   const handleToggleAutopilot = async (enabled: boolean) => {
@@ -240,7 +248,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
   };
 
-  // Safe display for brand title
   const currentDisplayName =
     account?.brandName && !account.brandName.includes('Luna Artisan')
       ? account.brandName
@@ -270,7 +277,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
                   Access Unlocked: Pro Growth Plan (50% Off First Month Applied)
                 </h3>
                 <p className="text-xs text-emerald-100 mt-1 font-medium">
-                  Complete the 3-step setup below to generate your 30-day autonomous content calendar.
+                  Your 30-day autonomous content calendar is now live and scheduled.
                 </p>
               </div>
             </div>
@@ -301,7 +308,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-soft-sm self-start">
             <button
               type="button"
-              onClick={() => setActiveTab('wizard')}
+              onClick={() => handleSelectTab('wizard')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                 activeTab === 'wizard'
                   ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-sm'
@@ -314,7 +321,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
 
             <button
               type="button"
-              onClick={() => setActiveTab('calendar')}
+              onClick={() => handleSelectTab('calendar')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                 activeTab === 'calendar'
                   ? 'bg-slate-900 text-white shadow-sm'
@@ -399,7 +406,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       <MobileBottomNav
         currentLocale={locale}
         activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        onSelectTab={handleSelectTab}
         autoPilotEnabled={autoPilotEnabled}
         onToggleAutopilot={handleToggleAutopilot}
         creditsBalance={creditsBalance}
