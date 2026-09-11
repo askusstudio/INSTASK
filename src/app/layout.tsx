@@ -1,13 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-  preload: true,
-});
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -30,9 +22,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className={inter.variable}>
-      {children}
-    </div>
-  );
+  return children;
 }

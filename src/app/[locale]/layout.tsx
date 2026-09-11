@@ -1,11 +1,19 @@
 import React from 'react';
 import type { Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, unstable_setRequestLocale } from 'next-intl/server';
 import { locales, rtlLocales, Locale } from '@/i18n';
 import { GuidanceProvider } from '@/context/GuidanceContext';
 import { BannerAlerts } from '@/components/ui/BannerAlerts';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  preload: true,
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +46,7 @@ export default async function LocaleLayout({
   const isRtl = rtlLocales.includes(locale as Locale);
 
   return (
-    <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'} className="h-full bg-slate-50">
+    <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'} className={`h-full bg-slate-50 ${inter.variable}`}>
       <body className="min-h-full flex flex-col font-sans antialiased text-slate-900 bg-slate-50">
         <NextIntlClientProvider messages={messages} locale={locale}>
           <GuidanceProvider>
