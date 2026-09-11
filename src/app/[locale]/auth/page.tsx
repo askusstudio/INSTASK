@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter, useParams, usePathname } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { supabase } from '@/lib/supabase';
 import {
   Mail,
   Phone,
@@ -73,7 +73,7 @@ export default function AuthPage({ params }: AuthPageProps) {
     router.push(`/${safeLocale}/onboarding/brand?userId=${encodeURIComponent(userId)}`);
   };
 
-  // 1. Send Email OTP
+  // 1. Send Email OTP (Live Supabase)
   const handleSendEmailOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -84,17 +84,18 @@ export default function AuthPage({ params }: AuthPageProps) {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/otp/email/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      const { error: sbError } = await supabase.auth.signInWithOtp({
+        email: email.trim().toLowerCase(),
+        options: {
+          shouldCreateUser: true,
+        },
       });
-      const data = await res.json();
-      if (data?.success) {
+
+      if (sbError) {
+        setError(sbError.message);
+      } else {
         setEmailOtpSent(true);
         setEmailOtpCode('');
-      } else {
-        setError(data?.error || 'Failed to send OTP to your email. Please try again.');
       }
     } catch {
       setError('Network error while requesting verification code.');
@@ -103,7 +104,7 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 2. Verify Email OTP (Strict Verification)
+  // 2. Verify Email OTP (Strict Live Supabase Verification)
   const handleVerifyEmailOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -113,20 +114,17 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
 
     setLoading(true);
-    const resolvedUserId = `usr_${email.trim().toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
-
     try {
-      const res = await signIn('credentials-or-otp', {
-        redirect: false,
-        identifier: email.trim().toLowerCase(),
+      const { data, error: sbError } = await supabase.auth.verifyOtp({
+        email: email.trim().toLowerCase(),
+        token: emailOtpCode.trim(),
         type: 'email',
-        otpOrPassword: emailOtpCode.trim(),
       });
 
-      if (!res || res.error || !res.ok) {
-        setError('Incorrect verification code. Please recheck the code sent to your inbox.');
+      if (sbError || !data?.user) {
+        setError(sbError?.message || 'Invalid or expired verification code. Please check your inbox.');
       } else {
-        completeAuth(resolvedUserId);
+        completeAuth(data.user.id);
       }
     } catch {
       setError('Authentication failed. Please verify your OTP code.');
@@ -135,7 +133,7 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 3. Send Phone OTP
+  // 3. Send Phone OTP (Live Supabase)
   const handleSendPhoneOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -147,17 +145,15 @@ export default function AuthPage({ params }: AuthPageProps) {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/otp/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: fullPhoneNumber }),
+      const { error: sbError } = await supabase.auth.signInWithOtp({
+        phone: fullPhoneNumber,
       });
-      const data = await res.json();
-      if (data?.success) {
+
+      if (sbError) {
+        setError(sbError.message);
+      } else {
         setPhoneOtpSent(true);
         setPhoneOtpCode('');
-      } else {
-        setError(data?.error || 'SMS Gateway quota exceeded. Please use Email OTP or Instant Demo.');
       }
     } catch {
       setError('Network error while sending SMS OTP.');
@@ -166,7 +162,7 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 4. Verify Phone OTP (Strict Verification)
+  // 4. Verify Phone OTP (Strict Live Supabase Verification)
   const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -176,20 +172,17 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
 
     setLoading(true);
-    const resolvedUserId = `usr_${fullPhoneNumber.replace(/[^0-9]/g, '')}`;
-
     try {
-      const res = await signIn('credentials-or-otp', {
-        redirect: false,
-        identifier: fullPhoneNumber,
-        type: 'phone',
-        otpOrPassword: phoneOtpCode.trim(),
+      const { data, error: sbError } = await supabase.auth.verifyOtp({
+        phone: fullPhoneNumber,
+        token: phoneOtpCode.trim(),
+        type: 'sms',
       });
 
-      if (!res || res.error || !res.ok) {
-        setError('Incorrect SMS OTP code. Please enter the valid code.');
+      if (sbError || !data?.user) {
+        setError(sbError?.message || 'Incorrect SMS OTP code. Please enter the valid code.');
       } else {
-        completeAuth(resolvedUserId);
+        completeAuth(data.user.id);
       }
     } catch {
       setError('Verification failed. Invalid or expired OTP.');
@@ -198,47 +191,33 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 5. Social Login (NextAuth Official Handlers)
-  const handleSocialSignIn = async (provider: 'instagram' | 'facebook' | 'google') => {
+  // 5. Social Login
+  const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
     setLoading(true);
     setError(null);
     try {
-      const res = await signIn(provider, {
-        callbackUrl: `/${safeLocale}/onboarding/brand`,
-        redirect: false,
+      const { error: sbError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/${safeLocale}/onboarding/brand`,
+        },
       });
 
-      if (res?.url) {
-        window.location.href = res.url;
-      } else if (res?.error) {
-        // Fallback demo connection if provider keys aren't set in development
-        const demoSocialId = `usr_${provider}_${Date.now().toString().slice(-4)}`;
-        completeAuth(demoSocialId);
+      if (sbError) {
+        setError(sbError.message);
       }
     } catch {
-      const demoSocialId = `usr_${provider}_${Date.now().toString().slice(-4)}`;
-      completeAuth(demoSocialId);
+      setError('Could not connect with social provider.');
     } finally {
       setLoading(false);
     }
   };
 
   // 6. Fast-Track Demo
-  const handleDemoFastTrack = async () => {
+  const handleDemoFastTrack = () => {
     setLoading(true);
-    try {
-      await signIn('credentials-or-otp', {
-        redirect: false,
-        identifier: 'demo@instask.ai',
-        type: 'email',
-        otpOrPassword: 'demo_password',
-      });
-      completeAuth('usr_demo_001');
-    } catch {
-      completeAuth('usr_demo_001');
-    } finally {
-      setLoading(false);
-    }
+    completeAuth('usr_demo_001');
+    setLoading(false);
   };
 
   return (
@@ -336,7 +315,7 @@ export default function AuthPage({ params }: AuthPageProps) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>{loading ? 'Sending Code...' : 'Send Verification OTP'}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -372,14 +351,14 @@ export default function AuthPage({ params }: AuthPageProps) {
                     <button
                       type="button"
                       onClick={() => { setEmailOtpSent(false); setEmailOtpCode(''); }}
-                      className="w-1/3 py-2.5 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold"
+                      className="w-1/3 py-2.5 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold cursor-pointer"
                     >
                       Change Email
                     </button>
                     <button
                       type="submit"
                       disabled={loading || emailOtpCode.length !== 6}
-                      className="w-2/3 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
+                      className="w-2/3 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <span>{loading ? 'Verifying...' : 'Verify & Sign In'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -437,7 +416,7 @@ export default function AuthPage({ params }: AuthPageProps) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>{loading ? 'Sending Code...' : 'Send 6-Digit Code'}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -473,14 +452,14 @@ export default function AuthPage({ params }: AuthPageProps) {
                     <button
                       type="button"
                       onClick={() => { setPhoneOtpSent(false); setPhoneOtpCode(''); }}
-                      className="w-1/3 py-2.5 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold"
+                      className="w-1/3 py-2.5 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold cursor-pointer"
                     >
                       Change Phone
                     </button>
                     <button
                       type="submit"
                       disabled={loading || phoneOtpCode.length !== 6}
-                      className="w-2/3 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
+                      className="w-2/3 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <span>{loading ? 'Verifying...' : 'Verify & Continue'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -496,21 +475,21 @@ export default function AuthPage({ params }: AuthPageProps) {
             <div className="space-y-3">
               <button
                 type="button"
-                onClick={() => handleSocialSignIn('instagram')}
+                onClick={() => handleSocialSignIn('google')}
                 disabled={loading}
-                className="w-full py-3 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition flex items-center justify-center gap-2.5 shadow-xs"
+                className="w-full py-3 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition flex items-center justify-center gap-2.5 shadow-xs cursor-pointer"
               >
                 <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white">
                   <Instagram className="w-3 h-3" />
                 </div>
-                <span>{loading ? 'Connecting...' : 'Continue with Instagram Professional'}</span>
+                <span>{loading ? 'Connecting...' : 'Continue with Google / Instagram'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSocialSignIn('facebook')}
                 disabled={loading}
-                className="w-full py-3 px-4 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold transition flex items-center justify-center gap-2.5 shadow-xs"
+                className="w-full py-3 px-4 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold transition flex items-center justify-center gap-2.5 shadow-xs cursor-pointer"
               >
                 <Facebook className="w-4 h-4 fill-white" />
                 <span>{loading ? 'Connecting...' : 'Continue with Facebook Business'}</span>
@@ -537,7 +516,7 @@ export default function AuthPage({ params }: AuthPageProps) {
             type="button"
             onClick={handleDemoFastTrack}
             disabled={loading}
-            className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition flex items-center justify-center gap-2"
+            className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
           >
             <Zap className="w-3.5 h-3.5 text-rose-600" />
             <span>Instant Demo Sign-in (1-Click Preview)</span>
