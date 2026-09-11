@@ -62,14 +62,15 @@ export function PostEditorModal({
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
 
-  // Gallery unlock state & QR modal
+  // QR modal state - Strictly false on open
   const [showPaywall, setShowPaywall] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(() => {
+
+  // Clear any old unlocked status from cache
+  useEffect(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('instask_custom_media_unlocked') === 'true';
+      localStorage.removeItem('instask_custom_media_unlocked');
     }
-    return false;
-  });
+  }, []);
 
   // Sync state when post prop changes
   useEffect(() => {
@@ -104,27 +105,17 @@ export function PostEditorModal({
     setBullets(updated);
   };
 
-  // Replace from Gallery Trigger: agar paid nahi hai toh turant QR open karega
+  // Button click: TURANT QR CODE MODAL OPEN KAREGA (Gallery seedha nahi khulegi)
   const handleGalleryClick = () => {
-    if (!isUnlocked) {
-      setShowPaywall(true);
-    } else {
-      galleryInputRef.current?.click();
-    }
+    setShowPaywall(true);
   };
 
-  // ₹2,000 QR Code Payment Complete & Instant Gallery Open
+  // QR Modal me button click karne ke baad hi Gallery/File picker khulega
   const handleUnlockPaywall = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('instask_custom_media_unlocked', 'true');
-    }
-    setIsUnlocked(true);
     setShowPaywall(false);
-
-    // Payment verify hote hi device ki gallery khol dega
     setTimeout(() => {
       galleryInputRef.current?.click();
-    }, 250);
+    }, 200);
   };
 
   // Handle File Chosen
@@ -218,7 +209,7 @@ export function PostEditorModal({
             </button>
           </div>
 
-          {/* Modal Body: Split view (Preview Left, Editor Right) */}
+          {/* Modal Body */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left Column: Live Instagram Phone Mockup */}
             <div className="lg:col-span-5 flex flex-col items-center sticky top-0 gap-3">
@@ -233,7 +224,7 @@ export function PostEditorModal({
                 dayNumber={post.dayNumber}
               />
 
-              {/* Gallery Replacement Pill Button */}
+              {/* Gallery Replacement Button */}
               <button
                 type="button"
                 onClick={handleGalleryClick}
@@ -241,12 +232,10 @@ export function PostEditorModal({
               >
                 <ImagePlus className="w-4 h-4 text-rose-400" />
                 <span>Replace with Custom Gallery Video / Image</span>
-                {!isUnlocked && (
-                  <span className="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1 font-extrabold border border-amber-300/30">
-                    <Lock className="w-2.5 h-2.5" />
-                    +₹2,000
-                  </span>
-                )}
+                <span className="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1 font-extrabold border border-amber-300/30">
+                  <Lock className="w-2.5 h-2.5" />
+                  +₹2,000
+                </span>
               </button>
             </div>
 
@@ -284,7 +273,7 @@ export function PostEditorModal({
                 </div>
               </div>
 
-              {/* Headline Hook (< 8 words) */}
+              {/* Headline Hook */}
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-bold text-slate-700">
@@ -423,7 +412,7 @@ export function PostEditorModal({
                 Scan QR to Unlock Gallery
               </h3>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                Scan with Google Pay, PhonePe, or Paytm to unlock custom 4K photos &amp; videos.
+                Scan with Google Pay, PhonePe, ya Paytm to upload your custom 4K photos &amp; Reels videos.
               </p>
             </div>
 
@@ -441,7 +430,7 @@ export function PostEditorModal({
               </div>
             </div>
 
-            {/* Primary Action Button (Opens device gallery immediately) */}
+            {/* Actions: Scan confirm ya Bypass dabane par hi Gallery open hogi */}
             <div className="space-y-2 pt-1">
               <button
                 type="button"
