@@ -13,29 +13,11 @@ import {
   ArrowRight,
   CheckCircle2,
   Zap,
-  ChevronDown,
 } from 'lucide-react';
 
 interface AuthPageProps {
   params?: { locale?: string };
 }
-
-const COUNTRY_CODES = [
-  { code: '+91', country: 'IN', flag: '🇮🇳', label: 'India (+91)' },
-  { code: '+1', country: 'US', flag: '🇺🇸', label: 'USA / Canada (+1)' },
-  { code: '+44', country: 'GB', flag: '🇬🇧', label: 'UK (+44)' },
-  { code: '+971', country: 'AE', flag: '🇦🇪', label: 'UAE (+971)' },
-  { code: '+61', country: 'AU', flag: '🇦🇺', label: 'Australia (+61)' },
-  { code: '+49', country: 'DE', flag: '🇩🇪', label: 'Germany (+49)' },
-  { code: '+33', country: 'FR', flag: '🇫🇷', label: 'France (+33)' },
-  { code: '+34', country: 'ES', flag: '🇪🇸', label: 'Spain (+34)' },
-  { code: '+55', country: 'BR', flag: '🇧🇷', label: 'Brazil (+55)' },
-  { code: '+81', country: 'JP', flag: '🇯🇵', label: 'Japan (+81)' },
-  { code: '+62', country: 'ID', flag: '🇮🇩', label: 'Indonesia (+62)' },
-  { code: '+7', country: 'RU', flag: '🇷🇺', label: 'Russia (+7)' },
-  { code: '+65', country: 'SG', flag: '🇸🇬', label: 'Singapore (+65)' },
-  { code: '+966', country: 'SA', flag: '🇸🇦', label: 'Saudi Arabia (+966)' },
-];
 
 export default function AuthPage({ params }: AuthPageProps) {
   const router = useRouter();
@@ -53,21 +35,13 @@ export default function AuthPage({ params }: AuthPageProps) {
   const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [emailOtpCode, setEmailOtpCode] = useState('');
 
-  // Phone form states
-  const [countryCode, setCountryCode] = useState('+91');
-  const [phoneRaw, setPhoneRaw] = useState('');
-  const [phoneOtpCode, setPhoneOtpCode] = useState('');
-  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const fullPhoneNumber = `${countryCode}${phoneRaw.replace(/\D/g, '')}`;
 
   const completeAuth = (userId: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('instask_user_id', userId);
-      localStorage.setItem('instask_user_email', email || `${fullPhoneNumber}@instask.ai`);
+      localStorage.setItem('instask_user_email', email || 'user@instask.ai');
       document.cookie = 'instask_auth=true; path=/; max-age=31536000';
     }
     router.push(`/${safeLocale}/onboarding/brand?userId=${encodeURIComponent(userId)}`);
@@ -133,65 +107,7 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 3. Send Phone OTP (Live Supabase)
-  const handleSendPhoneOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    const cleanNum = phoneRaw.replace(/\D/g, '');
-    if (!cleanNum || cleanNum.length < 8) {
-      setError('Please enter a valid mobile number.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error: sbError } = await supabase.auth.signInWithOtp({
-        phone: fullPhoneNumber,
-      });
-
-      if (sbError) {
-        setError(sbError.message);
-      } else {
-        setPhoneOtpSent(true);
-        setPhoneOtpCode('');
-      }
-    } catch {
-      setError('Network error while sending SMS OTP.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 4. Verify Phone OTP (Strict Live Supabase Verification)
-  const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!phoneOtpCode || phoneOtpCode.trim().length !== 6) {
-      setError('Please enter the 6-digit verification code.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { data, error: sbError } = await supabase.auth.verifyOtp({
-        phone: fullPhoneNumber,
-        token: phoneOtpCode.trim(),
-        type: 'sms',
-      });
-
-      if (sbError || !data?.user) {
-        setError(sbError?.message || 'Incorrect SMS OTP code. Please enter the valid code.');
-      } else {
-        completeAuth(data.user.id);
-      }
-    } catch {
-      setError('Verification failed. Invalid or expired OTP.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 5. Social Login
+  // 3. Social Login
   const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
     setLoading(true);
     setError(null);
@@ -213,7 +129,7 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 6. Fast-Track Demo
+  // 4. Fast-Track Demo
   const handleDemoFastTrack = () => {
     setLoading(true);
     completeAuth('usr_demo_001');
@@ -369,104 +285,28 @@ export default function AuthPage({ params }: AuthPageProps) {
             </div>
           )}
 
-          {/* Tab 2: Phone OTP */}
+          {/* Tab 2: Phone OTP (Recommended Notice) */}
           {activeTab === 'phone' && (
-            <div className="space-y-4">
-              {!phoneOtpSent ? (
-                <form onSubmit={handleSendPhoneOtp} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Mobile Phone Number
-                    </label>
-                    
-                    <div className="flex gap-2">
-                      <div className="relative shrink-0 w-32">
-                        <select
-                          value={countryCode}
-                          onChange={(e) => setCountryCode(e.target.value)}
-                          className="w-full appearance-none pl-3 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white"
-                        >
-                          {COUNTRY_CODES.map((c) => (
-                            <option key={c.country} value={c.code}>
-                              {c.flag} {c.code}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
+            <div className="space-y-4 py-2">
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-bold text-amber-900">Access Notice</p>
+                  <p className="text-amber-800 leading-relaxed font-medium">
+                    Please use Email OTP or Instant Sign-in for fast access.
+                  </p>
+                </div>
+              </div>
 
-                      <div className="relative flex-1">
-                        <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="tel"
-                          value={phoneRaw}
-                          onChange={(e) => setPhoneRaw(e.target.value)}
-                          placeholder="98765 43210"
-                          required
-                          className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-slate-900 font-medium"
-                        />
-                      </div>
-                    </div>
-
-                    <p className="text-[11px] text-slate-400 mt-1.5">
-                      Selected country: <span className="font-semibold text-slate-600">{countryCode}</span>.
-                    </p>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span>{loading ? 'Sending Code...' : 'Send 6-Digit Code'}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleVerifyPhoneOtp} className="space-y-4">
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-bold">Code sent to {fullPhoneNumber}</p>
-                      <p className="text-[11px] text-emerald-700 mt-0.5">Please enter the 6-digit verification code received on your mobile.</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Enter 6-Digit Verification Code
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={phoneOtpCode}
-                      onChange={(e) => setPhoneOtpCode(e.target.value.replace(/\D/g, ''))}
-                      placeholder="------"
-                      autoFocus
-                      required
-                      className="w-full py-2.5 px-3 text-center tracking-widest text-lg font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-slate-900 font-bold"
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => { setPhoneOtpSent(false); setPhoneOtpCode(''); }}
-                      className="w-1/3 py-2.5 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold cursor-pointer"
-                    >
-                      Change Phone
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading || phoneOtpCode.length !== 6}
-                      className="w-2/3 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <span>{loading ? 'Verifying...' : 'Verify & Continue'}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </form>
-              )}
+              <button
+                type="button"
+                onClick={() => { setActiveTab('email'); setError(null); }}
+                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Mail className="w-4 h-4" />
+                <span>Switch to Email OTP</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           )}
 
