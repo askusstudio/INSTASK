@@ -27,15 +27,15 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
   const [termsAccepted, setTermsAccepted] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>('razorpay');
 
-  // Success / Bypass handler that sets session cookies + local storage and bypasses middleware
-  const handlePaymentSuccess = async (reason: string = 'activated') => {
+  // Success handler after successful transaction
+  const handlePaymentSuccess = async (paymentId: string) => {
     setLoading(true);
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem('instask_plan_active', 'true');
         localStorage.setItem('instask_active_plan', 'pro_monthly');
         localStorage.setItem('instask_user_activated', 'true');
-        localStorage.setItem('instask_user_id', 'usr_demo_001');
+        localStorage.setItem('instask_payment_id', paymentId);
 
         // Session cookies required by middleware
         document.cookie = 'instask_auth=true; path=/; max-age=31536000';
@@ -47,16 +47,29 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
       await fetch('/api/billing/simulate-activate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 'usr_demo_001' }),
+        body: JSON.stringify({ userId: 'usr_demo_001', paymentId }),
       }).catch(() => {});
 
-      // Full window navigation so middleware intercepts fresh session cookies
-      window.location.href = `/${locale}/dashboard?activated=true&session=${reason}`;
+      window.location.href = `/${locale}/dashboard?activated=true&session=paid_${paymentId}`;
     } catch {
       window.location.href = `/${locale}/dashboard?activated=true`;
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper to ensure Razorpay script is loaded dynamically if not present
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (typeof window !== 'undefined' && (window as any).Razorpay) {
+        return resolve(true);
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
   };
 
   // Razorpay Checkout
@@ -66,6 +79,13 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
     setError(null);
 
     try {
+      // 1. Ensure Razorpay SDK is loaded
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error('Razorpay SDK failed to load. Please check your internet connection.');
+      }
+
+      // 2. Call backend order creation API
       const res = await fetch('/api/billing/razorpay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,42 +97,47 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
       });
 
       const data = await res.json();
-      const liveKey = data.keyId || 'rzp_live_Ta09UiD9oNIJhH';
 
-      if (typeof window !== 'undefined' && (window as any).Razorpay && data.orderId) {
-        const options: any = {
-          key: liveKey,
-          amount: Math.round((pricing.code === 'INR' ? pricing.discountPrice : 1999) * 100),
-          currency: pricing.code || 'INR',
-          name: 'INSTASK AI',
-          description: 'Pro Monthly Plan Activation',
-          order_id: data.orderId,
-          handler: function (response: any) {
-            handlePaymentSuccess(response?.razorpay_payment_id || 'pay_success');
-          },
-          prefill: {
-            name: 'Demo Admin',
-            email: 'tripathishanya310@gmail.com',
-          },
-          theme: { color: '#0F172A' },
-          modal: {
-            ondismiss: function () {
-              setLoading(false);
-            },
-          },
-        };
-
-        const rzp = new (window as any).Razorpay(options);
-        rzp.on('payment.failed', function () {
-          handlePaymentSuccess('test_override');
-        });
-        rzp.open();
-      } else {
-        handlePaymentSuccess('direct_bypass');
+      if (!res.ok || !data.success || !data.orderId) {
+        throw new Error(data.error || 'Failed to create payment order with Razorpay.');
       }
-    } catch {
-      handlePaymentSuccess('fallback_bypass');
-    } finally {
+
+      // 3. Use the new active Live Razorpay Key
+      const activeKey = data.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_Taeho8Zjy6LgGW';
+
+      const options: any = {
+        key: activeKey,
+        amount: data.amount || Math.round((pricing.code === 'INR' ? pricing.discountPrice : 1999) * 100),
+        currency: data.currency || pricing.code || 'INR',
+        name: 'Askus Studio (INSTASK)',
+        description: 'Pro Monthly Plan Activation',
+        order_id: data.orderId,
+        handler: function (response: any) {
+          handlePaymentSuccess(response?.razorpay_payment_id || 'pay_success');
+        },
+        prefill: {
+          name: 'Askus Studio Client',
+          email: 'tripathishanya310@gmail.com',
+          contact: '918429451312',
+        },
+        theme: { color: '#059669' },
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+          },
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        setError(response.error?.description || 'Payment transaction failed. Please try another method.');
+        setLoading(false);
+      });
+      
+      rzp.open();
+    } catch (err: any) {
+      console.error('Razorpay Checkout Error:', err);
+      setError(err.message || 'Payment initiation failed. Please try again.');
       setLoading(false);
     }
   };
@@ -137,10 +162,10 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
       if (data.mode === 'live' && data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        handlePaymentSuccess('simulated_stripe');
+        throw new Error(data.error || 'Stripe configuration pending.');
       }
-    } catch {
-      handlePaymentSuccess('stripe_fallback');
+    } catch (err: any) {
+      setError(err.message || 'Stripe error');
     } finally {
       setLoading(false);
     }
@@ -148,7 +173,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
 
   return (
     <>
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-12">
         <div className="max-w-xl w-full bg-white rounded-3xl border border-slate-200 shadow-soft-md p-6 sm:p-10 space-y-6">
           {/* Step Indicator */}
@@ -231,7 +256,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
             </div>
           </div>
 
-          {/* Testing Bypass Quick Action (For Sir / Dev Testing) */}
+          {/* Testing Bypass Quick Action */}
           <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-amber-950 flex items-center gap-1.5">

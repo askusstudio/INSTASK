@@ -37,25 +37,31 @@ export async function POST(req: Request) {
     const planKey = (body?.planKey || 'monthly').toLowerCase();
     const selectedPlan: any = (SUBSCRIPTION_PLANS as any)[planKey] || (SUBSCRIPTION_PLANS as any).monthly || {};
 
-    let user = await findUserById(userId);
-    if (!user) {
-      user = await upsertUser({
-        id: userId,
-        email: userEmail || null,
-        provider: 'EMAIL',
-        subscriptionStatus: 'INACTIVE',
-      });
+    let user: any = null;
+    try {
+      user = await findUserById(userId);
+      if (!user) {
+        user = await upsertUser({
+          id: userId,
+          email: userEmail || null,
+          provider: 'EMAIL',
+          subscriptionStatus: 'INACTIVE',
+        });
+      }
+    } catch (dbErr) {
+      console.warn('Database user sync bypassed for payment initialization:', dbErr);
+      user = { id: userId };
     }
 
-    const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || 'rzp_live_Ta09UiD9oNIJhH';
-    const keySecret = process.env.RAZORPAY_KEY_SECRET || '0K2FHOypnD6RlbFYZPWDhk1n';
+    // Active Live Razorpay Credentials
+    const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_Taeho8Zjy6LgGW';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'vsHAL5GosailjHsO0dlU06CB';
 
     const rzp = new Razorpay({
       key_id: keyId,
       key_secret: keySecret,
     });
 
-    // Safely extract price irrespective of property naming
     const planPrice = Number(selectedPlan.priceInr || selectedPlan.price || selectedPlan.amount || 1999);
     const amountInRupees = Number(body?.amount) || planPrice;
     const amountInPaise = Math.round(amountInRupees * 100);
@@ -65,7 +71,7 @@ export async function POST(req: Request) {
       currency: 'INR',
       receipt: `rcpt_${Date.now().toString().slice(-8)}`,
       notes: {
-        userId: user.id,
+        userId: user?.id || userId,
         planKey: selectedPlan.id || planKey,
         creditsGranted: (selectedPlan.creditsGranted || 60).toString(),
       },
@@ -74,7 +80,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       orderId: order.id,
-      amount: amountInRupees,
+      amount: amountInPaise,
       currency: 'INR',
       keyId,
       planKey: selectedPlan.id || planKey,
