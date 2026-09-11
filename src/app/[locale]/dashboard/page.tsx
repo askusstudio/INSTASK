@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { Navbar } from '@/components/ui/Navbar';
@@ -11,6 +12,11 @@ import { StrategyBlueprint } from '@/lib/recommendations';
 import { BusinessProfileData } from '@/components/onboarding/StepBusinessProfile';
 import { useGuidance } from '@/context/GuidanceContext';
 import { PostRecord } from '@/lib/prisma';
+import {
+  Calendar,
+  Wand2,
+  Sparkles,
+} from 'lucide-react';
 
 // Dynamic Code Splitting for non-critical mobile performance budget
 const StepWizard = dynamic(
@@ -42,16 +48,6 @@ const StrategyBlueprintModal = dynamic(
   () => import('@/components/strategy/StrategyBlueprintModal').then((m) => m.StrategyBlueprintModal),
   { ssr: false }
 );
-import {
-  Calendar,
-  Wand2,
-  Sparkles,
-  Instagram,
-  ShieldCheck,
-  Zap,
-  CheckCircle2,
-  Lock,
-} from 'lucide-react';
 
 interface DashboardPageProps {
   params: { locale: string };
@@ -60,10 +56,13 @@ interface DashboardPageProps {
 export default function DashboardPage({ params: { locale } }: DashboardPageProps) {
   const tNav = useTranslations('nav');
   const tOnboarding = useTranslations('onboarding');
-  const tCommon = useTranslations('common');
   const { dismissAllGuidance } = useGuidance();
+  const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('calendar');
+  // Wizard tab will open automatically if view=wizard or user is completing onboarding
+  const requestedView = searchParams.get('view') === 'wizard' || searchParams.get('step') ? 'wizard' : 'calendar';
+  const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>(requestedView);
+
   const [posts, setPosts] = useState<PostRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [autoPilotEnabled, setAutoPilotEnabled] = useState(false);
@@ -125,16 +124,16 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     };
     fetchCredits();
 
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('payment') === 'success' || params.get('activated') === 'true') {
-        setIsPaymentSuccess(true);
-      }
-      if (params.get('credits_added') === 'true') {
-        fetchCredits();
-      }
+    if (searchParams.get('payment') === 'success' || searchParams.get('activated') === 'true') {
+      setIsPaymentSuccess(true);
     }
-  }, []);
+    if (searchParams.get('credits_added') === 'true') {
+      fetchCredits();
+    }
+    if (searchParams.get('view') === 'wizard' || searchParams.get('step')) {
+      setActiveTab('wizard');
+    }
+  }, [searchParams]);
 
   const handleStrategyReady = (
     blueprint: StrategyBlueprint,
@@ -225,7 +224,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         connectedAccount={account}
       />
 
-      {/* Main Content Area: pb-28 on mobile leaves clearance for bottom navigation */}
+      {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pb-28 md:pb-8 flex-1 w-full space-y-6 sm:space-y-8">
         
         {/* Payment Success & Subscription Active Celebration Banner */}
@@ -252,7 +251,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
             <button
               type="button"
               onClick={() => setIsPaymentSuccess(false)}
-              className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold transition flex-shrink-0 self-end sm:self-center"
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold transition flex-shrink-0 self-end sm:self-center cursor-pointer"
             >
               Dismiss
             </button>
@@ -277,7 +276,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
             <button
               type="button"
               onClick={() => setActiveTab('calendar')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                 activeTab === 'calendar'
                   ? 'bg-slate-900 text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
@@ -290,7 +289,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
             <button
               type="button"
               onClick={() => setActiveTab('wizard')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                 activeTab === 'wizard'
                   ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
@@ -376,7 +375,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         </div>
       </footer>
       
-      {/* Mobile Persistent Thumb-Zone Navigation Bar & Slide-Up Sheet */}
+      {/* Mobile Bottom Navigation */}
       <MobileBottomNav
         currentLocale={locale}
         activeTab={activeTab}
