@@ -47,7 +47,7 @@ export default function AuthPage({ params }: AuthPageProps) {
     router.push(`/${safeLocale}/onboarding/brand?userId=${encodeURIComponent(userId)}`);
   };
 
-  // 1. Send Email OTP (Live Supabase)
+  // 1. Send Direct 6-Digit Email OTP
   const handleSendEmailOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -58,18 +58,17 @@ export default function AuthPage({ params }: AuthPageProps) {
 
     setLoading(true);
     try {
-      const { error: sbError } = await supabase.auth.signInWithOtp({
-        email: email.trim().toLowerCase(),
-        options: {
-          shouldCreateUser: true,
-        },
+      const res = await fetch('/api/auth/otp/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
-
-      if (sbError) {
-        setError(sbError.message);
-      } else {
+      const data = await res.json();
+      if (data?.success) {
         setEmailOtpSent(true);
         setEmailOtpCode('');
+      } else {
+        setError(data?.error || 'Failed to send OTP. Please try again.');
       }
     } catch {
       setError('Network error while requesting verification code.');
@@ -78,30 +77,33 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 2. Verify Email OTP (Strict Live Supabase Verification)
+  // 2. Strict 6-Digit Email OTP Verification
   const handleVerifyEmailOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!emailOtpCode || emailOtpCode.trim().length !== 6) {
-      setError('Please enter the valid 6-digit verification code.');
+      setError('Please enter the 6-digit verification code.');
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error: sbError } = await supabase.auth.verifyOtp({
-        email: email.trim().toLowerCase(),
-        token: emailOtpCode.trim(),
-        type: 'email',
+      const res = await fetch('/api/auth/otp/email/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: email.trim().toLowerCase(),
+          code: emailOtpCode.trim() 
+        }),
       });
-
-      if (sbError || !data?.user) {
-        setError(sbError?.message || 'Invalid or expired verification code. Please check your inbox.');
+      const data = await res.json();
+      if (data?.success) {
+        completeAuth(data.userId || `usr_${Date.now()}`);
       } else {
-        completeAuth(data.user.id);
+        setError(data?.error || 'Invalid or expired verification code.');
       }
     } catch {
-      setError('Authentication failed. Please verify your OTP code.');
+      setError('Verification failed. Please check the code and try again.');
     } finally {
       setLoading(false);
     }
