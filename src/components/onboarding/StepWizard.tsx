@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { StepConnectMeta } from './StepConnectMeta';
 import { StepBusinessProfile, BusinessProfileData } from './StepBusinessProfile';
@@ -17,44 +17,70 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
   const t = useTranslations('onboarding');
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
 
+  // Dynamic state: No hardcoded Luna Bakery dummy credentials
   const [metaAccount, setMetaAccount] = useState<{ igUserId: string; username: string }>({
-    igUserId: '17841458920194827',
-    username: 'artisan_luna_bakery',
+    igUserId: '',
+    username: '',
   });
 
   const [businessProfile, setBusinessProfile] = useState<BusinessProfileData>({
-    brandName: 'Luna Artisan Bakery',
-    industry: 'Artisan Bakery & Cafe',
-    location: 'Austin, TX',
-    productSummary: 'Fresh sourdough pastries and specialty espresso made from organic local grains.',
+    brandName: '',
+    industry: '',
+    location: '',
+    productSummary: '',
     brandColor: '#e1306c',
     logoUrl: '',
   });
 
-  const [competitors, setCompetitors] = useState<string[]>([
-    '@tartinebakery',
-    '@lafamille',
-    '@sweetcrust',
-  ]);
+  const [competitors, setCompetitors] = useState<string[]>([]);
+
+  // Pre-fill agar user ne handle ya brand pahle save kiya ho
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedBrand = localStorage.getItem('instask_brand_name');
+      const savedHandle = localStorage.getItem('instask_ig_handle');
+
+      if (savedBrand) {
+        setBusinessProfile((prev) => ({ ...prev, brandName: savedBrand }));
+      }
+      if (savedHandle) {
+        setMetaAccount((prev) => ({ ...prev, username: savedHandle }));
+      }
+    }
+  }, []);
 
   const handleAnalyzeStrategy = async () => {
-    // Call /api/recommendations/generate
+    // Save user's dynamic business identity to display in header
+    if (typeof window !== 'undefined') {
+      if (businessProfile.brandName) {
+        localStorage.setItem('instask_brand_name', businessProfile.brandName);
+      }
+      if (metaAccount.username) {
+        localStorage.setItem('instask_ig_handle', metaAccount.username);
+      }
+    }
+
     const res = await fetch('/api/recommendations/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        brandName: businessProfile.brandName,
-        industry: businessProfile.industry,
-        location: businessProfile.location,
-        productSummary: businessProfile.productSummary,
-        competitors,
+        brandName: businessProfile.brandName || 'My Brand',
+        industry: businessProfile.industry || 'General Business',
+        location: businessProfile.location || '',
+        productSummary: businessProfile.productSummary || '',
+        competitors: competitors.filter(Boolean),
         language: currentLocale,
+        handle: metaAccount.username,
+        igUserId: metaAccount.igUserId || `usr_${Date.now()}`,
       }),
     });
 
     const data = await res.json();
     if (data.success && data.blueprint) {
-      onStrategyReady(data.blueprint, businessProfile, metaAccount);
+      onStrategyReady(data.blueprint, businessProfile, {
+        igUserId: metaAccount.igUserId || `usr_${Date.now()}`,
+        username: metaAccount.username || businessProfile.brandName.toLowerCase().replace(/\s+/g, '_'),
+      });
     }
   };
 
@@ -81,9 +107,9 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
               <div key={step.num} className="relative z-10 flex flex-col items-center">
                 <button
                   type="button"
-                  onClick={() => isCompleted && setCurrentStep(step.num as any)}
+                  onClick={() => isCompleted && setCurrentStep(step.num as 1 | 2 | 3)}
                   aria-label={`Step ${step.num}: ${step.label}`}
-                  className={`w-11 h-11 rounded-full flex items-center justify-center transition shadow-sm touch-manipulation active:scale-95 ${
+                  className={`w-11 h-11 rounded-full flex items-center justify-center transition shadow-sm touch-manipulation active:scale-95 cursor-pointer ${
                     isCompleted
                       ? 'bg-emerald-600 text-white'
                       : isCurrent
@@ -114,14 +140,27 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
       <div className="transition-all duration-300">
         {currentStep === 1 && (
           <StepConnectMeta
-            onConnected={(acc) => setMetaAccount(acc)}
+            onConnected={(acc) => {
+              setMetaAccount(acc);
+              if (acc.username && typeof window !== 'undefined') {
+                localStorage.setItem('instask_ig_handle', acc.username);
+              }
+            }}
             onNext={() => setCurrentStep(2)}
           />
         )}
         {currentStep === 2 && (
           <StepBusinessProfile
             data={businessProfile}
-            onChange={(patch) => setBusinessProfile((prev) => ({ ...prev, ...patch }))}
+            onChange={(patch) => {
+              setBusinessProfile((prev) => {
+                const updated = { ...prev, ...patch };
+                if (patch.brandName && typeof window !== 'undefined') {
+                  localStorage.setItem('instask_brand_name', patch.brandName);
+                }
+                return updated;
+              });
+            }}
             onNext={() => setCurrentStep(3)}
             onBack={() => setCurrentStep(1)}
           />

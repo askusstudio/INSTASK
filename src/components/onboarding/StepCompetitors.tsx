@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { GuidanceTooltip } from '../ui/GuidanceTooltip';
-import { Target, Sparkles, ArrowLeft, Loader2, CheckCircle2, Flame, Bot, Layers } from 'lucide-react';
+import { Target, Sparkles, ArrowLeft, Loader2, Flame, Bot, Layers } from 'lucide-react';
 
 interface StepCompetitorsProps {
   handles: string[];
@@ -13,31 +13,63 @@ interface StepCompetitorsProps {
 }
 
 const PRESET_SUGGESTIONS = [
-  { label: 'Artisan Bakery', handles: ['@tartinebakery', '@lafamille', '@sweetcrust'] },
-  { label: 'Specialty Coffee', handles: ['@bluebottle', '@onyxcoffeelab', '@stumptown'] },
-  { label: 'Boutique Fashion', handles: ['@reformation', '@everlane', '@sezane'] },
-  { label: 'Fitness Studio', handles: ['@barrys', '@f45_training', '@equinox'] },
-  { label: 'Consulting / Agency', handles: ['@thefutur', '@hubspot', '@canva'] },
+  { label: 'Artisan Bakery', handles: ['@tartinebakery', '@sweetcrust'] },
+  { label: 'Specialty Coffee', handles: ['@bluebottle', '@onyxcoffeelab'] },
+  { label: 'Boutique Fashion', handles: ['@reformation', '@everlane'] },
+  { label: 'Fitness & Wellness', handles: ['@barrys', '@f45_training'] },
+  { label: 'Local Dining & Cafe', handles: ['@localbistrot', '@eater'] },
+  { label: 'Consulting & Agency', handles: ['@thefutur', '@hubspot'] },
 ];
 
 export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCompetitorsProps) {
   const t = useTranslations('onboarding.step3');
-  const [textInput, setTextInput] = useState(handles.join(', '));
+  const [textInput, setTextInput] = useState(handles?.length ? handles.join(', ') : '');
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState(0);
 
+  // Restore saved competitor handles if available
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (!handles || handles.length === 0)) {
+      const saved = localStorage.getItem('instask_competitors');
+      if (saved) {
+        setTextInput(saved);
+        const parsed = saved
+          .split(',')
+          .map((h) => h.trim().replace(/^@+/, ''))
+          .filter((h) => h.length > 0)
+          .map((h) => `@${h}`);
+        onChange(parsed);
+      }
+    }
+  }, []);
+
   const handleInputChange = (val: string) => {
     setTextInput(val);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('instask_competitors', val);
+    }
     const parsed = val
       .split(',')
-      .map((h) => h.trim())
-      .filter((h) => h.length > 0);
+      .map((h) => h.trim().replace(/^@+/, ''))
+      .filter((h) => h.length > 0)
+      .map((h) => `@${h}`);
     onChange(parsed);
   };
 
   const handleApplyPreset = (presetHandles: string[]) => {
-    setTextInput(presetHandles.join(', '));
-    onChange(presetHandles);
+    const existing = textInput
+      .split(',')
+      .map((h) => h.trim())
+      .filter((h) => h.length > 0);
+
+    // Merge unique handles
+    const combined = Array.from(new Set([...existing, ...presetHandles]));
+    const formatted = combined.join(', ');
+    setTextInput(formatted);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('instask_competitors', formatted);
+    }
+    onChange(combined);
   };
 
   const handleAnalyzeAndBuild = async () => {
@@ -56,7 +88,7 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
     }
   };
 
-  const activeHandlesCount = handles.length;
+  const activeHandlesCount = handles?.filter(Boolean).length || 0;
 
   return (
     <div className="space-y-6">
@@ -72,13 +104,13 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
             id="guide_competitors_header"
             title="Competitor Analysis Strategy"
             instructions={[
-              'Add 3 to 5 Instagram accounts you admire or compete with locally.',
-              'Apify inspects their top 15 engagement posts to identify which visual formats work best.',
-              'Our Gemini agent identifies format gaps to outperform them rather than copying.',
+              'Add 2 to 5 Instagram accounts in your niche that inspire you or compete locally.',
+              'Our engine analyzes top-performing hooks, reel formats, and carousel structures.',
+              'We uncover viral content gaps specifically tailored for your brand.',
             ]}
-            goodExample="@tartinebakery, @bluebottle, @sweetcrust"
-            badExample="Celebrities with 50M followers like @cristiano or @kimkardashian"
-            reachTip="Accounts with 5k–100k active followers provide the most reliable algorithmic hook data for small businesses."
+            goodExample="@my_favorite_cafe, @niche_fashion_label"
+            badExample="Global celebrities with 100M+ followers like @cristiano"
+            reachTip="Accounts between 5k and 80k followers provide the most actionable engagement trends for organic conversion."
           />
         </div>
         <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">
@@ -92,22 +124,22 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
               <label className="block text-xs font-semibold text-slate-700">
-                {t('handlesLabel')}
+                {t('handlesLabel')} *
               </label>
               <GuidanceTooltip
                 id="guide_handles_input"
                 title="Inputting Competitor Handles"
                 instructions={[
-                  'Type plain handles separated by commas (with or without @).',
-                  'Pick accounts that post consistently and engage local audiences.',
+                  'Type accounts separated by commas (with or without @).',
+                  'Select accounts that target a similar audience or demographic.',
                 ]}
-                goodExample="@bakery_local, @coffee_roaster, @sweet_pastry"
-                badExample="Random full website URLs or non-existent usernames"
-                reachTip="Selecting 3–5 competitors increases hook diversity and ensures balanced content buckets."
+                goodExample="@studio_luxe, @city_bakery, @wellness_hub"
+                badExample="http://instagram.com/profile or random text strings"
+                reachTip="Using 2 to 4 competitor accounts balances format variety across the 30-day calendar."
               />
             </div>
             <span className="text-[11px] font-medium text-slate-500">
-              {activeHandlesCount} accounts selected
+              {activeHandlesCount} accounts added
             </span>
           </div>
           <textarea
@@ -115,15 +147,15 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
             value={textInput}
             onChange={(e) => handleInputChange(e.target.value)}
             disabled={loading}
-            className="w-full p-3 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition resize-none"
-            placeholder={t('handlesPlaceholder')}
+            className="w-full p-3 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition resize-none font-medium"
+            placeholder="e.g. @brand_one, @brand_two, @competitor_local"
           />
         </div>
 
         {/* Quick presets */}
         <div>
           <div className="text-[11px] font-semibold text-slate-500 mb-2">
-            {t('quickPresetsLabel')}
+            Quick niche suggestions (click to append):
           </div>
           <div className="flex flex-wrap gap-2">
             {PRESET_SUGGESTIONS.map((preset) => (
@@ -132,7 +164,7 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
                 type="button"
                 onClick={() => handleApplyPreset(preset.handles)}
                 disabled={loading}
-                className="text-xs font-medium px-3 py-2 min-h-[40px] bg-slate-100 hover:bg-rose-50 hover:text-rose-700 active:bg-rose-100 text-slate-700 rounded-lg border border-slate-200/80 transition touch-manipulation"
+                className="text-xs font-medium px-3 py-1.5 min-h-[36px] bg-slate-50 hover:bg-rose-50 hover:text-rose-700 active:bg-rose-100 text-slate-700 rounded-lg border border-slate-200/80 transition touch-manipulation cursor-pointer"
               >
                 + {preset.label}
               </button>
@@ -149,19 +181,19 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
                 {loadingStage === 1 && (
                   <span className="flex items-center gap-1.5">
                     <Flame className="w-4 h-4 text-amber-500" />
-                    Apify scraping competitor engagement hooks &amp; top formats...
+                    Inspecting competitor engagement hooks &amp; visual styles...
                   </span>
                 )}
                 {loadingStage === 2 && (
                   <span className="flex items-center gap-1.5">
                     <Bot className="w-4 h-4 text-purple-600" />
-                    Gemini 2.5 Flash analyzing gap opportunities &amp; viral pillars...
+                    Analyzing content gap opportunities for your brand...
                   </span>
                 )}
                 {loadingStage >= 3 && (
                   <span className="flex items-center gap-1.5">
                     <Layers className="w-4 h-4 text-sky-600" />
-                    Synthesizing Strategy Blueprint &amp; visual template direction...
+                    Synthesizing 30-Day Strategy Blueprint &amp; post calendar...
                   </span>
                 )}
               </div>
@@ -181,17 +213,17 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
           type="button"
           onClick={handleAnalyzeAndBuild}
           disabled={loading || activeHandlesCount === 0}
-          className="w-full min-h-[48px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl text-sm sm:text-base font-extrabold text-white bg-gradient-to-r from-rose-500 via-pink-600 to-purple-600 hover:from-rose-600 hover:to-purple-700 active:scale-[0.98] shadow-soft-md transition touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full min-h-[48px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl text-sm sm:text-base font-extrabold text-white bg-gradient-to-r from-rose-500 via-pink-600 to-purple-600 hover:from-rose-600 hover:to-purple-700 active:scale-[0.98] shadow-soft-md transition touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Analyzing &amp; Building Niche Strategy...</span>
+              <span>Synthesizing Strategy Blueprint...</span>
             </>
           ) : (
             <>
               <Sparkles className="w-5 h-5" />
-              <span>Analyze &amp; Build My Strategy</span>
+              <span>Analyze &amp; Build My 30-Day Growth Plan</span>
             </>
           )}
         </button>
@@ -203,10 +235,10 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-95 transition touch-manipulation"
+          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-95 transition touch-manipulation cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 rtl-flip" />
-          <span>Back</span>
+          <span>Back to Step 2</span>
         </button>
       </div>
     </div>

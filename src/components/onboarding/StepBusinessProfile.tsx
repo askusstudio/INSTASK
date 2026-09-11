@@ -3,7 +3,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { GuidanceTooltip } from '../ui/GuidanceTooltip';
-import { Store, MapPin, Sparkles, ArrowRight, ArrowLeft, Palette, Image as ImageIcon, Briefcase } from 'lucide-react';
+import { Store, MapPin, ArrowRight, ArrowLeft, Palette, Image as ImageIcon, Briefcase } from 'lucide-react';
 
 export interface BusinessProfileData {
   brandName: string;
@@ -30,6 +30,8 @@ const INDUSTRIES = [
   'Restaurant & Local Dining',
   'Real Estate & Home Services',
   'Professional Consulting & Agency',
+  'Jewelry & Handmade Crafts',
+  'Ecommerce & Consumer Goods',
 ];
 
 const PRESET_COLORS = ['#e1306c', '#2563eb', '#059669', '#d97706', '#7c3aed', '#0f172a'];
@@ -37,7 +39,17 @@ const PRESET_COLORS = ['#e1306c', '#2563eb', '#059669', '#d97706', '#7c3aed', '#
 export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusinessProfileProps) {
   const t = useTranslations('onboarding.step2');
 
-  const isValid = data.brandName.trim().length > 1 && data.productSummary.trim().length > 5;
+  const isValid = 
+    data.brandName?.trim().length > 1 && 
+    Boolean(data.industry?.trim()) && 
+    data.productSummary?.trim().length > 5;
+
+  const handleBrandNameChange = (val: string) => {
+    onChange({ brandName: val });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('instask_brand_name', val);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -72,7 +84,7 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-slate-700">
-                {t('brandNameLabel')} *
+                Brand / Shop Name *
               </label>
               <GuidanceTooltip
                 id="guide_brand_name"
@@ -80,9 +92,9 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
                 instructions={[
                   'Use your official trading name that appears on your storefront or signage.',
                 ]}
-                goodExample="Luna Artisan Bakery"
-                badExample="The Best Bakery in the World #1 Store"
-                reachTip="Keep it clean and identical to your physical brand name."
+                goodExample="Glow & Bloom Studio"
+                badExample="The Best Shop in the World #1 Store"
+                reachTip="Keep it clean and identical to your real business identity."
               />
             </div>
             <div className="relative">
@@ -91,10 +103,11 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
               </span>
               <input
                 type="text"
-                value={data.brandName}
-                onChange={(e) => onChange({ brandName: e.target.value })}
-                className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition"
-                placeholder={t('brandNamePlaceholder')}
+                value={data.brandName || ''}
+                onChange={(e) => handleBrandNameChange(e.target.value)}
+                className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition font-medium"
+                placeholder="Enter your brand name"
+                required
               />
             </div>
           </div>
@@ -109,10 +122,10 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
                 title="Industry Vertical Selection"
                 instructions={[
                   'Select the category that best matches your primary offering.',
-                  'This customizes the visual templates, content pillars, and hashtag rankings in Step 4.',
+                  'This customizes the visual templates, content pillars, and hashtag rankings in Step 3.',
                 ]}
-                goodExample="Artisan Bakery & Cafe (tailors warm photography & morning hooks)"
-                badExample="Selecting generic consulting when running a physical boutique"
+                goodExample="Specialty Coffee & Roastery (tailors cozy photography & morning hooks)"
+                badExample="Selecting generic consulting when running a physical salon"
                 reachTip="Aligning with your vertical helps the Instagram discovery algorithm categorize your profile properly."
               />
             </div>
@@ -121,10 +134,11 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
                 <Briefcase className="w-4 h-4" />
               </span>
               <select
-                value={data.industry || INDUSTRIES[0]}
+                value={data.industry || ''}
                 onChange={(e) => onChange({ industry: e.target.value })}
-                className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition font-medium"
+                className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition font-medium cursor-pointer"
               >
+                <option value="" disabled>Select your industry</option>
                 {INDUSTRIES.map((ind) => (
                   <option key={ind} value={ind}>
                     {ind}
@@ -139,7 +153,7 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="block text-xs font-semibold text-slate-700">
-              {t('locationLabel')}
+              City & Region (Target Location)
             </label>
             <GuidanceTooltip
               id="guide_location"
@@ -147,9 +161,9 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
               instructions={[
                 'Provide your city and region so our engine can generate geo-targeted hashtags.',
               ]}
-              goodExample="Austin, TX, USA"
+              goodExample="Mumbai, India or New York, NY"
               badExample="Somewhere on Earth"
-              reachTip="Local hashtags (#AustinFoodie, #AustinBakery) have 4x higher customer purchase intent than generic tags."
+              reachTip="Local hashtags (#MumbaiFoodie, #NYCBoutique) have 4x higher purchase intent than generic tags."
             />
           </div>
           <div className="relative">
@@ -158,10 +172,10 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
             </span>
             <input
               type="text"
-              value={data.location}
+              value={data.location || ''}
               onChange={(e) => onChange({ location: e.target.value })}
               className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition"
-              placeholder={t('locationPlaceholder')}
+              placeholder="e.g. Mumbai, India / London, UK / Austin, TX"
             />
           </div>
         </div>
@@ -170,27 +184,28 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="block text-xs font-semibold text-slate-700">
-              {t('productSummaryLabel')} *
+              Short Business / Product Description *
             </label>
             <GuidanceTooltip
               id="guide_product_summary"
               title="1-Sentence Offering Summary"
               instructions={[
-                'Describe what makes your offering unique in 1 or 2 clear sentences.',
-                'Highlight your key ingredient, craftsmanship, or customer outcome.',
+                'Describe what makes your product/service special in 1 or 2 sentences.',
+                'Highlight key benefits, craftsmanship, or results.',
               ]}
-              goodExample="Fresh sourdough pastries and specialty pour-over espresso made from organic local grains."
+              goodExample="Handcrafted leather bags made from eco-certified Italian hides."
               badExample="We have products for everyone."
-              reachTip="This sentence is transformed by Gemini 2.5 Flash into 30 distinct viral hook variations."
+              reachTip="This sentence is transformed by AI into 30 distinct viral hook variations."
             />
           </div>
           <div className="relative">
             <textarea
               rows={3}
-              value={data.productSummary}
+              value={data.productSummary || ''}
               onChange={(e) => onChange({ productSummary: e.target.value })}
               className="w-full p-3 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition resize-none"
-              placeholder={t('productSummaryPlaceholder')}
+              placeholder="What makes your product or service stand out?"
+              required
             />
           </div>
         </div>
@@ -202,7 +217,7 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
               <label className="block text-xs font-semibold text-slate-700">
                 <span className="flex items-center gap-1.5">
                   <Palette className="w-3.5 h-3.5 text-slate-500" />
-                  {t('brandColorLabel')}
+                  Primary Brand Accent Color
                 </span>
               </label>
               <GuidanceTooltip
@@ -223,7 +238,7 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
                   key={color}
                   type="button"
                   onClick={() => onChange({ brandColor: color })}
-                  className={`w-7 h-7 rounded-full transition transform ${
+                  className={`w-7 h-7 rounded-full transition transform cursor-pointer ${
                     data.brandColor === color ? 'scale-110 ring-2 ring-offset-2 ring-slate-900' : 'hover:scale-105'
                   }`}
                   style={{ backgroundColor: color }}
@@ -232,7 +247,7 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
               ))}
               <input
                 type="color"
-                value={data.brandColor}
+                value={data.brandColor || '#e1306c'}
                 onChange={(e) => onChange({ brandColor: e.target.value })}
                 className="w-7 h-7 p-0 border-0 rounded-full cursor-pointer bg-transparent"
                 title="Custom Hex Color"
@@ -245,7 +260,7 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
               <label className="block text-xs font-semibold text-slate-700">
                 <span className="flex items-center gap-1.5">
                   <ImageIcon className="w-3.5 h-3.5 text-slate-500" />
-                  {t('logoUrlLabel')}
+                  Brand Logo URL (Optional)
                 </span>
               </label>
               <GuidanceTooltip
@@ -261,10 +276,10 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
             </div>
             <input
               type="url"
-              value={data.logoUrl}
+              value={data.logoUrl || ''}
               onChange={(e) => onChange({ logoUrl: e.target.value })}
               className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 transition"
-              placeholder={t('logoUrlPlaceholder')}
+              placeholder="https://example.com/logo.png"
             />
           </div>
         </div>
@@ -275,19 +290,19 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
         <button
           type="button"
           onClick={onBack}
-          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-95 transition touch-manipulation"
+          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-95 transition touch-manipulation cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 rtl-flip" />
-          <span>Back</span>
+          <span>Back to Step 1</span>
         </button>
 
         <button
           type="button"
           onClick={onNext}
           disabled={!isValid}
-          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 active:scale-95 rounded-xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
+          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 active:scale-95 rounded-xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation cursor-pointer"
         >
-          <span>Continue to Step 3</span>
+          <span>Continue to Step 3 (Competitors)</span>
           <ArrowRight className="w-4 h-4 rtl-flip" />
         </button>
       </div>
