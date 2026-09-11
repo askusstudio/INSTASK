@@ -134,14 +134,14 @@ class InMemoryStore {
   creditTransactions: CreditTransactionRecord[] = [];
 
   constructor() {
-    // Seed default demo user
+    // Clean demo user setup without hardcoded bakery seed
     const demoUserId = 'usr_demo_001';
     this.users.set(demoUserId, {
       id: demoUserId,
-      email: 'demo@instask.ai',
-      phone: '+15551234567',
+      email: 'creator@instask.ai',
+      phone: null,
       provider: 'EMAIL',
-      name: 'Luna Baker',
+      name: 'Creator',
       role: 'OWNER',
       subscriptionStatus: 'ACTIVE',
       isFirstMonthDiscountApplied: false,
@@ -150,43 +150,8 @@ class InMemoryStore {
       currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       creditsBalance: 60,
       monthlyCreditsLimit: 60,
-      stripeCustomerId: 'cus_demo_123',
-      subscriptionId: 'sub_demo_123',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    // Seed default demo brand
-    this.brands.set('brd_demo_001', {
-      id: 'brd_demo_001',
-      userId: demoUserId,
-      brandName: 'Luna Artisan Bakery',
-      industry: 'Artisan Bakery',
-      country: 'US',
-      currency: 'USD',
-      website: 'https://lunabakery.com',
-      instagramHandle: 'artisan_luna_bakery',
-      logoUrl: '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    // Seed default demo account
-    const demoAccountId = 'acc_demo_001';
-    this.accounts.set(demoAccountId, {
-      id: demoAccountId,
-      userId: demoUserId,
-      igUserId: process.env.META_IG_USER_ID || '17841400000000000',
-      username: 'artisan_luna_bakery',
-      profilePictureUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=150&auto=format&fit=crop&q=80',
-      brandName: 'Luna Artisan Bakery',
-      city: 'Austin, TX',
-      country: 'USA',
-      productSummary: 'Fresh sourdough breads, handcrafted viennoiseries, and specialty pour-over coffee.',
-      brandColor: '#e1306c',
-      targetTimezone: 'America/Chicago',
-      language: 'en',
-      autoPilotEnabled: false,
+      stripeCustomerId: null,
+      subscriptionId: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
