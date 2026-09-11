@@ -87,7 +87,7 @@ async function runTests() {
     console.log('\n2. Testing Competitor Scraping Deduction (15 Credits for audit)...');
     const scrapeRes = await post('/api/competitors/scrape', {
       userId: 'usr_demo_001',
-      handles: ['@bakery_test_1', '@bakery_test_2'],
+      handles: ['@brand_test_1', '@brand_test_2'],
     });
     assert(scrapeRes.status === 200, `Competitor scrape returned HTTP 200 (Got ${scrapeRes.status})`);
     assert(
@@ -99,8 +99,8 @@ async function runTests() {
     console.log('\n3. Testing 30-Day Strategy Plan Deduction (10 Credits)...');
     const planRes = await post('/api/generate-plan', {
       userId: 'usr_demo_001',
-      brandName: 'Luna Artisan Bakery',
-      productSummary: 'Fresh sourdough pastries and pour-over coffee.',
+      brandName: 'Brand Pulse Studio',
+      productSummary: 'Specialty coffee roasting and artisan handcrafted beverage products.',
       competitors: ['@test1'],
     });
     assert(planRes.status === 200, `Generate plan returned HTTP 200 (Got ${planRes.status})`);
@@ -113,11 +113,10 @@ async function runTests() {
 
     // 4. Test Single Post Regeneration (2 Credits)
     console.log('\n4. Testing Single Post Creative Regeneration (2 Credits)...');
-    // Ensure demo post exists in memoryStore
     const targetPostId = planRes.data?.posts?.[0]?.id || 'post_demo_001';
     const postRegen = await post(`/api/posts/${targetPostId}`, {
       userId: 'usr_demo_001',
-      headline: 'New Sourdough Batch Hook',
+      headline: 'New Product Batch Hook',
     });
     assert(postRegen.status === 200, `Post regeneration returned HTTP 200 (Got ${postRegen.status})`);
 
@@ -129,16 +128,10 @@ async function runTests() {
 
     // 5. Test Insufficient Balance & HTTP 402 Rejection
     console.log('\n5. Testing Credit Exhaustion & HTTP 402 Rejection...');
-    // Create an exhausted user with 0 credits
-    const exhaustedUserId = 'usr_exhausted_test_' + Date.now();
-    // Simulate user with insufficient credits by attempting scrape
-    // We can test scrape with a user who has 0 balance
-    // First, deduct all credits from a test user
     const failRes = await post('/api/competitors/scrape', {
       userId: 'usr_nonexistent_zero',
       handles: ['@brand1', '@brand2'],
     });
-    // usr_nonexistent_zero not found or 402
     assert(
       failRes.status === 402 || failRes.data?.code === 'CREDITS_EXHAUSTED' || failRes.data?.error,
       `Gatekeeper rejects with HTTP 402 / error message: ${failRes.data?.error || failRes.status}`
@@ -148,12 +141,12 @@ async function runTests() {
     console.log('\n6. Testing Stripe Top-Up Checkout (/api/billing/topup)...');
     const topupRes = await post('/api/billing/topup', {
       userId: 'usr_demo_001',
-      bundleKey: 'tier_medium', // 75 credits
+      bundleKey: 'tier_medium',
     });
     assert(topupRes.status === 200, `Top-up returned HTTP 200 (Got ${topupRes.status})`);
     assert(topupRes.data.url.includes('credits_added=true'), `Generated top-up URL: ${topupRes.data.url}`);
 
-    // 7. Test Webhook Credit Fulfillment (checkout.session.completed with CREDIT_TOPUP)
+    // 7. Test Webhook Credit Fulfillment
     console.log('\n7. Testing Webhook Credit Top-Up Fulfillment...');
     const webhookRes = await post('/api/webhooks/stripe', {
       type: 'checkout.session.completed',

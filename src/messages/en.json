@@ -27,7 +27,7 @@
   },
   "onboarding": {
     "title": "Launch Your 30-Day Growth Plan in 3 Easy Steps",
-    "subtitle": "No marketing experience needed. Connect, describe your shop, and let AI build and publish your monthly content automatically.",
+    "subtitle": "No marketing experience needed. Connect, describe your brand, and let AI build and publish your monthly content automatically.",
     "step1": {
       "tab": "1. Connect",
       "heading": "Connect Your Instagram Professional Account",
@@ -38,25 +38,25 @@
     },
     "step2": {
       "tab": "2. Business Info",
-      "heading": "Tell Us About Your Shop or Business",
+      "heading": "Tell Us About Your Brand or Business",
       "description": "Help our AI understand what makes your brand special and craft copy that resonates with your local customers.",
       "brandNameLabel": "Shop or Brand Name",
-      "brandNamePlaceholder": "e.g. Luna Artisan Bakery",
+      "brandNamePlaceholder": "Enter your brand or business name",
       "locationLabel": "City & Country",
-      "locationPlaceholder": "e.g. Austin, TX, USA",
+      "locationPlaceholder": "e.g. New York, USA or Mumbai, India",
       "productSummaryLabel": "What do you sell or offer in one sentence?",
-      "productSummaryPlaceholder": "e.g. Fresh sourdough pastries and specialty espresso made from organic local grains.",
+      "productSummaryPlaceholder": "e.g. Handcrafted lifestyle products and curated essentials made with organic materials.",
       "brandColorLabel": "Primary Brand Color",
       "logoUrlLabel": "Brand Logo URL (Optional)",
       "logoUrlPlaceholder": "https://example.com/logo.png"
     },
     "step3": {
       "tab": "3. Competitors",
-      "heading": "Add 3 to 5 Competitors or Accounts You Admire",
-      "description": "Our Apify intelligence engine scrapes their top-performing posts to discover what hook formulas work best in your niche.",
-      "handlesLabel": "Instagram Handles (Plain text, with or without @)",
-      "handlesPlaceholder": "@bakery_austin, @sweetcrust, @grainandflour",
-      "quickPresetsLabel": "Or click a quick preset to fill inspiration:",
+      "heading": "Add 2 to 5 Competitors or Accounts You Admire",
+      "description": "Our Apify intelligence engine inspects their top-performing posts to discover what hook formulas work best in your niche.",
+      "handlesLabel": "Instagram Competitor Handles (comma separated)",
+      "handlesPlaceholder": "@competitor_one, @inspiring_brand, @local_niche",
+      "quickPresetsLabel": "Quick niche suggestions (click to append):",
       "presets": {
         "bakery": "Artisan Bakery",
         "cafe": "Specialty Coffee Shop",

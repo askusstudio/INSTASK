@@ -29,6 +29,15 @@ export function Navbar({
   const tNav = useTranslations('nav');
   const { guidanceEnabled, toggleGuidance } = useGuidance();
 
+  // Strict check: sirf tab true hoga jab user ka real handle ho aur artisan_luna na ho
+  const cleanUsername = connectedAccount?.username?.replace(/^@+/, '').trim();
+  const isConnected = Boolean(
+    cleanUsername &&
+    cleanUsername.length > 1 &&
+    !cleanUsername.toLowerCase().includes('artisan_luna') &&
+    cleanUsername !== 'shop'
+  );
+
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,22 +59,25 @@ export function Navbar({
                   Meta v21.0
                 </span>
               </div>
-              <p className="hidden md:block text-[11px] text-slate-500 font-medium">
-                {connectedAccount?.brandName
-                  ? `${tNav('connectedAs')} @${connectedAccount.username || 'shop'}`
-                  : t('tagline')}
-              </p>
+              <div className="hidden md:block text-[11px] font-medium">
+                {isConnected ? (
+                  <span className="text-slate-700 font-semibold">
+                    {tNav('connectedAs')} <strong className="text-rose-600">@{cleanUsername}</strong>
+                  </span>
+                ) : (
+                  <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70 font-semibold">
+                    Account Setup in Progress
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Right Controls: Streamlined on mobile, full on desktop */}
+          {/* Right Controls */}
           <div className="flex items-center gap-2 sm:gap-2.5">
-            {/* Credit & Token Balance Badge (Always visible on mobile & desktop) */}
             <CreditBadge balance={creditsBalance} />
 
-            {/* Desktop Only Secondary Controls (Mobile uses thumb-friendly MobileBottomNav) */}
             <div className="hidden md:flex items-center gap-2 sm:gap-2.5">
-              {/* Pro Plan Active Badge */}
               <a
                 href={`/${currentLocale}/onboarding/payment`}
                 className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200/80 hover:bg-amber-100 transition shadow-xs"
@@ -75,7 +87,6 @@ export function Navbar({
                 <span>Pro Plan (50% Off)</span>
               </a>
 
-              {/* Quick Auth & Onboarding link */}
               <a
                 href={`/${currentLocale}/auth`}
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
@@ -88,7 +99,7 @@ export function Navbar({
               <button
                 type="button"
                 onClick={toggleGuidance}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition shadow-xs ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition shadow-xs cursor-pointer ${
                   guidanceEnabled
                     ? 'bg-rose-50 text-rose-700 border-rose-200 ring-1 ring-rose-200'
                     : 'bg-white text-slate-500 border-slate-200 hover:text-slate-800'
@@ -102,7 +113,7 @@ export function Navbar({
                 </span>
               </button>
 
-              {/* Autopilot Master Switch */}
+              {/* Autopilot Switch */}
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
                 <div className="flex items-center gap-1.5">
                   <Zap className={`w-3.5 h-3.5 ${autoPilotEnabled ? 'text-amber-500 fill-amber-500' : 'text-slate-400'}`} />
@@ -129,7 +140,6 @@ export function Navbar({
                 </button>
               </div>
 
-              {/* Language Switcher */}
               <LanguageSwitcher currentLocale={currentLocale} />
             </div>
           </div>

@@ -20,14 +20,14 @@ export async function PATCH(
       if (postId.startsWith('post_demo')) {
         post = {
           id: postId,
-          accountId: 'acc_demo_001',
+          accountId: 'acc_user_main',
           dayNumber: 1,
           scheduledTime: new Date(),
-          theme: 'Behind the Scenes & Craft',
-          headline: 'Fresh Out of the Oven',
-          bodyBullets: ['Fermented 36 hours', '100% wild yeast starter'],
-          caption: 'The secret to sourdough is patience.',
-          hashtags: ['#artisanbread', '#sourdough'],
+          theme: 'Value Proposition & Brand Story',
+          headline: 'Crafting Premium Experiences',
+          bodyBullets: ['Unmatched quality & design', 'Dedicated customer focus'],
+          caption: 'Delivering exceptional value with every single release.',
+          hashtags: ['#brandgrowth', '#qualityfirst'],
           templateId: 'template_quote',
           mediaType: 'IMAGE',
           mediaAspectRatio: '1:1',
@@ -91,14 +91,14 @@ export async function POST(
       if (postId.startsWith('post_demo')) {
         post = {
           id: postId,
-          accountId: 'acc_demo_001',
+          accountId: 'acc_user_main',
           dayNumber: 1,
           scheduledTime: new Date(),
-          theme: 'Behind the Scenes & Craft',
-          headline: 'Fresh Out of the Oven',
-          bodyBullets: ['Fermented 36 hours', '100% wild yeast starter'],
-          caption: 'The secret to sourdough is patience.',
-          hashtags: ['#artisanbread', '#sourdough'],
+          theme: 'Value Proposition & Brand Story',
+          headline: 'Crafting Premium Experiences',
+          bodyBullets: ['Unmatched quality & design', 'Dedicated customer focus'],
+          caption: 'Delivering exceptional value with every single release.',
+          hashtags: ['#brandgrowth', '#qualityfirst'],
           templateId: 'template_quote',
           mediaType: 'IMAGE',
           mediaAspectRatio: '1:1',
@@ -113,13 +113,13 @@ export async function POST(
     }
 
     const account = memoryStore.accounts.get(post.accountId) || {
-      userId: 'usr_demo_001',
-      brandName: 'Luna Artisan Bakery',
+      userId: 'usr_main',
+      brandName: 'Your Business Brand',
       brandColor: '#e1306c',
-      username: 'artisan_luna_bakery',
+      username: 'yourbrand',
     };
 
-    const userId = body.userId || account.userId || 'usr_demo_001';
+    const userId = body.userId || account.userId || 'usr_main';
 
     // Deduct 2 credits for regenerating a single post creative
     const deduction = await deductCredits(
@@ -132,11 +132,10 @@ export async function POST(
     if (!deduction.success) {
       return NextResponse.json(
         { error: deduction.error, code: 'CREDITS_EXHAUSTED' },
-        { status: 402 } // Payment Required
+        { status: 402 }
       );
     }
 
-    // Toggle aspect ratio if requested or re-render
     const targetAspectRatio = body.aspectRatio || post.mediaAspectRatio || '1:1';
 
     const renderResult = await renderPostAsset({
@@ -144,7 +143,7 @@ export async function POST(
       aspectRatio: targetAspectRatio,
       brandName: account.brandName,
       brandColor: account.brandColor || '#e1306c',
-      handle: account.username || 'artisan_shop',
+      handle: account.username || 'yourbrand',
       headline: body.headline || post.headline,
       bullets: body.bodyBullets || post.bodyBullets,
       theme: post.theme,

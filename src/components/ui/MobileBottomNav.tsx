@@ -13,7 +13,6 @@ import {
   HelpCircle,
   Globe,
   ShieldCheck,
-  CreditCard,
   Building2,
   ChevronRight,
 } from 'lucide-react';
@@ -64,9 +63,20 @@ export function MobileBottomNav({
     };
   }, [sheetOpen]);
 
+  // Clean dynamic business identity
+  const cleanBrandName =
+    connectedAccount?.brandName && !connectedAccount.brandName.includes('Luna Artisan')
+      ? connectedAccount.brandName
+      : 'Your Business Brand';
+
+  const cleanHandle =
+    connectedAccount?.username && !connectedAccount.username.includes('artisan_luna')
+      ? connectedAccount.username.replace(/^@+/, '')
+      : null;
+
   return (
     <>
-      {/* 1. Mobile Persistent Bottom Tab Bar (Thumb Zone Ergonomics) */}
+      {/* 1. Mobile Persistent Bottom Tab Bar */}
       <nav
         aria-label="Mobile Navigation Bar"
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200 pb-safe shadow-lg gpu-layer"
@@ -152,7 +162,7 @@ export function MobileBottomNav({
         </div>
       </nav>
 
-      {/* 2. Accessible Slide-Up Bottom Sheet Drawer */}
+      {/* 2. Slide-Up Bottom Sheet Drawer */}
       {sheetOpen && (
         <div
           role="dialog"
@@ -167,23 +177,23 @@ export function MobileBottomNav({
             aria-label="Dismiss sheet"
           />
 
-          {/* Sheet Container with 100dvh Max-Height Bound */}
+          {/* Sheet Container */}
           <div className="bg-white rounded-t-3xl border-t border-slate-200 shadow-2xl p-5 pb-safe space-y-5 max-h-[85dvh] overflow-y-auto gpu-layer">
             {/* Grab Handle */}
             <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-1" />
 
-            {/* Header: Brand Profile & Close Button */}
+            {/* Header: Dynamic Brand Profile */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm">
-                  {connectedAccount?.brandName?.charAt(0) || 'I'}
+                  {cleanBrandName.charAt(0)}
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">
-                    {connectedAccount?.brandName || 'Luna Artisan Bakery'}
+                    {cleanBrandName}
                   </h3>
                   <p className="text-[11px] text-slate-500">
-                    @{connectedAccount?.username || 'artisan_luna_bakery'}
+                    {cleanHandle ? `@${cleanHandle}` : 'Setup in Progress'}
                   </p>
                 </div>
               </div>
@@ -191,14 +201,14 @@ export function MobileBottomNav({
               <button
                 type="button"
                 onClick={() => setSheetOpen(false)}
-                className="touch-target-48 p-2 text-slate-400 hover:text-slate-800 rounded-xl transition"
+                className="touch-target-48 p-2 text-slate-400 hover:text-slate-800 rounded-xl transition cursor-pointer"
                 aria-label="Close sheet"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Credit & Token Balance Card */}
+            {/* Credit Balance Card */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-rose-950 to-slate-900 text-white flex items-center justify-between shadow-soft">
               <div>
                 <span className="text-[11px] font-semibold text-rose-200 uppercase tracking-wider block">
@@ -253,7 +263,7 @@ export function MobileBottomNav({
               </button>
             </div>
 
-            {/* Secondary Controls (Guidance & Language) */}
+            {/* Secondary Controls */}
             <div className="space-y-2">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
                 Preferences &amp; Language
@@ -263,7 +273,7 @@ export function MobileBottomNav({
               <button
                 type="button"
                 onClick={toggleGuidance}
-                className="w-full touch-target-48 flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white text-left transition hover:bg-slate-50"
+                className="w-full touch-target-48 flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white text-left transition hover:bg-slate-50 cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <HelpCircle className="w-4 h-4 text-rose-500" />

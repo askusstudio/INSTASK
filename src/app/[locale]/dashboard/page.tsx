@@ -51,7 +51,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const { dismissAllGuidance } = useGuidance();
   const searchParams = useSearchParams();
 
-  // Login ke just baad always wizard open hoga
+  // Login ke baad setup wizard default open hoga
   const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('wizard');
 
   const [posts, setPosts] = useState<PostRecord[]>([]);
@@ -65,14 +65,27 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const [pendingProfile, setPendingProfile] = useState<BusinessProfileData | null>(null);
   const [pendingMetaAccount, setPendingMetaAccount] = useState<{ igUserId: string; username: string } | null>(null);
 
+  // Dynamic user account: Safe clean initialization without mock bakery
   const [account, setAccount] = useState<{
     brandName?: string | null;
     username?: string | null;
     location?: string | null;
-  } | null>({
-    brandName: 'Luna Artisan Bakery',
-    username: 'artisan_luna_bakery',
-    location: 'Austin, TX',
+  } | null>(() => {
+    if (typeof window !== 'undefined') {
+      const savedBrand = localStorage.getItem('instask_brand_name');
+      const savedHandle = localStorage.getItem('instask_ig_handle');
+      if (
+        (savedBrand && !savedBrand.includes('Luna Artisan')) ||
+        (savedHandle && !savedHandle.includes('artisan_luna'))
+      ) {
+        return {
+          brandName: savedBrand || null,
+          username: savedHandle || null,
+          location: null,
+        };
+      }
+    }
+    return null;
   });
 
   const fetchPosts = async () => {
@@ -82,7 +95,13 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       const data = await res.json();
       if (data.success && Array.isArray(data.posts)) {
         setPosts(data.posts);
-        if (data.account) {
+        // Strict guard: ignore mock backend bakery data completely
+        if (
+          data.account &&
+          data.account.username &&
+          !data.account.username.toLowerCase().includes('artisan_luna') &&
+          !data.account.brandName?.toLowerCase().includes('luna artisan')
+        ) {
           setAccount({
             brandName: data.account.brandName,
             username: data.account.username,
@@ -121,7 +140,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       fetchCredits();
     }
 
-    // Check if user explicitly asked for calendar or completed wizard
     if (typeof window !== 'undefined') {
       const isCompleted = localStorage.getItem('instask_wizard_completed') === 'true';
       if (searchParams.get('view') === 'calendar' && isCompleted) {
@@ -140,6 +158,12 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     setStrategyBlueprint(blueprint);
     setPendingProfile(profile);
     setPendingMetaAccount(metaAcc);
+    // Real user account update in header & navbar
+    setAccount({
+      brandName: profile.brandName,
+      username: metaAcc.username,
+      location: profile.location,
+    });
     setShowBlueprintModal(true);
   };
 
@@ -147,16 +171,16 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     dismissAllGuidance();
 
     const profile = pendingProfile || {
-      brandName: account?.brandName || 'Luna Artisan Bakery',
-      industry: 'Artisan Bakery & Cafe',
-      location: account?.location || 'Austin, TX',
-      productSummary: 'Fresh sourdough pastries and specialty espresso made from organic local grains.',
+      brandName: account?.brandName || 'My Brand',
+      industry: 'General Business',
+      location: account?.location || '',
+      productSummary: '',
       brandColor: '#e1306c',
       logoUrl: '',
     };
 
-    const handle = pendingMetaAccount?.username || account?.username || 'artisan_luna_bakery';
-    const igUserId = pendingMetaAccount?.igUserId || '17841400000000000';
+    const handle = pendingMetaAccount?.username || account?.username || profile.brandName.toLowerCase().replace(/\s+/g, '_');
+    const igUserId = pendingMetaAccount?.igUserId || `ig_${Date.now()}`;
 
     try {
       const res = await fetch('/api/generate-plan', {
@@ -179,16 +203,18 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       const data = await res.json();
       if (data.success && Array.isArray(data.posts)) {
         setPosts(data.posts);
-        setAccount({
+        const updatedAccount = {
           brandName: profile.brandName,
           username: handle,
           location: profile.location,
-        });
+        };
+        setAccount(updatedAccount);
         if (typeof window !== 'undefined') {
           localStorage.setItem('instask_wizard_completed', 'true');
+          localStorage.setItem('instask_brand_name', profile.brandName);
+          localStorage.setItem('instask_ig_handle', handle);
         }
         setShowBlueprintModal(false);
-        // Sirf ab teeno steps complete hone ke baad Calendar dikhega
         setActiveTab('calendar');
       }
     } catch (err) {
@@ -214,6 +240,12 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
   };
 
+  // Safe display for brand title
+  const currentDisplayName =
+    account?.brandName && !account.brandName.includes('Luna Artisan')
+      ? account.brandName
+      : pendingProfile?.brandName || 'Your Business Brand';
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar
@@ -226,7 +258,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pb-28 md:pb-8 flex-1 w-full space-y-6 sm:space-y-8">
         
-        {/* Banner */}
+        {/* Payment / Plan Banner */}
         {isPaymentSuccess && (
           <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 rounded-3xl p-5 text-white shadow-soft-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-emerald-400/40">
             <div className="flex items-center gap-3.5">
@@ -256,7 +288,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-              <span>{account?.brandName || 'INSTASK AI'}</span>
+              <span>{currentDisplayName}</span>
               <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200/80">
                 {activeTab === 'wizard' ? 'Step Setup Wizard' : '30-Day Autonomous Dashboard'}
               </span>
@@ -295,7 +327,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           </div>
         </div>
 
-        {/* Condition: Login ke turant baad Setup Wizard page dikhega */}
+        {/* Setup Wizard / Calendar View */}
         {activeTab === 'wizard' ? (
           <div className="bg-white rounded-3xl border border-slate-200 shadow-soft-md p-4 sm:p-8">
             <div className="max-w-2xl mx-auto text-center mb-6">

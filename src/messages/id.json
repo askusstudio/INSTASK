@@ -27,7 +27,7 @@
   },
   "onboarding": {
     "title": "Mulai Rencana Pertumbuhan 30 Hari dalam 3 Langkah Mudah",
-    "subtitle": "Tanpa pengalaman pemasaran. Hubungkan akun, jelaskan bisnis Anda, dan biarkan AI membuat serta mempublikasikan konten bulanan secara otomatis.",
+    "subtitle": "Tanpa pengalaman pemasaran. Hubungkan akun, jelaskan brand Anda, dan biarkan AI membuat serta mempublikasikan konten bulanan secara otomatis.",
     "step1": {
       "tab": "1. Hubungkan",
       "heading": "Hubungkan Akun Instagram Profesional Anda",
@@ -41,21 +41,21 @@
       "heading": "Ceritakan Tentang Toko atau Bisnis Anda",
       "description": "Bantu AI kami memahami keunikan brand Anda untuk membuat konten yang memikat pelanggan lokal Anda.",
       "brandNameLabel": "Nama Toko atau Brand",
-      "brandNamePlaceholder": "cth. Luna Artisan Bakery",
+      "brandNamePlaceholder": "Masukkan nama toko atau brand Anda",
       "locationLabel": "Kota & Negara",
-      "locationPlaceholder": "cth. Jakarta, Indonesia",
+      "locationPlaceholder": "cth. Jakarta, Indonesia atau Kuala Lumpur",
       "productSummaryLabel": "Apa yang Anda jual atau tawarkan dalam satu kalimat?",
-      "productSummaryPlaceholder": "cth. Roti sourdough organik segar dan kopi espresso spesialti berkualitas tinggi.",
+      "productSummaryPlaceholder": "cth. Produk gaya hidup berkualitas tinggi dan perlengkapan harian dengan bahan ramah lingkungan.",
       "brandColorLabel": "Warna Utama Brand",
       "logoUrlLabel": "URL Logo (Opsional)",
       "logoUrlPlaceholder": "https://example.com/logo.png"
     },
     "step3": {
       "tab": "3. Kompetitor",
-      "heading": "Tambahkan 3 hingga 5 Kompetitor atau Akun Inspirasi",
+      "heading": "Tambahkan 2 hingga 5 Kompetitor atau Akun Inspirasi",
       "description": "Mesin intelijen Apify kami menganalisis postingan dengan interaksi tertinggi mereka untuk menemukan formula konten terbaik di bidang Anda.",
-      "handlesLabel": "Handle Instagram (dengan atau tanpa @)",
-      "handlesPlaceholder": "@bakery_jkt, @kopi_nusantara, @rotisourdough",
+      "handlesLabel": "Handle Instagram Kompetitor (pisahkan dengan koma)",
+      "handlesPlaceholder": "@kompetitor_utama, @brand_inspirasi, @bisnis_lokal",
       "quickPresetsLabel": "Atau klik preset cepat untuk inspirasi:",
       "presets": {
         "bakery": "Toko Roti & Pastry",

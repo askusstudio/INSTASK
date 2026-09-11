@@ -18,14 +18,14 @@ import {
 } from 'lucide-react';
 
 const INDUSTRIES = [
-  { id: 'Artisan Bakery', label: 'Artisan Bakery', desc: 'Sourdough, pastries & viennoiseries' },
-  { id: 'Coffee & Cafe', label: 'Specialty Coffee & Cafe', desc: 'Roasteries, pour-overs & brunch' },
-  { id: 'Boutique Fitness', label: 'Boutique Fitness & Yoga', desc: 'Pilates, HIIT & personal training' },
-  { id: 'Sustainable Fashion', label: 'Sustainable Fashion', desc: 'Eco-apparel, handmade goods & jewelry' },
-  { id: 'Beauty & Skincare', label: 'Beauty & Skincare', desc: 'Organic cosmetics & salon care' },
-  { id: 'Local Restaurant', label: 'Local Restaurant & Dining', desc: 'Chef specials, farm-to-table & hospitality' },
+  { id: 'Coffee & Cafe', label: 'Specialty Coffee & Cafe', desc: 'Roasteries, pour-overs & cafe hospitality' },
+  { id: 'Boutique Fitness', label: 'Boutique Fitness & Yoga', desc: 'Pilates, HIIT, gym & personal training' },
+  { id: 'Sustainable Fashion', label: 'Fashion & Apparel', desc: 'Apparel, handmade crafts & accessories' },
+  { id: 'Beauty & Skincare', label: 'Beauty & Skincare', desc: 'Organic cosmetics, hair & salon care' },
+  { id: 'Local Restaurant', label: 'Local Restaurant & Dining', desc: 'Chef specials, dining & catering' },
   { id: 'Real Estate', label: 'Real Estate & Properties', desc: 'Residential listings & architectural tours' },
-  { id: 'SaaS / Tech', label: 'SaaS & Digital Services', desc: 'Productivity apps & agency consulting' },
+  { id: 'SaaS / Tech', label: 'SaaS & Digital Services', desc: 'Productivity tools & agency consulting' },
+  { id: 'Retail & Crafts', label: 'Artisan Goods & Crafts', desc: 'Handmade products, bakery & local goods' },
 ];
 
 const CURRENCIES = [
@@ -55,10 +55,8 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
   const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Identify user from URL or session storage or fallback
-  const resolvedUserId = searchParams.get('userId') || (typeof window !== 'undefined' ? localStorage.getItem('instask_user_id') : null) || 'usr_demo_001';
+  const resolvedUserId = searchParams.get('userId') || (typeof window !== 'undefined' ? localStorage.getItem('instask_user_id') : null) || 'usr_main';
 
-  // State defaults to empty (null representation) for first-time users
   const [brandName, setBrandName] = useState('');
   const [industry, setIndustry] = useState('');
   const [country, setCountry] = useState('');
@@ -75,7 +73,6 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load existing brand: If repeat user, pre-fill; if first time, remains empty
   useEffect(() => {
     async function loadBrandProfile() {
       setIsInitialLoading(true);
@@ -84,17 +81,18 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
         const data = await res.json();
 
         if (data.success && data.brand) {
-          // Returning user: autofill with existing saved records
-          setBrandName(data.brand.brandName || '');
+          const fetchedBrand = data.brand.brandName || '';
+          if (!fetchedBrand.toLowerCase().includes('luna')) {
+            setBrandName(fetchedBrand);
+          }
           setIndustry(data.brand.industry || '');
           setCountry(data.brand.country || '');
           setCurrency(data.brand.currency || 'USD');
           setWebsite(data.brand.website || '');
-          setInstagramHandle(
-            data.brand.instagramHandle
-              ? `@${data.brand.instagramHandle.replace(/^@/, '')}`
-              : ''
-          );
+          const fetchedHandle = data.brand.instagramHandle || '';
+          if (!fetchedHandle.toLowerCase().includes('artisan_luna')) {
+            setInstagramHandle(fetchedHandle ? `@${fetchedHandle.replace(/^@/, '')}` : '');
+          }
           if (data.brand.primaryColor) setPrimaryColor(data.brand.primaryColor);
           if (data.brand.accentColor) setAccentColor(data.brand.accentColor);
           if (data.brand.logoUrl) {
@@ -102,7 +100,6 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
             setLogoPreview(data.brand.logoUrl);
           }
         }
-        // If data.brand is null (first-time user), states stay blank as initialized
       } catch (err) {
         console.warn('Could not load existing brand profile:', err);
       } finally {
@@ -171,7 +168,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
         body: JSON.stringify({
           userId: resolvedUserId,
           brandName,
-          industry: industry || 'Artisan Bakery',
+          industry: industry || 'General Business',
           primaryColor,
           accentColor,
           country: country || 'United States',
@@ -184,6 +181,12 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
 
       const data = await res.json();
       if (data.success) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('instask_brand_name', brandName);
+          if (instagramHandle) {
+            localStorage.setItem('instask_ig_handle', instagramHandle.replace(/^@/, ''));
+          }
+        }
         router.push(`/${locale}/onboarding/payment?userId=${encodeURIComponent(resolvedUserId)}`);
       } else {
         setError(data.error || 'Failed to save brand profile');
@@ -249,7 +252,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-bold text-slate-800">
-                  Business or Brand Name
+                  Business or Brand Name *
                 </label>
                 <GuidanceTooltip
                   id="tooltip-brand-name"
@@ -258,16 +261,16 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                     'Enter the exact trade name customers search for on Instagram.',
                     'Avoid excessive emojis or legal suffixes like LLC/Inc.',
                   ]}
-                  goodExample="Luna Artisan Bakery"
-                  badExample="Luna_Bakery_Austin_Texas_LLC_Official_123"
-                  reachTip="Keep it identical to your storefront sign so local visitors tag your geotag."
+                  goodExample="Urban Bloom Studio"
+                  badExample="Studio_Shop_City_LLC_Official_123"
+                  reachTip="Keep it identical to your storefront or social identity for easy tagging."
                 />
               </div>
               <input
                 type="text"
                 value={brandName}
                 onChange={(e) => setBrandName(e.target.value)}
-                placeholder="e.g. Luna Artisan Bakery"
+                placeholder="Enter your brand name"
                 required
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-slate-900 font-medium"
               />
@@ -316,7 +319,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-2 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-xs flex items-center gap-1.5 shrink-0"
+                  className="px-3 py-2 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
                 >
                   <UploadCloud className="w-3.5 h-3.5 text-slate-500" />
                   <span>{logoPreview ? 'Change' : 'Browse'}</span>
@@ -345,7 +348,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                         setPrimaryColor(preset.primary);
                         setAccentColor(preset.accent);
                       }}
-                      className={`p-2 rounded-xl border text-center transition flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition flex flex-col items-center gap-1.5 cursor-pointer ${
                         isSelected ? 'border-rose-500 bg-rose-50/50' : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
@@ -409,7 +412,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                     'This selects pre-tested visual templates and high-converting caption structures.',
                     'Trained on top performers in your niche for optimal bookmarks.',
                   ]}
-                  goodExample="Artisan Bakery or Specialty Coffee"
+                  goodExample="Coffee & Cafe or Fashion & Apparel"
                   badExample="Generic 'Business' or 'Sales'"
                   reachTip="Niche content gets 3.2x higher bookmark rates than generic corporate messaging."
                 />
@@ -420,7 +423,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                     key={ind.id}
                     type="button"
                     onClick={() => setIndustry(ind.id)}
-                    className={`p-3 rounded-xl border text-left transition flex flex-col justify-between ${
+                    className={`p-3 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
                       industry === ind.id
                         ? 'border-rose-500 bg-rose-50/50 ring-1 ring-rose-500'
                         : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
@@ -450,8 +453,8 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                       'Enter your handle with or without @.',
                       'This will appear as the author on all rendered mockups and live publishing.',
                     ]}
-                    goodExample="@artisan_luna_bakery"
-                    badExample="bakery#1!! (spaces or invalid characters)"
+                    goodExample="@yourbrand"
+                    badExample="shop#1!! (spaces or invalid characters)"
                     reachTip="Short, memorable handles improve direct profile visits by 22%."
                   />
                 </div>
@@ -462,7 +465,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                     value={instagramHandle}
                     onChange={(e) => setInstagramHandle(e.target.value)}
                     placeholder="@yourhandle"
-                    className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-slate-900"
+                    className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-slate-900 font-medium"
                   />
                 </div>
               </div>
@@ -479,8 +482,8 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                       'Provide your main destination URL.',
                       'E.g. your online store, menu, or booking link.',
                     ]}
-                    goodExample="https://lunabakery.com/order"
-                    badExample="lunabakery (missing protocol or domain)"
+                    goodExample="https://yourbrand.com"
+                    badExample="yourbrand (missing domain format)"
                     reachTip="Clear CTAs driving to this link in your captions increase bio clicks."
                   />
                 </div>
@@ -507,7 +510,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                   type="text"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  placeholder="e.g. United States, Spain, India"
+                  placeholder="e.g. United States, India, UK"
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-slate-900 font-medium"
                 />
               </div>
@@ -519,7 +522,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-slate-900 font-medium"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-slate-900 font-medium cursor-pointer"
                 >
                   {CURRENCIES.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -540,7 +543,7 @@ export default function BrandOnboardingPage({ params: { locale } }: BrandOnboard
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-auto px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>{loading ? 'Saving Profile...' : 'Save & Continue to Activation'}</span>
                 <ArrowRight className="w-4 h-4" />

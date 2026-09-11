@@ -97,7 +97,6 @@ export function CalendarGrid({ initialPosts, account }: CalendarGridProps) {
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.results)) {
-        // Update statuses
         const publishedIds = new Set(
           data.results.filter((r: any) => r.status === 'PUBLISHED').map((r: any) => r.postId)
         );
@@ -135,6 +134,17 @@ export function CalendarGrid({ initialPosts, account }: CalendarGridProps) {
       console.error('Error saving post:', err);
     }
   };
+
+  // Clean dynamic values without hardcoded bakery fallback
+  const resolvedHandle =
+    account?.username && !account.username.includes('artisan_luna')
+      ? account.username.replace(/^@+/, '')
+      : 'yourbrand';
+
+  const resolvedBrandName =
+    account?.brandName && !account.brandName.includes('Luna Artisan')
+      ? account.brandName
+      : 'Your Business Brand';
 
   return (
     <div className="space-y-6">
@@ -176,8 +186,8 @@ export function CalendarGrid({ initialPosts, account }: CalendarGridProps) {
           isOpen={Boolean(activeModalPost)}
           onClose={() => setActiveModalPost(null)}
           onSave={handleSaveModalPost}
-          handle={account?.username || 'artisan_luna_bakery'}
-          brandName={account?.brandName || 'Luna Artisan Bakery'}
+          handle={resolvedHandle}
+          brandName={resolvedBrandName}
         />
       )}
     </div>
