@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { GuidanceTooltip } from '../ui/GuidanceTooltip';
-import { Instagram, ShieldCheck, CheckCircle2, ArrowRight, Lock, Sparkles } from 'lucide-react';
+import { Instagram, ShieldCheck, CheckCircle2, ArrowRight, Lock } from 'lucide-react';
 
 interface StepConnectMetaProps {
   onConnected: (data: { igUserId: string; username: string }) => void;
@@ -22,7 +22,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
     if (typeof window !== 'undefined') {
       const savedHandle = localStorage.getItem('instask_ig_handle');
       if (savedHandle) {
-        setAccountHandle(savedHandle.replace(/^@/, ''));
+        setAccountHandle(savedHandle.replace(/^@+/, ''));
       }
     }
   }, []);
@@ -36,7 +36,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
     const cleanHandle = sanitizeHandle(accountHandle);
 
     if (!cleanHandle || cleanHandle.length < 2) {
-      setInputError('Please enter a valid Instagram username/handle.');
+      setInputError('Please enter your Instagram username or handle.');
       return;
     }
 
@@ -109,23 +109,23 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
         </div>
         <div className="flex items-center justify-center gap-2">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            {t('heading')}
+            Connect Your Instagram Professional Account
           </h2>
           <GuidanceTooltip
             id="guide_meta_header"
             title="Instagram Professional Account"
             instructions={[
-              'Meta Graph API v21.0 requires either a Creator or Business account.',
-              'Personal profiles do not support automated publishing or container creation.',
-              'Switching is 100% free and takes 15 seconds inside the Instagram app.',
+              'Meta Graph API requires either a Creator or Business Instagram account.',
+              'Personal accounts do not support automated scheduling or insights.',
+              'Switching is free in Instagram Settings -> Account -> Switch to Professional Account.',
             ]}
-            goodExample="Switch to Professional Account in Settings -> Account -> Switch to Professional"
-            badExample="Trying to connect a private personal profile without Facebook Page link"
-            reachTip="Professional accounts get access to Meta API auto-publishing, insights, and call-to-action buttons."
+            goodExample="Switch to a Creator or Business account inside your Instagram mobile app"
+            badExample="Using a private personal profile"
+            reachTip="Professional accounts enable direct container scheduling and viral analytics."
           />
         </div>
         <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-          {t('description')}
+          INSTASK securely connects via certified Meta Graph API. We never ask for your personal password.
         </p>
       </div>
 
@@ -136,48 +136,49 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">{t('connectedSuccess')}</h3>
+              <h3 className="text-base font-bold text-slate-900">Account Connected Successfully</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Connected handle: <span className="font-semibold text-rose-600">@{accountHandle}</span>
+                Target account: <span className="font-semibold text-rose-600">@{accountHandle}</span>
               </p>
             </div>
             <div className="flex items-center justify-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 py-1.5 px-3 rounded-lg border border-emerald-200">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Meta Graph API v21.0 Container Verification Ready</span>
+              <span>Meta Graph API Container Active</span>
             </div>
           </div>
         ) : (
           <div className="space-y-4">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-semibold text-slate-700">
-                  Your Instagram Handle (@shop)
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  Enter Your Instagram Handle *
                 </label>
                 <GuidanceTooltip
                   id="guide_meta_handle"
                   title="Your Instagram Handle"
                   instructions={[
-                    'Enter your exact Instagram handle without extra spaces or URLs.',
-                    'This identity is used to generate tailor-made visual hooks and tags.',
+                    'Enter your exact Instagram public username without extra spaces or URLs.',
+                    'This handle will be stamped on your visuals, carousels, and hashtag sets.',
                   ]}
-                  goodExample="artisan_bakery"
-                  badExample="https://instagram.com/my-shop"
-                  reachTip="A clean handle helps audience tagging and discovery."
+                  goodExample="yourbrandname"
+                  badExample="https://instagram.com/my-shop or spaces in username"
+                  reachTip="A clean handle ensures your brand tags and mentions index properly."
                 />
               </div>
+
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-medium">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-bold text-sm">
                   @
                 </span>
                 <input
                   type="text"
                   value={accountHandle}
                   onChange={(e) => {
-                    setAccountHandle(e.target.value.replace(/^@/, ''));
+                    setAccountHandle(e.target.value.replace(/^@+/, '').replace(/\s+/g, ''));
                     if (inputError) setInputError(null);
                   }}
-                  className="w-full pl-8 pr-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition font-medium"
-                  placeholder="your_shop_name"
+                  className="w-full pl-8 pr-4 py-3 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium transition shadow-xs"
+                  placeholder="yourbrandname"
                   required
                 />
               </div>
@@ -186,7 +187,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 pt-1">
               <button
                 type="button"
                 onClick={handleConnect}
@@ -194,7 +195,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
                 className="w-full min-h-[48px] flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 hover:opacity-95 active:scale-[0.98] transition shadow-soft-md disabled:opacity-50 touch-manipulation cursor-pointer"
               >
                 <Instagram className="w-4 h-4" />
-                <span>{connecting ? 'Verifying Account...' : t('connectButton')}</span>
+                <span>{connecting ? 'Connecting Account...' : 'Connect with Instagram Pro (Meta OAuth 2.0)'}</span>
               </button>
 
               <button
@@ -209,7 +210,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
 
             <div className="flex items-start gap-2 text-[11px] text-slate-500 pt-2 border-t border-slate-200/80">
               <Lock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
-              <span>{t('accountTypeNote')}</span>
+              <span>Requires an Instagram Creator or Business account linked to a Facebook Page.</span>
             </div>
           </div>
         )}
@@ -223,7 +224,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
             className="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 active:scale-95 rounded-xl transition shadow-sm touch-manipulation cursor-pointer"
           >
             <span>Continue to Step 2 (Business Info)</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 rtl-flip" />
           </button>
         </div>
       )}
