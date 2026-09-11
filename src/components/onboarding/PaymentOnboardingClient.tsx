@@ -267,7 +267,7 @@ export function PaymentOnboardingClient({ locale, pricing }: PaymentOnboardingCl
               </span>
             </div>
             <p className="text-[11px] text-amber-800 leading-relaxed">
-              Jab tak payment gateway live domain par approve ho raha hai, aap direct platform test kar sakte hain:
+              While payment gateway domain verification is in progress, you can directly preview and test the platform:
             </p>
             <button
               type="button"
