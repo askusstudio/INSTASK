@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -78,21 +78,22 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         (savedHandle && !savedHandle.includes('artisan_luna'))
       ) {
         return {
-          brandName: savedBrand || null,
-          username: savedHandle || null,
+          brandName: savedBrand || 'GlamFlow',
+          username: savedHandle || 'glamflow.in',
           location: null,
         };
       }
     }
-    return null;
+    return { brandName: 'GlamFlow', username: 'glamflow.in', location: null };
   });
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/posts');
       const data = await res.json();
-      if (data.success && Array.isArray(data.posts)) {
+
+      if (data.success && Array.isArray(data.posts) && data.posts.length > 0) {
         setPosts(data.posts);
         if (
           data.account &&
@@ -107,13 +108,35 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           });
           setAutoPilotEnabled(Boolean(data.account.autoPilotEnabled));
         }
+      } else {
+        // Fallback auto-population: agar calendar khali hai toh 30 posts generate karein
+        const effectiveBrand = account?.brandName || (typeof window !== 'undefined' ? localStorage.getItem('instask_brand_name') : null) || 'GlamFlow';
+        const effectiveHandle = account?.username || (typeof window !== 'undefined' ? localStorage.getItem('instask_ig_handle') : null) || 'glamflow.in';
+
+        const planRes = await fetch('/api/generate-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            brandName: effectiveBrand,
+            industry: 'Beauty & Wellness',
+            productSummary: 'Curated beauty products, treatments, and aesthetics.',
+            brandColor: '#e1306c',
+            language: locale,
+            handle: effectiveHandle,
+            selectedTemplateId: 'template_quote',
+          }),
+        });
+        const planData = await planRes.json();
+        if (planData.success && Array.isArray(planData.posts)) {
+          setPosts(planData.posts);
+        }
       }
     } catch (err) {
-      console.error('Failed to fetch posts:', err);
+      console.error('Failed to fetch/populate posts:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [account?.brandName, account?.username, locale]);
 
   useEffect(() => {
     fetchPosts();
@@ -148,14 +171,13 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       fetchCredits();
     }
 
-    // Directly open calendar if activated or requested via view param
     const viewParam = searchParams.get('view');
     if (viewParam === 'wizard' && !isActivated) {
       setActiveTab('wizard');
     } else {
       setActiveTab('calendar');
     }
-  }, [searchParams]);
+  }, [searchParams, fetchPosts]);
 
   const handleStrategyReady = (
     blueprint: StrategyBlueprint,
@@ -177,15 +199,15 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     dismissAllGuidance();
 
     const profile = pendingProfile || {
-      brandName: account?.brandName || 'My Brand',
-      industry: 'General Business',
+      brandName: account?.brandName || 'GlamFlow',
+      industry: 'Beauty & Wellness',
       location: account?.location || '',
-      productSummary: '',
+      productSummary: 'Curated beauty products, treatments, and aesthetics.',
       brandColor: '#e1306c',
       logoUrl: '',
     };
 
-    const handle = pendingMetaAccount?.username || account?.username || profile.brandName.toLowerCase().replace(/\s+/g, '_');
+    const handle = pendingMetaAccount?.username || account?.username || 'glamflow.in';
     const igUserId = pendingMetaAccount?.igUserId || `ig_${Date.now()}`;
 
     if (typeof window !== 'undefined') {
@@ -195,24 +217,36 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       localStorage.setItem('instask_wizard_completed', 'true');
     }
 
-    fetch('/api/generate-plan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        brandName: profile.brandName,
-        industry: profile.industry,
-        location: profile.location,
-        productSummary: profile.productSummary,
-        brandColor: profile.brandColor,
-        logoUrl: profile.logoUrl,
-        language: locale,
-        handle,
-        igUserId,
-        selectedTemplateId,
-      }),
-    }).catch((err) => console.warn('Plan generation initiated:', err));
-
+    setLoading(true);
     setShowBlueprintModal(false);
+
+    try {
+      const res = await fetch('/api/generate-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandName: profile.brandName,
+          industry: profile.industry,
+          location: profile.location,
+          productSummary: profile.productSummary,
+          brandColor: profile.brandColor,
+          logoUrl: profile.logoUrl,
+          language: locale,
+          handle,
+          igUserId,
+          selectedTemplateId,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.posts)) {
+        setPosts(data.posts);
+      }
+    } catch (err) {
+      console.warn('Plan generation error:', err);
+    } finally {
+      setLoading(false);
+    }
+
     router.push(`/${locale}/onboarding/payment?userId=usr_main&plan=pro_monthly`);
   };
 
@@ -242,10 +276,11 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
   };
 
+  // Clean dynamic brand title
   const currentDisplayName =
     account?.brandName && !account.brandName.includes('Luna Artisan')
       ? account.brandName
-      : pendingProfile?.brandName || 'Your Business Brand';
+      : pendingProfile?.brandName || 'GlamFlow';
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
