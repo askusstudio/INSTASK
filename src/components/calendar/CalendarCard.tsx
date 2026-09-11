@@ -14,6 +14,9 @@ import {
   X,
   Check,
   Zap,
+  QrCode,
+  ArrowRight,
+  ShieldCheck,
 } from 'lucide-react';
 import { PostRecord } from '@/lib/prisma';
 
@@ -38,12 +41,9 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
   const [currentMedia, setCurrentMedia] = useState<string | null>(post.mediaUrl || null);
   const [isVideo, setIsVideo] = useState(false);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('instask_custom_media_unlocked') === 'true';
-    }
-    return false;
-  });
+  
+  // Strict check: testing me compulsory QR khule
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   const themeStyle = THEME_STYLES[post.theme] || {
     bg: 'bg-slate-50',
@@ -62,7 +62,7 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
   const isDraft = post.status === 'DRAFT';
   const isFailed = post.status === 'FAILED';
 
-  // Click handler for Replace from Gallery
+  // Click handler for Replace / Gallery: turant QR open karega
   const handleReplaceClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isUnlocked) {
@@ -72,16 +72,13 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
     }
   };
 
-  // Simulating Payment & Unlocking Custom Media Add-on (₹2,000)
+  // ₹2,000 QR Code Payment Complete & Instant Gallery Open
   const handleUnlockPayment = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('instask_custom_media_unlocked', 'true');
-    }
     setIsUnlocked(true);
     setShowPaywallModal(false);
     setTimeout(() => {
       fileInputRef.current?.click();
-    }, 200);
+    }, 250);
   };
 
   // File Upload and Live Preview Replacement
@@ -116,7 +113,7 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
               {post.dayNumber}
             </span>
             <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-              <Clock className="w-3 h-3 text-slate-400" />
+              <Clock className="w-3 3 text-slate-400" />
               {formattedTime}
             </span>
           </div>
@@ -190,8 +187,8 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
           <button
             type="button"
             onClick={handleReplaceClick}
-            className="absolute top-2 right-2 min-h-[36px] px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 active:scale-95 text-white backdrop-blur-md border border-white/20 text-[10px] font-bold flex items-center gap-1 shadow-sm transition touch-manipulation"
-            title="Replace AI media with custom gallery media"
+            className="absolute top-2 right-2 min-h-[36px] px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 active:scale-95 text-white backdrop-blur-md border border-white/20 text-[10px] font-bold flex items-center gap-1 shadow-sm transition touch-manipulation cursor-pointer"
+            title="Replace AI media with custom gallery media (+₹2,000)"
           >
             <ImagePlus className="w-3.5 h-3.5 text-rose-400" />
             <span>Replace</span>
@@ -215,13 +212,13 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
             <button
               type="button"
               onClick={handleReplaceClick}
-              className="min-h-[44px] text-[11px] font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition touch-manipulation"
+              className="min-h-[44px] text-[11px] font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition touch-manipulation cursor-pointer"
             >
               <ImagePlus className="w-3.5 h-3.5 text-rose-500" />
               <span>Gallery</span>
               {!isUnlocked && (
-                <span className="text-[9px] font-extrabold bg-amber-100 text-amber-800 px-1 rounded">
-                  ₹2,000
+                <span className="text-[9px] font-extrabold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300">
+                  +₹2,000
                 </span>
               )}
             </button>
@@ -229,7 +226,8 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                className="min-h-[44px] text-[11px] font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 touch-manipulation px-2 -ml-1 rounded-lg"
+                onClick={onClick}
+                className="min-h-[44px] text-[11px] font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 touch-manipulation px-2 rounded-lg cursor-pointer"
               >
                 <Edit3 className="w-3.5 h-3.5 text-slate-400" />
                 <span>{t('viewDetails')}</span>
@@ -239,7 +237,7 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
                 <button
                   type="button"
                   onClick={onApprove}
-                  className="min-h-[44px] text-[11px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 px-3 py-1.5 rounded-xl transition touch-manipulation flex items-center justify-center"
+                  className="min-h-[44px] text-[11px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 px-3 py-1.5 rounded-xl transition touch-manipulation flex items-center justify-center cursor-pointer"
                 >
                   {t('approve')}
                 </button>
@@ -249,82 +247,86 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
         </div>
       </div>
 
-      {/* ₹2,000 Paywall Add-on Modal */}
+      {/* ₹2,000 UPI QR Code Paywall Modal */}
       {showPaywallModal && (
         <div
-          onClick={(e) => e.stopPropagation()}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowPaywallModal(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md"
         >
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full p-5 sm:p-6 text-left relative animate-in fade-in zoom-in-95 duration-200 max-h-[90dvh] overflow-y-auto gpu-layer">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-sm w-full p-5 sm:p-6 text-center relative animate-in fade-in zoom-in-95 duration-200 max-h-[92dvh] overflow-y-auto gpu-layer space-y-3.5"
+          >
             {/* Close Button */}
             <button
               type="button"
               onClick={() => setShowPaywallModal(false)}
-              className="w-10 h-10 flex items-center justify-center absolute top-4 right-4 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition touch-manipulation"
+              className="w-9 h-9 flex items-center justify-center absolute top-3.5 right-3.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition touch-manipulation cursor-pointer"
               aria-label="Close paywall modal"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white mb-4 shadow-sm">
-              <Sparkles className="w-6 h-6" />
+            {/* Icon */}
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center text-white mx-auto shadow-sm">
+              <QrCode className="w-6 h-6" />
             </div>
 
-            <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-extrabold mb-2">
-              <Zap className="w-3 h-3 text-rose-600" />
-              EXCLUSIVE CREATOR ADD-ON
+            <div>
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-extrabold mb-1">
+                <Zap className="w-3 h-3 text-rose-600" />
+                CUSTOM MEDIA ADD-ON
+              </div>
+              <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                Scan QR to Unlock Gallery
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                Scan with Google Pay, PhonePe, ya Paytm to upload your custom 4K photos &amp; Reels videos.
+              </p>
             </div>
 
-            <h3 className="text-xl font-black text-slate-900 tracking-tight">
-              Unlock Custom Media Replacement
-            </h3>
-            <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-              Replace any AI-generated post or video with your own original footage directly from your device gallery across the 30-day autonomous schedule.
-            </p>
-
-            {/* Price Tag */}
-            <div className="my-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-slate-700">One-Time Lifetime Add-on</p>
-                <p className="text-[11px] text-slate-400">Unlimited custom gallery video & photo uploads</p>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-black text-slate-900">₹2,000</span>
-                <span className="text-[10px] font-semibold text-emerald-600 block">Single Fee</span>
-              </div>
-            </div>
-
-            <div className="space-y-2 mb-6 text-xs text-slate-600 font-medium">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Upload high-res MP4/MOV videos or raw photos</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>AI will keep viral captions and hashtags intact</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Instant Meta Graph API container sync</span>
+            {/* Live Dynamic UPI QR Code for ₹2000 */}
+            <div className="p-3.5 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 inline-block">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                  'upi://pay?pa=tripathishanya310@okaxis&pn=INSTASK%20Studio&am=2000.00&cu=INR&tn=INSTASK%20Custom%20Media%20Upload'
+                )}`}
+                alt="Scan to Pay ₹2,000"
+                className="w-44 h-44 mx-auto rounded-xl shadow-sm border border-slate-100"
+              />
+              <div className="text-xs font-black text-slate-800 mt-2">
+                Amount to Pay: <span className="text-emerald-600 text-sm font-black">₹2,000</span>
               </div>
             </div>
 
-            {/* Pay / Unlock Button */}
-            <div className="flex gap-2 pb-safe">
-              <button
-                type="button"
-                onClick={() => setShowPaywallModal(false)}
-                className="w-1/3 min-h-[48px] py-3 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 active:scale-95 text-xs font-bold transition touch-manipulation flex items-center justify-center"
-              >
-                Cancel
-              </button>
+            {/* Action Buttons */}
+            <div className="space-y-2 pt-1">
               <button
                 type="button"
                 onClick={handleUnlockPayment}
-                className="w-2/3 min-h-[48px] py-3 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md touch-manipulation"
+                className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
-                <span>Unlock Now (Pay ₹2,000)</span>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>I Have Paid ₹2,000 (Open Gallery Now)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
+
+              <button
+                type="button"
+                onClick={handleUnlockPayment}
+                className="w-full py-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 rounded-xl text-[11px] font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span>Developer Test Bypass (Instant Unlock)</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 pt-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Instant Gallery Trigger Upon Confirmation</span>
             </div>
           </div>
         </div>
