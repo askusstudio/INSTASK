@@ -132,7 +132,7 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
                 type="button"
                 onClick={() => handleApplyPreset(preset.handles)}
                 disabled={loading}
-                className="text-xs font-medium px-3 py-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-700 rounded-lg border border-slate-200/80 transition"
+                className="text-xs font-medium px-3 py-2 min-h-[40px] bg-slate-100 hover:bg-rose-50 hover:text-rose-700 active:bg-rose-100 text-slate-700 rounded-lg border border-slate-200/80 transition touch-manipulation"
               >
                 + {preset.label}
               </button>
@@ -181,7 +181,7 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
           type="button"
           onClick={handleAnalyzeAndBuild}
           disabled={loading || activeHandlesCount === 0}
-          className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl text-base font-extrabold text-white bg-gradient-to-r from-rose-500 via-pink-600 to-purple-600 hover:from-rose-600 hover:to-purple-700 shadow-soft-md transition transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          className="w-full min-h-[48px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl text-sm sm:text-base font-extrabold text-white bg-gradient-to-r from-rose-500 via-pink-600 to-purple-600 hover:from-rose-600 hover:to-purple-700 active:scale-[0.98] shadow-soft-md transition touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>
@@ -198,12 +198,12 @@ export function StepCompetitors({ handles, onChange, onBack, onSubmit }: StepCom
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-start max-w-xl mx-auto pt-2">
+      <div className="flex items-center justify-start max-w-xl mx-auto pt-2 pb-safe">
         <button
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
+          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-95 transition touch-manipulation"
         >
           <ArrowLeft className="w-4 h-4 rtl-flip" />
           <span>Back</span>

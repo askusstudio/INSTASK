@@ -271,11 +271,11 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-between max-w-xl mx-auto pt-2">
+      <div className="flex items-center justify-between max-w-xl mx-auto pt-2 pb-safe">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
+          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-95 transition touch-manipulation"
         >
           <ArrowLeft className="w-4 h-4 rtl-flip" />
           <span>Back</span>
@@ -285,7 +285,7 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
           type="button"
           onClick={onNext}
           disabled={!isValid}
-          className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          className="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 active:scale-95 rounded-xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
         >
           <span>Continue to Step 3</span>
           <ArrowRight className="w-4 h-4 rtl-flip" />

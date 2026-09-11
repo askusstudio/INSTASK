@@ -2,9 +2,14 @@
 
 import React, { useState } from 'react';
 import { PostRecord } from '@/lib/prisma';
+import dynamic from 'next/dynamic';
 import { CalendarCard } from './CalendarCard';
 import { FilterToolbar } from './FilterToolbar';
-import { PostEditorModal } from './PostEditorModal';
+
+const PostEditorModal = dynamic(
+  () => import('./PostEditorModal').then((m) => m.PostEditorModal),
+  { ssr: false }
+);
 
 interface CalendarGridProps {
   initialPosts: PostRecord[];

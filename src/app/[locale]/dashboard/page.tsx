@@ -3,15 +3,45 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { Navbar } from '@/components/ui/Navbar';
-import { StepWizard } from '@/components/onboarding/StepWizard';
+import { MobileBottomNav } from '@/components/ui/MobileBottomNav';
 import { CalendarGrid } from '@/components/calendar/CalendarGrid';
-import { GrowthForecast } from '@/components/analytics/GrowthForecast';
-import { StrategyBlueprintModal } from '@/components/strategy/StrategyBlueprintModal';
 import { StrategyBlueprint } from '@/lib/recommendations';
 import { BusinessProfileData } from '@/components/onboarding/StepBusinessProfile';
 import { useGuidance } from '@/context/GuidanceContext';
 import { PostRecord } from '@/lib/prisma';
+
+// Dynamic Code Splitting for non-critical mobile performance budget
+const StepWizard = dynamic(
+  () => import('@/components/onboarding/StepWizard').then((m) => m.StepWizard),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="p-8 text-center text-xs text-slate-500 font-medium">
+        <div className="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+        Loading Plan Wizard...
+      </div>
+    ),
+  }
+);
+
+const GrowthForecast = dynamic(
+  () => import('@/components/analytics/GrowthForecast').then((m) => m.GrowthForecast),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="p-8 text-center text-xs text-slate-400">
+        Loading growth projection...
+      </div>
+    ),
+  }
+);
+
+const StrategyBlueprintModal = dynamic(
+  () => import('@/components/strategy/StrategyBlueprintModal').then((m) => m.StrategyBlueprintModal),
+  { ssr: false }
+);
 import {
   Calendar,
   Wand2,
@@ -195,8 +225,8 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         connectedAccount={account}
       />
 
-      {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-8">
+      {/* Main Content Area: pb-28 on mobile leaves clearance for bottom navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pb-28 md:pb-8 flex-1 w-full space-y-6 sm:space-y-8">
         
         {/* Payment Success & Subscription Active Celebration Banner */}
         {isPaymentSuccess && (
@@ -345,6 +375,17 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           </div>
         </div>
       </footer>
+      
+      {/* Mobile Persistent Thumb-Zone Navigation Bar & Slide-Up Sheet */}
+      <MobileBottomNav
+        currentLocale={locale}
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+        autoPilotEnabled={autoPilotEnabled}
+        onToggleAutopilot={handleToggleAutopilot}
+        creditsBalance={creditsBalance}
+        connectedAccount={account}
+      />
     </div>
   );
 }

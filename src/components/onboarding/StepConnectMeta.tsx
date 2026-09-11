@@ -130,7 +130,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
               type="button"
               onClick={handleConnect}
               disabled={connecting || !accountHandle}
-              className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 hover:opacity-95 transition shadow-soft-md disabled:opacity-50"
+              className="w-full min-h-[48px] flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 hover:opacity-95 active:scale-[0.98] transition shadow-soft-md disabled:opacity-50 touch-manipulation"
             >
               <Instagram className="w-4 h-4" />
               {connecting ? 'Connecting with Meta...' : t('connectButton')}
@@ -145,11 +145,11 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
       </div>
 
       {connected && (
-        <div className="flex justify-end max-w-md mx-auto">
+        <div className="flex justify-end max-w-md mx-auto pt-2 pb-safe">
           <button
             type="button"
             onClick={onNext}
-            className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition shadow-sm"
+            className="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 active:scale-95 rounded-xl transition shadow-sm touch-manipulation"
           >
             <span>Continue to Step 2</span>
             <ArrowRight className="w-4 h-4 rtl-flip" />

@@ -82,7 +82,8 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
                 <button
                   type="button"
                   onClick={() => isCompleted && setCurrentStep(step.num as any)}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition shadow-sm ${
+                  aria-label={`Step ${step.num}: ${step.label}`}
+                  className={`w-11 h-11 rounded-full flex items-center justify-center transition shadow-sm touch-manipulation active:scale-95 ${
                     isCompleted
                       ? 'bg-emerald-600 text-white'
                       : isCurrent

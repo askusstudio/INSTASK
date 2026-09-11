@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, unstable_setRequestLocale } from 'next-intl/server';
@@ -7,6 +8,17 @@ import { GuidanceProvider } from '@/context/GuidanceContext';
 import { BannerAlerts } from '@/components/ui/BannerAlerts';
 
 export const dynamic = 'force-dynamic';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F8FAFC' },
+    { media: '(prefers-color-scheme: dark)', color: '#0F172A' },
+  ],
+  interactiveWidget: 'resizes-visual',
+};
 
 export default async function LocaleLayout({
   children,
