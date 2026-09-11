@@ -43,11 +43,11 @@ export default function AuthPage({ params }: AuthPageProps) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('instask_user_id', userId);
       localStorage.setItem('instask_user_email', email || 'user@instask.ai');
-      localStorage.setItem('instask_wizard_pending', 'true');
+      localStorage.setItem('instask_wizard_completed', 'false');
       document.cookie = 'instask_auth=true; path=/; max-age=31536000';
     }
-    // Direct 3-step setup wizard dashboard par redirect (view=wizard ensures the setup steps open first)
-    router.push(`/${safeLocale}/dashboard?view=wizard&activated=true&session=paid_admin_testing_bypass`);
+    // Strict redirect: Sirf Setup Wizard khulega taaki teeno steps complete kare
+    router.push(`/${safeLocale}/dashboard?view=wizard&setup=required`);
   };
 
   // 1. Send Direct 6-Digit Email OTP
@@ -122,7 +122,7 @@ export default function AuthPage({ params }: AuthPageProps) {
       const { error: sbError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/${safeLocale}/dashboard?view=wizard&activated=true&session=paid_admin_testing_bypass`,
+          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/${safeLocale}/dashboard?view=wizard&setup=required`,
         },
       });
 

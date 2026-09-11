@@ -18,7 +18,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-// Dynamic Code Splitting for non-critical mobile performance budget
 const StepWizard = dynamic(
   () => import('@/components/onboarding/StepWizard').then((m) => m.StepWizard),
   {
@@ -26,7 +25,7 @@ const StepWizard = dynamic(
     loading: () => (
       <div className="p-8 text-center text-xs text-slate-500 font-medium">
         <div className="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-        Loading Plan Wizard...
+        Loading Setup Wizard...
       </div>
     ),
   }
@@ -34,14 +33,7 @@ const StepWizard = dynamic(
 
 const GrowthForecast = dynamic(
   () => import('@/components/analytics/GrowthForecast').then((m) => m.GrowthForecast),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="p-8 text-center text-xs text-slate-400">
-        Loading growth projection...
-      </div>
-    ),
-  }
+  { ssr: false }
 );
 
 const StrategyBlueprintModal = dynamic(
@@ -59,9 +51,8 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const { dismissAllGuidance } = useGuidance();
   const searchParams = useSearchParams();
 
-  // Wizard tab will open automatically if view=wizard or user is completing onboarding
-  const requestedView = searchParams.get('view') === 'wizard' || searchParams.get('step') ? 'wizard' : 'calendar';
-  const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>(requestedView);
+  // Login ke just baad always wizard open hoga
+  const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('wizard');
 
   const [posts, setPosts] = useState<PostRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +62,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [creditsBalance, setCreditsBalance] = useState<number>(60);
 
-  // Active business context
   const [pendingProfile, setPendingProfile] = useState<BusinessProfileData | null>(null);
   const [pendingMetaAccount, setPendingMetaAccount] = useState<{ igUserId: string; username: string } | null>(null);
 
@@ -130,8 +120,15 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     if (searchParams.get('credits_added') === 'true') {
       fetchCredits();
     }
-    if (searchParams.get('view') === 'wizard' || searchParams.get('step')) {
-      setActiveTab('wizard');
+
+    // Check if user explicitly asked for calendar or completed wizard
+    if (typeof window !== 'undefined') {
+      const isCompleted = localStorage.getItem('instask_wizard_completed') === 'true';
+      if (searchParams.get('view') === 'calendar' && isCompleted) {
+        setActiveTab('calendar');
+      } else {
+        setActiveTab('wizard');
+      }
     }
   }, [searchParams]);
 
@@ -187,7 +184,11 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           username: handle,
           location: profile.location,
         });
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('instask_wizard_completed', 'true');
+        }
         setShowBlueprintModal(false);
+        // Sirf ab teeno steps complete hone ke baad Calendar dikhega
         setActiveTab('calendar');
       }
     } catch (err) {
@@ -215,7 +216,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Navigation Bar */}
       <Navbar
         currentLocale={locale}
         autoPilotEnabled={autoPilotEnabled}
@@ -224,27 +224,21 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         connectedAccount={account}
       />
 
-      {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pb-28 md:pb-8 flex-1 w-full space-y-6 sm:space-y-8">
         
-        {/* Payment Success & Subscription Active Celebration Banner */}
+        {/* Banner */}
         {isPaymentSuccess && (
-          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 rounded-3xl p-5 text-white shadow-soft-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-emerald-400/40 animate-fade-in">
+          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 rounded-3xl p-5 text-white shadow-soft-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-emerald-400/40">
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 shadow-inner">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0">
                 <Sparkles className="w-6 h-6 text-amber-300 animate-pulse" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-black text-base sm:text-lg tracking-tight">
-                    Access Unlocked: Pro Growth Plan (50% Off First Month Applied)
-                  </h3>
-                  <span className="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
-                    COUPON: FIRST50
-                  </span>
-                </div>
-                <p className="text-xs text-emerald-100 mt-1 font-medium leading-relaxed">
-                  Your 30-day autonomous content calendar is running. Creatomate templates and Meta Graph API auto-publishing are enabled.
+                <h3 className="font-black text-base sm:text-lg tracking-tight">
+                  Access Unlocked: Pro Growth Plan (50% Off First Month Applied)
+                </h3>
+                <p className="text-xs text-emerald-100 mt-1 font-medium">
+                  Complete the 3-step setup below to generate your 30-day autonomous content calendar.
                 </p>
               </div>
             </div>
@@ -258,21 +252,34 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           </div>
         )}
 
-        {/* Dashboard Header & View Switcher */}
+        {/* View Switcher Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-              <span>{account?.brandName || 'INSTASK'}</span>
+              <span>{account?.brandName || 'INSTASK AI'}</span>
               <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200/80">
-                30-Day Autonomous Dashboard
+                {activeTab === 'wizard' ? 'Step Setup Wizard' : '30-Day Autonomous Dashboard'}
               </span>
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Autonomous Instagram growth platform with certified Meta Graph API v21.0 container posting.
+              Autonomous Instagram growth platform with certified Meta Graph API container posting.
             </p>
           </div>
 
           <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-soft-sm self-start">
+            <button
+              type="button"
+              onClick={() => setActiveTab('wizard')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
+                activeTab === 'wizard'
+                  ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Wand2 className="w-3.5 h-3.5" />
+              <span>Setup Wizard (3 Steps)</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setActiveTab('calendar')}
@@ -285,24 +292,30 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
               <Calendar className="w-3.5 h-3.5" />
               <span>{tNav('calendar')} ({posts.length})</span>
             </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('wizard')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
-                activeTab === 'wizard'
-                  ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Wand2 className="w-3.5 h-3.5" />
-              <span>Generate New Plan</span>
-            </button>
           </div>
         </div>
 
-        {/* Tab 1: 30-Day Visual Calendar */}
-        {activeTab === 'calendar' && (
+        {/* Condition: Login ke turant baad Setup Wizard page dikhega */}
+        {activeTab === 'wizard' ? (
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-soft-md p-4 sm:p-8">
+            <div className="max-w-2xl mx-auto text-center mb-6">
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
+                Setup Wizard
+              </span>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2">
+                {tOnboarding('title')}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                {tOnboarding('subtitle')}
+              </p>
+            </div>
+
+            <StepWizard
+              onStrategyReady={handleStrategyReady}
+              currentLocale={locale}
+            />
+          </div>
+        ) : (
           <div className="space-y-8">
             {loading ? (
               <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center space-y-3 shadow-soft">
@@ -323,31 +336,8 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
             )}
           </div>
         )}
-
-        {/* Tab 2: Setup Wizard */}
-        {activeTab === 'wizard' && (
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-soft-md p-4 sm:p-8">
-            <div className="max-w-2xl mx-auto text-center mb-6">
-              <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
-                Setup Wizard
-              </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2">
-                {tOnboarding('title')}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                {tOnboarding('subtitle')}
-              </p>
-            </div>
-
-            <StepWizard
-              onStrategyReady={handleStrategyReady}
-              currentLocale={locale}
-            />
-          </div>
-        )}
       </div>
 
-      {/* Strategy Blueprint Review Modal */}
       {strategyBlueprint && (
         <StrategyBlueprintModal
           blueprint={strategyBlueprint}
@@ -357,7 +347,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         />
       )}
 
-      {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex flex-col sm:flex-row items-center gap-2">
@@ -375,7 +364,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         </div>
       </footer>
       
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav
         currentLocale={locale}
         activeTab={activeTab}
