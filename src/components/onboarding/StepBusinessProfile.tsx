@@ -9,11 +9,10 @@ import {
   ArrowRight,
   ArrowLeft,
   Palette,
-  Image as ImageIcon,
-  Sparkles,
   Upload,
   X,
   Check,
+  Link as LinkIcon,
 } from 'lucide-react';
 
 export interface BusinessProfileData {
@@ -97,14 +96,15 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
   const handleBrandNameChange = (val: string) => {
     onChange({ brandName: val });
     if (typeof window !== 'undefined') {
-      localStorage.setItem('instask_brand_name', val);
+      if (!val.toLowerCase().includes('glamflow') && !val.toLowerCase().includes('luna')) {
+        localStorage.setItem('instask_brand_name', val);
+      }
     }
   };
 
   const handleCategorySelect = (category: (typeof CATEGORY_OPTIONS)[0]) => {
     onChange({
       industry: category.name,
-      // Auto-fill prompt only if user hasn't typed custom details yet
       productSummary:
         !data.productSummary ||
         CATEGORY_OPTIONS.some((c) => c.defaultPrompt === data.productSummary)
@@ -186,7 +186,7 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
                 ) : (
                   <div className="flex flex-col items-center text-slate-400 group-hover:text-rose-600">
                     <Upload className="w-4 h-4" />
-                    <span className="text-[9px] font-bold mt-0.5">Logo</span>
+                    <span className="text-[9px] font-bold mt-0.5">Upload</span>
                   </div>
                 )}
               </button>
@@ -213,10 +213,24 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
                 value={data.brandName || ''}
                 onChange={(e) => handleBrandNameChange(e.target.value)}
                 className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition font-medium"
-                placeholder="e.g. GlamFlow, Velvet Aura"
+                placeholder="Enter your brand or shop name"
                 required
               />
             </div>
+          </div>
+
+          {/* Optional Direct Logo URL */}
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+              <LinkIcon className="w-3.5 h-3.5" />
+            </span>
+            <input
+              type="url"
+              value={data.logoUrl?.startsWith('data:') ? '' : data.logoUrl || ''}
+              onChange={(e) => onChange({ logoUrl: e.target.value })}
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-rose-500 transition"
+              placeholder="Or paste direct logo URL (optional)"
+            />
           </div>
         </div>
 
