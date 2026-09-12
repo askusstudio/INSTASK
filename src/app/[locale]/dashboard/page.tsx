@@ -105,7 +105,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           setAutoPilotEnabled(Boolean(data.account.autoPilotEnabled));
         }
       } else {
-        // Naye user ke liye automated fallback create nahi karna hai jab tak wizard complete na ho
         setPosts([]);
       }
     } catch (err) {
@@ -149,7 +148,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
 
     const viewParam = searchParams.get('view');
-    // Agar account ya posts nahi hain toh direct Setup Wizard dikhana hai
     if (viewParam === 'wizard' || !isActivated || posts.length === 0) {
       setActiveTab('wizard');
     } else {
@@ -254,7 +252,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
   };
 
-  // Naye user ke liye clean brand identity logic
   const hasConfiguredBrand = Boolean(
     (account?.brandName && !account.brandName.toLowerCase().includes('glamflow')) ||
     pendingProfile?.brandName
@@ -279,7 +276,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         connectedAccount={account}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-28 md:pb-8 flex-1 w-full space-y-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-6 pb-28 md:pb-8 flex-1 w-full space-y-4">
         
         {/* Payment Confirmation Banner */}
         {isPaymentSuccess && (
@@ -305,8 +302,8 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           </div>
         )}
 
-        {/* Clean Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        {/* Clean Header Bar: Sirf Calendar Tab par ya Desktop par render hoga (Mobile wizard par hide) */}
+        <div className={`${activeTab === 'wizard' ? 'hidden md:flex' : 'flex'} flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4`}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-sm">
               {hasConfiguredBrand ? currentDisplayName.charAt(0).toUpperCase() : <Store className="w-5 h-5 text-white" />}
@@ -332,12 +329,12 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
             </div>
           </div>
 
-          {/* Tab Selector */}
-          <div className="flex items-center bg-slate-200/70 p-1 rounded-xl w-full sm:w-auto self-start">
+          {/* Desktop Tab Selector */}
+          <div className="hidden md:flex items-center bg-slate-200/70 p-1 rounded-xl">
             <button
               type="button"
               onClick={() => handleSelectTab('calendar')}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                 activeTab === 'calendar'
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
@@ -350,7 +347,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
             <button
               type="button"
               onClick={() => handleSelectTab('wizard')}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                 activeTab === 'wizard'
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
@@ -362,18 +359,9 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           </div>
         </div>
 
-        {/* View Switcher */}
+        {/* View Switcher: Wizard vs Calendar */}
         {activeTab === 'wizard' ? (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-8">
-            <div className="max-w-xl mx-auto text-center mb-6">
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900">
-                {tOnboarding('title')}
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                {tOnboarding('subtitle')}
-              </p>
-            </div>
-
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs p-2 sm:p-8">
             <StepWizard
               onStrategyReady={handleStrategyReady}
               currentLocale={locale}
@@ -411,7 +399,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         />
       )}
 
-      {/* Clean Footer */}
+      {/* Clean Desktop Footer */}
       <footer className="bg-white border-t border-slate-200 py-4 text-xs text-slate-500 mt-auto hidden md:block">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -426,7 +414,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         </div>
       </footer>
 
-      {/* Floating Bottom Nav */}
+      {/* Mobile Floating Bottom Nav */}
       <MobileBottomNav
         currentLocale={locale}
         activeTab={activeTab}
