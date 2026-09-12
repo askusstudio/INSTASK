@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Building2,
   ChevronRight,
+  TrendingUp,
 } from 'lucide-react';
 import { useGuidance } from '@/context/GuidanceContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -42,11 +43,9 @@ export function MobileBottomNav({
   connectedAccount,
 }: MobileBottomNavProps) {
   const t = useTranslations('nav');
-  const tCommon = useTranslations('common');
   const { guidanceEnabled, toggleGuidance } = useGuidance();
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  // Close sheet on escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSheetOpen(false);
@@ -63,7 +62,6 @@ export function MobileBottomNav({
     };
   }, [sheetOpen]);
 
-  // Clean dynamic business identity
   const cleanBrandName =
     connectedAccount?.brandName && !connectedAccount.brandName.includes('Luna Artisan')
       ? connectedAccount.brandName
@@ -76,12 +74,12 @@ export function MobileBottomNav({
 
   return (
     <>
-      {/* 1. Mobile Persistent Bottom Tab Bar */}
+      {/* Plixi-Style Floating Mobile Tab Bar */}
       <nav
         aria-label="Mobile Navigation Bar"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200 pb-safe shadow-lg gpu-layer"
+        className="md:hidden fixed bottom-3 inset-x-3 z-40 bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-2xl py-1.5 px-2 transition-all duration-200"
       >
-        <div className="grid grid-cols-4 h-16 max-w-lg mx-auto items-center px-2">
+        <div className="grid grid-cols-4 items-center gap-1">
           {/* Tab 1: Calendar */}
           <button
             type="button"
@@ -89,15 +87,15 @@ export function MobileBottomNav({
               onSelectTab('calendar');
               setSheetOpen(false);
             }}
-            className={`touch-target-48 min-w-[48px] min-h-[48px] flex flex-col items-center justify-center gap-1 transition rounded-xl ${
+            className={`min-h-[46px] py-1 flex flex-col items-center justify-center gap-1 rounded-xl transition cursor-pointer ${
               activeTab === 'calendar'
-                ? 'text-rose-600 font-bold'
-                : 'text-slate-500 hover:text-slate-900 font-medium'
+                ? 'bg-rose-50 text-rose-600 font-extrabold shadow-2xs'
+                : 'text-slate-500 hover:text-slate-800 font-medium'
             }`}
             aria-label="Calendar View"
           >
-            <Calendar className={`w-5 h-5 ${activeTab === 'calendar' ? 'stroke-[2.5]' : ''}`} />
-            <span className="text-[10px] leading-none">Calendar</span>
+            <Calendar className={`w-4 h-4 ${activeTab === 'calendar' ? 'stroke-[2.5]' : ''}`} />
+            <span className="text-[10px] leading-none tracking-tight">Calendar</span>
           </button>
 
           {/* Tab 2: New Plan Wizard */}
@@ -107,93 +105,98 @@ export function MobileBottomNav({
               onSelectTab('wizard');
               setSheetOpen(false);
             }}
-            className={`touch-target-48 min-w-[48px] min-h-[48px] flex flex-col items-center justify-center gap-1 transition rounded-xl ${
+            className={`min-h-[46px] py-1 flex flex-col items-center justify-center gap-1 rounded-xl transition cursor-pointer relative ${
               activeTab === 'wizard'
-                ? 'text-purple-600 font-bold'
-                : 'text-slate-500 hover:text-slate-900 font-medium'
+                ? 'bg-purple-50 text-purple-600 font-extrabold shadow-2xs'
+                : 'text-slate-500 hover:text-slate-800 font-medium'
             }`}
             aria-label="Generate Plan Wizard"
           >
             <div className="relative">
-              <Wand2 className={`w-5 h-5 ${activeTab === 'wizard' ? 'stroke-[2.5]' : ''}`} />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-tr from-rose-500 to-amber-500 rounded-full animate-ping" />
+              <Wand2 className={`w-4 h-4 ${activeTab === 'wizard' ? 'stroke-[2.5]' : ''}`} />
+              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping" />
             </div>
-            <span className="text-[10px] leading-none">New Plan</span>
+            <span className="text-[10px] leading-none tracking-tight">Wizard</span>
           </button>
 
-          {/* Tab 3: Autopilot Master Control */}
+          {/* Tab 3: Autopilot Toggle */}
           <button
             type="button"
             onClick={() => onToggleAutopilot(!autoPilotEnabled)}
-            className={`touch-target-48 min-w-[48px] min-h-[48px] flex flex-col items-center justify-center gap-1 transition rounded-xl ${
+            className={`min-h-[46px] py-1 flex flex-col items-center justify-center gap-1 rounded-xl transition cursor-pointer ${
               autoPilotEnabled
-                ? 'text-amber-600 font-bold'
+                ? 'bg-amber-50 text-amber-700 font-extrabold shadow-2xs'
                 : 'text-slate-400 hover:text-slate-700 font-medium'
             }`}
             aria-label={`Autopilot: ${autoPilotEnabled ? 'Active' : 'Paused'}`}
           >
             <Zap
-              className={`w-5 h-5 ${
+              className={`w-4 h-4 ${
                 autoPilotEnabled ? 'text-amber-500 fill-amber-500 stroke-[2.5]' : ''
               }`}
             />
-            <span className="text-[10px] leading-none">
-              {autoPilotEnabled ? 'Active' : 'Paused'}
+            <span className="text-[10px] leading-none tracking-tight">
+              {autoPilotEnabled ? 'Autopilot' : 'Manual'}
             </span>
           </button>
 
-          {/* Tab 4: More / Bottom Sheet Trigger */}
+          {/* Tab 4: More Menu */}
           <button
             type="button"
             onClick={() => setSheetOpen(true)}
-            className={`touch-target-48 min-w-[48px] min-h-[48px] flex flex-col items-center justify-center gap-1 transition rounded-xl ${
-              sheetOpen ? 'text-slate-900 font-bold' : 'text-slate-500 hover:text-slate-900'
+            className={`min-h-[46px] py-1 flex flex-col items-center justify-center gap-1 rounded-xl transition cursor-pointer relative ${
+              sheetOpen
+                ? 'bg-slate-100 text-slate-900 font-bold'
+                : 'text-slate-500 hover:text-slate-800 font-medium'
             }`}
             aria-label="Open Controls and Account Sheet"
           >
             <div className="relative">
-              <Menu className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1.5 px-1 py-0.2 bg-rose-500 text-white text-[8px] font-extrabold rounded-full">
+              <Menu className="w-4 h-4" />
+              <span className="absolute -top-1.5 -right-2 px-1 py-0.2 bg-rose-600 text-white text-[8px] font-black rounded-full shadow-2xs">
                 {creditsBalance}
               </span>
             </div>
-            <span className="text-[10px] leading-none">More</span>
+            <span className="text-[10px] leading-none tracking-tight">Menu</span>
           </button>
         </div>
       </nav>
 
-      {/* 2. Slide-Up Bottom Sheet Drawer */}
+      {/* Plixi-Style Bottom Sheet Drawer */}
       {sheetOpen && (
         <div
           role="dialog"
           aria-modal="true"
           aria-label="Navigation Controls and Account Sheet"
-          className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/60 backdrop-blur-xs animate-fade-in"
+          className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
         >
-          {/* Backdrop Touch Dismiss */}
+          {/* Backdrop */}
           <div
             className="flex-1 w-full"
             onClick={() => setSheetOpen(false)}
             aria-label="Dismiss sheet"
           />
 
-          {/* Sheet Container */}
-          <div className="bg-white rounded-t-3xl border-t border-slate-200 shadow-2xl p-5 pb-safe space-y-5 max-h-[85dvh] overflow-y-auto gpu-layer">
+          {/* Drawer Container */}
+          <div className="bg-white rounded-t-3xl border-t border-slate-200 shadow-2xl p-5 pb-8 space-y-4 max-h-[85dvh] overflow-y-auto">
             {/* Grab Handle */}
-            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-1" />
+            <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto" />
 
-            {/* Header: Dynamic Brand Profile */}
+            {/* Profile Bar */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-purple-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
                   {cleanBrandName.charAt(0)}
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
-                    {cleanBrandName}
+                  <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                    <span>{cleanBrandName}</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                      Verified
+                    </span>
                   </h3>
                   <p className="text-[11px] text-slate-500">
-                    {cleanHandle ? `@${cleanHandle}` : 'Setup in Progress'}
+                    {cleanHandle ? `@${cleanHandle}` : 'Connected Account'}
                   </p>
                 </div>
               </div>
@@ -201,37 +204,41 @@ export function MobileBottomNav({
               <button
                 type="button"
                 onClick={() => setSheetOpen(false)}
-                className="touch-target-48 p-2 text-slate-400 hover:text-slate-800 rounded-xl transition cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition cursor-pointer"
                 aria-label="Close sheet"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Credit Balance Card */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-rose-950 to-slate-900 text-white flex items-center justify-between shadow-soft">
+            {/* Plixi-Style Credit Card */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white flex items-center justify-between shadow-md border border-slate-800">
               <div>
-                <span className="text-[11px] font-semibold text-rose-200 uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block">
                   Available Credits
                 </span>
-                <span className="text-2xl font-black tracking-tight">{creditsBalance} Credits</span>
-                <span className="text-[10px] text-slate-300 block mt-0.5">
-                  60 credits/month included in Base Plan
+                <span className="text-2xl font-black tracking-tight">{creditsBalance}</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">
+                  10 credits / 30-day strategy run
                 </span>
               </div>
               <Link
                 href={`/${currentLocale}/pricing`}
                 onClick={() => setSheetOpen(false)}
-                className="touch-target-48 px-3.5 py-2 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow-xs transition"
+                className="px-3.5 py-2 bg-gradient-to-r from-rose-500 to-purple-600 text-white font-bold text-xs rounded-xl shadow-xs active:scale-95 transition"
               >
                 Top Up
               </Link>
             </div>
 
-            {/* Autopilot Master Row */}
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            {/* Autopilot Row */}
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
               <div className="flex items-center gap-2.5">
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${autoPilotEnabled ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500'}`}>
+                <div
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                    autoPilotEnabled ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
                   <Zap className="w-4 h-4 fill-current" />
                 </div>
                 <div>
@@ -239,7 +246,7 @@ export function MobileBottomNav({
                     Meta Graph API Autopilot
                   </span>
                   <span className="text-[10px] text-slate-500 block">
-                    {autoPilotEnabled ? 'Publishing daily without manual intervention' : 'Paused — manual approval required'}
+                    {autoPilotEnabled ? 'Live container automatic posting' : 'Paused (Manual approval)'}
                   </span>
                 </div>
               </div>
@@ -247,7 +254,7 @@ export function MobileBottomNav({
               <button
                 type="button"
                 onClick={() => onToggleAutopilot(!autoPilotEnabled)}
-                className={`touch-target-48 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                   autoPilotEnabled ? 'bg-rose-600' : 'bg-slate-300'
                 }`}
                 role="switch"
@@ -256,60 +263,60 @@ export function MobileBottomNav({
               >
                 <span
                   aria-hidden="true"
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
                     autoPilotEnabled ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
               </button>
             </div>
 
-            {/* Secondary Controls */}
+            {/* Controls */}
             <div className="space-y-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
-                Preferences &amp; Language
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider px-1">
+                Preferences
               </span>
 
               {/* Guidance Mode Toggle */}
               <button
                 type="button"
                 onClick={toggleGuidance}
-                className="w-full touch-target-48 flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white text-left transition hover:bg-slate-50 cursor-pointer"
+                className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white text-left transition hover:bg-slate-50 cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <HelpCircle className="w-4 h-4 text-rose-500" />
-                  <span className="text-xs font-semibold text-slate-800">
+                  <span className="text-xs font-bold text-slate-800">
                     Interactive Guidance Tips
                   </span>
                 </div>
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                    guidanceEnabled ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-500'
+                  className={`text-[9px] px-2 py-0.5 rounded-full font-black ${
+                    guidanceEnabled ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-500'
                   }`}
                 >
-                  {guidanceEnabled ? 'ENABLED' : 'OFF'}
+                  {guidanceEnabled ? 'ON' : 'OFF'}
                 </span>
               </button>
 
-              {/* Language Switcher in Sheet */}
+              {/* Language Switcher */}
               <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white">
                 <div className="flex items-center gap-2.5">
                   <Globe className="w-4 h-4 text-slate-500" />
-                  <span className="text-xs font-semibold text-slate-800">Language</span>
+                  <span className="text-xs font-bold text-slate-800">Language</span>
                 </div>
                 <LanguageSwitcher currentLocale={currentLocale} />
               </div>
             </div>
 
-            {/* Links & Account Navigation */}
+            {/* Quick Links */}
             <div className="space-y-1 pt-2 border-t border-slate-100">
               <Link
                 href={`/${currentLocale}/onboarding/brand`}
                 onClick={() => setSheetOpen(false)}
-                className="touch-target-48 w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700"
               >
                 <div className="flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-slate-400" />
-                  <span>Edit Brand Assets &amp; Colors</span>
+                  <span>Edit Brand Profile &amp; Assets</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-300" />
               </Link>
@@ -317,11 +324,11 @@ export function MobileBottomNav({
               <Link
                 href={`/${currentLocale}/pricing`}
                 onClick={() => setSheetOpen(false)}
-                className="touch-target-48 w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700"
               >
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>Growth Plans &amp; Autopay (50% Off)</span>
+                  <span>Upgrade / Pro Plans (50% Off)</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-300" />
               </Link>
@@ -329,7 +336,7 @@ export function MobileBottomNav({
               <Link
                 href={`/${currentLocale}/refund-policy`}
                 onClick={() => setSheetOpen(false)}
-                className="touch-target-48 w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-500"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-500"
               >
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-slate-400" />

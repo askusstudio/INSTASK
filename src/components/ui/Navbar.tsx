@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useGuidance } from '@/context/GuidanceContext';
@@ -29,7 +30,6 @@ export function Navbar({
   const tNav = useTranslations('nav');
   const { guidanceEnabled, toggleGuidance } = useGuidance();
 
-  // Strict check: sirf tab true hoga jab user ka real handle ho aur artisan_luna na ho
   const cleanUsername = connectedAccount?.username?.replace(/^@+/, '').trim();
   const isConnected = Boolean(
     cleanUsername &&
@@ -39,48 +39,57 @@ export function Navbar({
   );
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-xl border-b border-slate-100 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Brand Identity */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2px] shadow-sm flex items-center justify-center">
-              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
-                <Instagram className="w-5 h-5 text-rose-600" />
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <Link href={`/${currentLocale}/dashboard`} className="flex items-center gap-2.5">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[1.5px] sm:p-[2px] shadow-xs flex items-center justify-center shrink-0">
+                <div className="w-full h-full bg-white rounded-[9px] sm:rounded-[10px] flex items-center justify-center">
+                  <Instagram className="w-4 h-4 sm:w-5 sm:h-5 text-rose-600" />
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-slate-900 tracking-tight text-lg">
-                  INSTASK<span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600"> AI</span>
-                </span>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <ShieldCheck className="w-3 h-3" />
-                  Meta v21.0
-                </span>
-              </div>
-              <div className="hidden md:block text-[11px] font-medium">
-                {isConnected ? (
-                  <span className="text-slate-700 font-semibold">
-                    {tNav('connectedAs')} <strong className="text-rose-600">@{cleanUsername}</strong>
+              <div>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="font-extrabold text-slate-900 tracking-tight text-base sm:text-lg leading-tight">
+                    INSTASK<span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600"> AI</span>
                   </span>
-                ) : (
-                  <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70 font-semibold">
-                    Account Setup in Progress
+                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <ShieldCheck className="w-3 h-3" />
+                    Meta v21.0
                   </span>
-                )}
+                </div>
+                <div className="hidden md:block text-[11px] font-medium">
+                  {isConnected ? (
+                    <span className="text-slate-700 font-semibold">
+                      {tNav('connectedAs')} <strong className="text-rose-600">@{cleanUsername}</strong>
+                    </span>
+                  ) : (
+                    <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70 font-semibold">
+                      Account Setup in Progress
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Right Controls */}
           <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Credit Pill */}
             <CreditBadge balance={creditsBalance} />
 
+            {/* Language Switcher on Mobile & Desktop */}
+            <div className="sm:hidden">
+              <LanguageSwitcher currentLocale={currentLocale} />
+            </div>
+
+            {/* Desktop Full Navigation Controls */}
             <div className="hidden md:flex items-center gap-2 sm:gap-2.5">
               <a
                 href={`/${currentLocale}/onboarding/payment`}
-                className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200/80 hover:bg-amber-100 transition shadow-xs"
+                className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200/80 hover:bg-amber-100 transition shadow-2xs"
                 title="Pro Plan: 50% Off Month 1 Active"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -89,7 +98,7 @@ export function Navbar({
 
               <a
                 href={`/${currentLocale}/auth`}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
                 title="Multi-channel Account Sign In & Brand Setup"
               >
                 <span>Account</span>
@@ -99,7 +108,7 @@ export function Navbar({
               <button
                 type="button"
                 onClick={toggleGuidance}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition shadow-xs cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition shadow-2xs cursor-pointer ${
                   guidanceEnabled
                     ? 'bg-rose-50 text-rose-700 border-rose-200 ring-1 ring-rose-200'
                     : 'bg-white text-slate-500 border-slate-200 hover:text-slate-800'
@@ -114,7 +123,7 @@ export function Navbar({
               </button>
 
               {/* Autopilot Switch */}
-              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs">
                 <div className="flex items-center gap-1.5">
                   <Zap className={`w-3.5 h-3.5 ${autoPilotEnabled ? 'text-amber-500 fill-amber-500' : 'text-slate-400'}`} />
                   <span className="text-xs font-semibold text-slate-700 hidden sm:inline">
@@ -124,7 +133,7 @@ export function Navbar({
                 <button
                   type="button"
                   onClick={() => onToggleAutopilot(!autoPilotEnabled)}
-                  className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-1 ${
+                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-1 ${
                     autoPilotEnabled ? 'bg-gradient-to-r from-rose-500 to-purple-600' : 'bg-slate-200'
                   }`}
                   role="switch"
@@ -140,7 +149,9 @@ export function Navbar({
                 </button>
               </div>
 
-              <LanguageSwitcher currentLocale={currentLocale} />
+              <div className="hidden sm:block">
+                <LanguageSwitcher currentLocale={currentLocale} />
+              </div>
             </div>
           </div>
         </div>
