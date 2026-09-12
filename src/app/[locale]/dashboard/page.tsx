@@ -16,9 +16,6 @@ import {
   Calendar,
   Wand2,
   Sparkles,
-  TrendingUp,
-  Clock,
-  ShieldCheck,
   Zap,
 } from 'lucide-react';
 
@@ -57,7 +54,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const searchParams = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('calendar');
-
   const [posts, setPosts] = useState<PostRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [autoPilotEnabled, setAutoPilotEnabled] = useState(false);
@@ -300,113 +296,88 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         connectedAccount={account}
       />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 pb-32 md:pb-8 flex-1 w-full space-y-4 sm:space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-28 md:pb-8 flex-1 w-full space-y-4">
         
-        {/* Payment / Activation Notice */}
+        {/* Payment Confirmation Banner */}
         {isPaymentSuccess && (
-          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white shadow-soft-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 border border-emerald-400/40">
+          <div className="bg-emerald-600 rounded-2xl p-4 text-white shadow-sm flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300 animate-pulse" />
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 text-amber-200" />
               </div>
               <div>
-                <h3 className="font-black text-sm sm:text-base tracking-tight">
-                  Pro Growth Plan Activated (50% Off Month 1)
-                </h3>
-                <p className="text-[11px] sm:text-xs text-emerald-100 mt-0.5 font-medium">
-                  Your 30-day autonomous content calendar is now live and scheduled.
+                <h3 className="font-bold text-sm">Growth Plan Active</h3>
+                <p className="text-xs text-emerald-100">
+                  Your 30-day autonomous Instagram calendar is live.
                 </p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setIsPaymentSuccess(false)}
-              className="px-3.5 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-bold transition shrink-0 self-end sm:self-center cursor-pointer"
+              className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs font-semibold transition cursor-pointer"
             >
               Dismiss
             </button>
           </div>
         )}
 
-        {/* Plixi-Style Mobile Quick Metric Chips (Mobile Only) */}
-        <div className="grid grid-cols-2 gap-2 md:hidden">
-          <div className="bg-white rounded-xl border border-slate-200/80 p-3 shadow-2xs flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 font-bold">
-              <Calendar className="w-4 h-4" />
+        {/* Clean Header Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-sm">
+              {currentDisplayName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <span className="text-xs font-black text-slate-900 block leading-tight">
-                {posts.length} Posts
-              </span>
-              <span className="text-[10px] text-slate-400">30-Day Plan</span>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
+                  {currentDisplayName}
+                </h1>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
+                  @{account?.username || 'brand'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500">
+                30-Day Growth Pipeline
+              </p>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200/80 p-3 shadow-2xs flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 font-bold">
-              <Zap className="w-4 h-4 fill-current" />
-            </div>
-            <div>
-              <span className="text-xs font-black text-slate-900 block leading-tight">
-                {autoPilotEnabled ? 'Autopilot ON' : 'Paused'}
-              </span>
-              <span className="text-[10px] text-slate-400">Meta v21.0</span>
-            </div>
-          </div>
-        </div>
-
-        {/* View Switcher Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3 sm:pb-4">
-          <div>
-            <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <span>{currentDisplayName}</span>
-              <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200/80">
-                {activeTab === 'wizard' ? 'Setup Wizard' : 'Autonomous Dashboard'}
-              </span>
-            </h1>
-            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
-              Autonomous Instagram growth platform with certified Meta Graph API publishing.
-            </p>
-          </div>
-
-          {/* Segmented Control Pill */}
-          <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-2xs w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => handleSelectTab('wizard')}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
-                activeTab === 'wizard'
-                  ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Wand2 className="w-3.5 h-3.5" />
-              <span>Setup Wizard</span>
-            </button>
-
+          {/* Tab Selector */}
+          <div className="flex items-center bg-slate-200/70 p-1 rounded-xl w-full sm:w-auto self-start">
             <button
               type="button"
               onClick={() => handleSelectTab('calendar')}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                 activeTab === 'calendar'
-                  ? 'bg-slate-900 text-white shadow-xs'
+                  ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>{tNav('calendar')} ({posts.length})</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => handleSelectTab('wizard')}
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                activeTab === 'wizard'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Wand2 className="w-3.5 h-3.5" />
+              <span>Setup Wizard</span>
+            </button>
           </div>
         </div>
 
-        {/* View Body: Wizard vs Calendar */}
+        {/* View Switcher */}
         {activeTab === 'wizard' ? (
-          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-soft-md p-4 sm:p-8">
-            <div className="max-w-2xl mx-auto text-center mb-5 sm:mb-6">
-              <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
-                Setup Wizard
-              </span>
-              <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 mt-2">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-8">
+            <div className="max-w-xl mx-auto text-center mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">
                 {tOnboarding('title')}
               </h2>
               <p className="text-xs text-slate-500 mt-1">
@@ -420,12 +391,12 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
             />
           </div>
         ) : (
-          <div className="space-y-6 sm:space-y-8">
+          <div className="space-y-6">
             {loading ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-12 sm:p-16 text-center space-y-3 shadow-soft">
-                <div className="w-9 h-9 border-3 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-xs sm:text-sm font-semibold text-slate-700">
-                  Loading your 30-day autonomous growth plan...
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
+                <div className="w-8 h-8 border-3 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs font-medium text-slate-600">
+                  Loading your scheduled posts...
                 </p>
               </div>
             ) : (
@@ -451,25 +422,22 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         />
       )}
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 mt-auto hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex flex-col sm:flex-row items-center gap-2">
-            <span className="font-bold text-slate-800">Instask</span>
-            <span className="hidden sm:inline">•</span>
-            <span>Operated by <strong>INSTASK</strong></span>
-            <span className="hidden sm:inline">•</span>
-            <span className="text-emerald-700 font-medium">Meta Graph API v21.0 Certified</span>
+      {/* Clean Footer */}
+      <footer className="bg-white border-t border-slate-200 py-4 text-xs text-slate-500 mt-auto hidden md:block">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-800">INSTASK</span>
+            <span>•</span>
+            <span className="text-emerald-600 font-medium">Meta Verified Graph API</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-600">
-            <Link href={`/${locale}/terms`} className="hover:text-slate-900 font-medium">Terms of Service</Link>
-            <Link href={`/${locale}/refund-policy`} className="hover:text-slate-900 font-medium">Refund Policy</Link>
-            <Link href={`/${locale}/privacy`} className="hover:text-slate-900 font-medium">Privacy Policy</Link>
+          <div className="flex items-center gap-4 text-slate-500">
+            <Link href={`/${locale}/terms`} className="hover:text-slate-900">Terms</Link>
+            <Link href={`/${locale}/privacy`} className="hover:text-slate-900">Privacy</Link>
           </div>
         </div>
       </footer>
-      
-      {/* Plixi-Style Floating Mobile Bottom Bar */}
+
+      {/* Floating Bottom Nav */}
       <MobileBottomNav
         currentLocale={locale}
         activeTab={activeTab}
