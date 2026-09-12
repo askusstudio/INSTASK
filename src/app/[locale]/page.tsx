@@ -32,9 +32,9 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroTitleHighlight: '3 Easy Clicks.',
     heroDesc: "Generate 30 days of high-converting graphics, viral captions, and 3-tier hashtags. We scrape your top competitors and publish directly via Meta's official Graph API.",
     startGrowthPlan: 'Start 30-Day Growth Plan',
-    viewPricing: 'View Pricing ($24.50 First Month)',
+    viewPricing: 'View Pricing (50% Off)',
     officialApi: 'Official Meta Graph API v21.0',
-    stripeEncrypted: 'Stripe 256-Bit Encrypted Payments',
+    stripeEncrypted: '256-Bit Encrypted Payments',
     moneyBack: '100% Money-Back Guarantee',
     calendarTitle: 'INSTASK • 30-Day Autonomous Calendar',
     autopilotActive: 'Autopilot: ACTIVE',
@@ -74,9 +74,9 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroTitleHighlight: '3 Fáciles Clics.',
     heroDesc: 'Genera 30 días de gráficos de alta conversión, subtítulos virales y hashtags. Analizamos a tus competidores y publicamos con la API oficial de Meta.',
     startGrowthPlan: 'Comenzar Plan de 30 Días',
-    viewPricing: 'Ver Precios ($24.50 Primer Mes)',
+    viewPricing: 'Ver Precios (-50% Descuento)',
     officialApi: 'API Oficial Meta Graph v21.0',
-    stripeEncrypted: 'Pagos Seguros Encriptados Stripe',
+    stripeEncrypted: 'Pagos Seguros Encriptados',
     moneyBack: 'Garantía 100% de Devolución',
     calendarTitle: 'INSTASK • Calendario Autónomo de 30 Días',
     autopilotActive: 'Piloto Automático: ACTIVO',
@@ -116,9 +116,9 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroTitleHighlight: '3 आसान क्लिक में।',
     heroDesc: '30 दिनों के वायरल ग्राफिक्स, आकर्षक कैप्शन और 3-स्तरीय हैशटैग बनाएं। हम आपके प्रतिस्पर्धियों का विश्लेषण करते हैं और सीधे मेटा के आधिकारिक API से पोस्ट करते हैं।',
     startGrowthPlan: '30-दिवसीय ग्रोथ प्लान शुरू करें',
-    viewPricing: 'कीमत देखें ($24.50 पहला महीना)',
+    viewPricing: 'कीमत देखें (50% छूट)',
     officialApi: 'आधिकारिक मेटा ग्राफ API v21.0',
-    stripeEncrypted: 'स्ट्राइप 256-बिट सुरक्षित भुगतान',
+    stripeEncrypted: '256-बिट सुरक्षित भुगतान',
     moneyBack: '100% धन वापसी गारंटी',
     calendarTitle: 'INSTASK • 30-दिवसीय स्वचालित कैलेंडर',
     autopilotActive: 'ऑटोपायलट: सक्रिय',
@@ -164,19 +164,19 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
   return (
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-rose-500 selection:text-white pb-20 md:pb-0"
+      className="min-h-screen bg-[#FAFAFC] flex flex-col font-sans selection:bg-rose-500 selection:text-white pb-20 md:pb-0"
     >
-      {/* Sticky Glassmorphic Header */}
+      {/* Minimal Glassmorphic Header */}
       <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[1.5px] shadow-xs flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[1.5px] shadow-2xs flex items-center justify-center shrink-0">
               <div className="w-full h-full bg-white rounded-[9px] flex items-center justify-center">
-                <Instagram className="w-4 h-4 sm:w-5 sm:h-5 text-rose-600" />
+                <Instagram className="w-4 h-4 text-rose-600" />
               </div>
             </div>
             <div>
-              <span className="font-extrabold text-slate-900 tracking-tight text-base sm:text-lg">
+              <span className="font-black text-slate-900 tracking-tight text-base sm:text-lg">
                 INSTASK<span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600"> AI</span>
               </span>
               <span className="hidden md:inline-flex mx-2 items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -186,17 +186,20 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             <LanguageSwitcher currentLocale={activeLocale} />
+            
+            {/* Sign in hidden on mobile to give room to Logo and flag */}
             <Link
               href={`/${activeLocale}/login`}
-              className="text-xs font-bold text-slate-700 hover:text-slate-900 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl border border-slate-200 hover:bg-slate-100 transition shadow-2xs"
+              className="hidden sm:inline-flex text-xs font-bold text-slate-700 hover:text-slate-900 px-3 py-2 rounded-xl transition hover:bg-slate-100"
             >
               {t.signIn}
             </Link>
+            
             <Link
               href={`/${activeLocale}/login`}
-              className="text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl transition shadow-xs flex items-center gap-1"
+              className="text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl transition shadow-xs flex items-center gap-1 active:scale-95"
             >
               <span>{t.getStarted}</span>
               <ArrowRight className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
@@ -206,31 +209,31 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-8 pb-14 sm:pt-20 sm:pb-28 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 sm:space-y-6">
+      <section className="relative pt-6 pb-12 sm:pt-16 sm:pb-24 overflow-hidden">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 sm:space-y-6">
           
-          {/* Social Proof Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200/80 text-rose-800 text-[11px] sm:text-xs font-bold shadow-2xs">
+          {/* Subtle Welcome Badge */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-[11px] sm:text-xs font-bold shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-rose-600 shrink-0" />
             <span>{t.welcomeOffer}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight max-w-4xl mx-auto leading-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight max-w-3xl mx-auto leading-[1.18]">
             {t.heroTitle1}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-purple-600 to-amber-500 block sm:inline mt-1 sm:mt-0">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 block sm:inline">
               {t.heroTitleHighlight}
             </span>
           </h1>
 
-          <p className="text-slate-600 text-xs sm:text-lg max-w-2xl mx-auto font-normal leading-relaxed px-2">
+          <p className="text-slate-500 text-xs sm:text-base max-w-xl mx-auto font-normal leading-relaxed">
             {t.heroDesc}
           </p>
 
-          {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 sm:pt-4">
+          {/* Action CTAs: High visual hierarchy */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2 sm:pt-4 max-w-md mx-auto w-full">
             <Link
               href={`/${activeLocale}/login`}
-              className="w-full sm:w-auto px-8 py-3.5 sm:py-4 bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 hover:opacity-95 text-white rounded-2xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 active:scale-98"
+              className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 hover:opacity-95 text-white rounded-2xl font-bold text-xs sm:text-sm transition shadow-md shadow-rose-500/20 flex items-center justify-center gap-2 active:scale-98"
             >
               <span>{t.startGrowthPlan}</span>
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
@@ -238,72 +241,71 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
 
             <Link
               href={`/${activeLocale}/pricing`}
-              className="w-full sm:w-auto px-6 py-3.5 sm:py-4 bg-white hover:bg-slate-50 text-slate-800 rounded-2xl font-bold text-sm transition-all border border-slate-200 shadow-2xs flex items-center justify-center gap-2 active:scale-98"
+              className="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-700 rounded-2xl font-bold text-xs sm:text-sm transition border border-slate-200/80 shadow-2xs flex items-center justify-center gap-1.5 active:scale-98"
             >
-              <Zap className="w-4 h-4 text-amber-500" />
+              <Zap className="w-3.5 h-3.5 text-amber-500" />
               <span>{t.viewPricing}</span>
             </Link>
           </div>
 
-          {/* Plixi-Style 2x2 Metric Badges */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 max-w-3xl mx-auto pt-4">
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-4 text-center shadow-2xs">
-              <span className="text-lg sm:text-2xl font-black text-slate-900 flex items-center justify-center gap-1">
-                <TrendingUp className="w-4 h-4 text-emerald-500 inline" />
-                +420-680
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 max-w-3xl mx-auto pt-4">
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-center shadow-2xs">
+              <span className="text-base sm:text-xl font-black text-slate-900 flex items-center justify-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-500 inline" />
+                +420–680
               </span>
-              <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium block mt-0.5">
                 New Target Followers/Mo
               </span>
             </div>
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-4 text-center shadow-2xs">
-              <span className="text-lg sm:text-2xl font-black text-slate-900 flex items-center justify-center gap-1">
-                <Clock className="w-4 h-4 text-rose-500 inline" />
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-center shadow-2xs">
+              <span className="text-base sm:text-xl font-black text-slate-900 flex items-center justify-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-rose-500 inline" />
                 32 Hours
               </span>
-              <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium block mt-0.5">
                 Time Saved Monthly
               </span>
             </div>
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-4 text-center shadow-2xs">
-              <span className="text-lg sm:text-2xl font-black text-emerald-600 flex items-center justify-center gap-1">
-                <ShieldCheck className="w-4 h-4 inline" />
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-center shadow-2xs">
+              <span className="text-base sm:text-xl font-black text-purple-600 flex items-center justify-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 inline" />
                 v21.0
               </span>
-              <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium block mt-0.5">
                 Official Meta Graph API
               </span>
             </div>
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-4 text-center shadow-2xs">
-              <span className="text-lg sm:text-2xl font-black text-purple-600 flex items-center justify-center gap-1">
-                <Star className="w-4 h-4 fill-purple-600 inline" />
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-center shadow-2xs">
+              <span className="text-base sm:text-xl font-black text-amber-600 flex items-center justify-center gap-1">
+                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 inline" />
                 100% Safe
               </span>
-              <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium block mt-0.5">
                 Anti-Ban Stagger Limits
               </span>
             </div>
           </div>
 
-          {/* Plixi Horizontal Snap-Scroll Visual Preview */}
-          <div className="pt-6 sm:pt-10 max-w-5xl mx-auto">
-            <div className="rounded-3xl border border-slate-200/80 bg-white shadow-2xl p-3 sm:p-6 overflow-hidden">
-              <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-400" />
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-400" />
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-400" />
-                  <span className="mx-1 sm:mx-2 text-[11px] sm:text-xs font-bold text-slate-700">
+          {/* Horizontal Preview */}
+          <div className="pt-4 sm:pt-8 max-w-4xl mx-auto">
+            <div className="rounded-3xl border border-slate-200/80 bg-white shadow-xl p-3 sm:p-5 overflow-hidden">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                  <span className="mx-1.5 text-[11px] font-bold text-slate-700">
                     {t.calendarTitle}
                   </span>
                 </div>
-                <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                   {t.autopilotActive}
                 </span>
               </div>
 
-              {/* Mobile: Horizontal Snap Scroll / Desktop: 4 Columns */}
-              <div className="flex md:grid md:grid-cols-4 gap-3 pt-4 overflow-x-auto snap-x snap-mandatory pb-2 text-left -mx-1 px-1">
+              <div className="flex md:grid md:grid-cols-4 gap-2.5 pt-3 overflow-x-auto snap-x snap-mandatory pb-1 text-left -mx-1 px-1">
                 {[
                   { day: 'Day 1', theme: 'Problem-Solution', hook: 'Tired of generic beauty quality? Try us.', status: 'Published' },
                   { day: 'Day 2', theme: 'Behind The Scenes', hook: 'The secret organic extraction process', status: 'Published' },
@@ -312,12 +314,12 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
                 ].map((post, i) => (
                   <div
                     key={i}
-                    className="w-[78vw] sm:w-[45vw] md:w-auto shrink-0 snap-center p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1.5"
+                    className="w-[72vw] sm:w-[40vw] md:w-auto shrink-0 snap-center p-3 rounded-xl bg-slate-50 border border-slate-200/60 space-y-1"
                   >
-                    <div className="flex items-center justify-between text-[10px] font-bold">
-                      <span className="text-slate-500">{post.day}</span>
+                    <div className="flex items-center justify-between text-[9px] font-bold">
+                      <span className="text-slate-400">{post.day}</span>
                       <span
-                        className={`px-1.5 py-0.5 rounded-full ${
+                        className={`px-1.5 py-0.2 rounded-full ${
                           post.status === 'Published'
                             ? 'bg-emerald-100 text-emerald-800'
                             : 'bg-rose-100 text-rose-800'
@@ -326,7 +328,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
                         {post.status}
                       </span>
                     </div>
-                    <p className="text-xs font-bold text-slate-800 line-clamp-2">{post.hook}</p>
+                    <p className="text-xs font-bold text-slate-800 line-clamp-2 leading-snug">{post.hook}</p>
                     <span className="text-[9px] font-medium text-slate-400 block">{post.theme}</span>
                   </div>
                 ))}
@@ -337,7 +339,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </section>
 
-      {/* 3-Step Architecture Flow with Aesthetic Visuals */}
+      {/* 3-Step Flow */}
       <section className="py-12 sm:py-16 bg-white border-y border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
@@ -352,112 +354,74 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            
-            {/* Step 1: Multi-Channel Connect */}
-            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
-              <div className="h-44 w-full bg-gradient-to-tr from-rose-500/10 via-purple-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&auto=format&fit=crop&q=80" 
-                  alt="Multi-Channel Connect"
-                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute top-4 left-4 w-7 h-7 rounded-full bg-rose-500 text-white font-black text-xs flex items-center justify-center shadow-md">
-                  1
-                </span>
-              </div>
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step1Title}</h3>
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">{t.step1Desc}</p>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-3">
+              <span className="w-7 h-7 rounded-xl bg-rose-500 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                1
+              </span>
+              <h3 className="font-extrabold text-slate-900 text-base">{t.step1Title}</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">{t.step1Desc}</p>
             </div>
 
-            {/* Step 2: Niche Intelligence Analysis */}
-            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
-              <div className="h-44 w-full bg-gradient-to-tr from-purple-500/10 via-indigo-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80" 
-                  alt="Niche Intelligence Analysis"
-                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute top-4 left-4 w-7 h-7 rounded-full bg-purple-600 text-white font-black text-xs flex items-center justify-center shadow-md">
-                  2
-                </span>
-              </div>
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step2Title}</h3>
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">{t.step2Desc}</p>
-                </div>
-              </div>
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-3">
+              <span className="w-7 h-7 rounded-xl bg-purple-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                2
+              </span>
+              <h3 className="font-extrabold text-slate-900 text-base">{t.step2Title}</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">{t.step2Desc}</p>
             </div>
 
-            {/* Step 3: Autopilot Publishing */}
-            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
-              <div className="h-44 w-full bg-gradient-to-tr from-amber-500/10 via-orange-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80" 
-                  alt="Autopilot Publishing"
-                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute top-4 left-4 w-7 h-7 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shadow-md">
-                  3
-                </span>
-              </div>
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step3Title}</h3>
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">{t.step3Desc}</p>
-                </div>
-              </div>
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-3">
+              <span className="w-7 h-7 rounded-xl bg-amber-500 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                3
+              </span>
+              <h3 className="font-extrabold text-slate-900 text-base">{t.step3Title}</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">{t.step3Desc}</p>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* Pricing Teaser Section */}
-      <section className="py-14 sm:py-20 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8">
+      {/* Pricing Teaser */}
+      <section className="py-12 sm:py-16 bg-[#FAFAFC]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-5">
           <div>
             <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
               {t.pricingPill}
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mt-2.5">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
               {t.pricingHeading}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
               {t.pricingSubheading}
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl border-2 border-rose-500/40 p-5 sm:p-10 shadow-soft-md max-w-xl mx-auto text-left space-y-5">
+          <div className="bg-white rounded-3xl border border-rose-200/80 p-5 sm:p-7 shadow-sm max-w-lg mx-auto text-left space-y-4">
             <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">{t.planName}</h3>
-                <p className="text-xs text-slate-500">{t.planDesc}</p>
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900">{t.planName}</h3>
+                <p className="text-xs text-slate-400">{t.planDesc}</p>
               </div>
               <div className="text-right">
                 <span className="text-xs text-slate-400 line-through mr-1">$49</span>
-                <span className="text-3xl sm:text-4xl font-black text-slate-900">$24.50</span>
-                <span className="text-[10px] sm:text-[11px] text-emerald-600 font-bold block">{t.firstMonthBadge}</span>
+                <span className="text-2xl sm:text-3xl font-black text-slate-900">$24.50</span>
+                <span className="text-[10px] text-emerald-600 font-bold block">{t.firstMonthBadge}</span>
               </div>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {[t.f1, t.f2, t.f3, t.f4, t.f5].map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-xs text-slate-700">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span className="font-medium">{item}</span>
+                  <span className="font-medium text-[11px] sm:text-xs text-slate-600">{item}</span>
                 </div>
               ))}
             </div>
 
             <Link
               href={`/${activeLocale}/pricing`}
-              className="w-full py-3.5 sm:py-4 px-5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2"
             >
               <span>{t.claimDiscountBtn}</span>
               <ArrowRight className={`w-4 h-4 text-rose-300 ${isRTL ? 'rotate-180' : ''}`} />
@@ -466,36 +430,34 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 sm:py-8 text-xs text-slate-500 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-          <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
+      {/* Clean Footer */}
+      <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
             <span className="font-bold text-slate-800">Instask</span>
-            <span className="hidden sm:inline">•</span>
-            <span>Operated by <strong>INSTASK</strong></span>
-            <span className="hidden sm:inline">•</span>
+            <span>•</span>
             <span className="text-emerald-700 font-medium">Meta Graph API v21.0 Certified</span>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-slate-600">
-            <Link href={`/${activeLocale}/pricing`} className="hover:text-slate-900 font-medium">{t.pricingLink}</Link>
-            <Link href={`/${activeLocale}/terms`} className="hover:text-slate-900 font-medium">{t.termsLink}</Link>
-            <Link href={`/${activeLocale}/refund-policy`} className="hover:text-slate-900 font-medium">{t.refundLink}</Link>
-            <Link href={`/${activeLocale}/privacy`} className="hover:text-slate-900 font-medium">{t.privacyLink}</Link>
+          <div className="flex items-center gap-4 text-slate-500">
+            <Link href={`/${activeLocale}/pricing`} className="hover:text-slate-900">{t.pricingLink}</Link>
+            <Link href={`/${activeLocale}/terms`} className="hover:text-slate-900">{t.termsLink}</Link>
+            <Link href={`/${activeLocale}/refund-policy`} className="hover:text-slate-900">{t.refundLink}</Link>
+            <Link href={`/${activeLocale}/privacy`} className="hover:text-slate-900">{t.privacyLink}</Link>
           </div>
         </div>
       </footer>
 
-      {/* Persistent Plixi-Style Mobile Bottom Floating CTA */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-lg">
+      {/* Floating Bottom Bar (Mobile Only) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2 flex items-center justify-between shadow-lg">
         <div>
-          <span className="text-[10px] text-slate-400 block font-medium">50% Welcome Off</span>
-          <span className="text-sm font-black text-slate-900">
+          <span className="text-[10px] text-emerald-700 font-bold block leading-none">50% Welcome Off</span>
+          <span className="text-xs font-black text-slate-900">
             $24.50<span className="text-[10px] text-slate-400 font-normal">/mo</span>
           </span>
         </div>
         <Link
           href={`/${activeLocale}/login`}
-          className="py-2 px-4 bg-gradient-to-r from-rose-600 to-purple-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1 active:scale-95 transition"
+          className="py-2 px-4 bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1 active:scale-95 transition"
         >
           <span>Get Started</span>
           <ArrowRight className="w-3 h-3" />
