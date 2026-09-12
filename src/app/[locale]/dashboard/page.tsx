@@ -16,6 +16,7 @@ import {
   Calendar,
   Wand2,
   Sparkles,
+  Store,
 } from 'lucide-react';
 
 const StepWizard = dynamic(
@@ -52,7 +53,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const { dismissAllGuidance } = useGuidance();
   const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('calendar');
+  const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('wizard');
   const [posts, setPosts] = useState<PostRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [autoPilotEnabled, setAutoPilotEnabled] = useState(false);
@@ -74,7 +75,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       const savedHandle = localStorage.getItem('instask_ig_handle');
       if (
         savedBrand &&
-        !savedBrand.includes('Luna Artisan') &&
+        !savedBrand.toLowerCase().includes('luna') &&
         !savedBrand.toLowerCase().includes('glamflow')
       ) {
         return {
@@ -103,6 +104,9 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           });
           setAutoPilotEnabled(Boolean(data.account.autoPilotEnabled));
         }
+      } else {
+        // Naye user ke liye automated fallback create nahi karna hai jab tak wizard complete na ho
+        setPosts([]);
       }
     } catch (err) {
       console.error('Failed to fetch posts:', err);
@@ -145,7 +149,8 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
 
     const viewParam = searchParams.get('view');
-    if (viewParam === 'wizard' || (!isActivated && posts.length === 0)) {
+    // Agar account ya posts nahi hain toh direct Setup Wizard dikhana hai
+    if (viewParam === 'wizard' || !isActivated || posts.length === 0) {
       setActiveTab('wizard');
     } else {
       setActiveTab('calendar');
@@ -172,10 +177,10 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     dismissAllGuidance();
 
     const profile = pendingProfile || {
-      brandName: account?.brandName || 'My Brand',
+      brandName: account?.brandName || 'My Business',
       industry: 'Business & Retail',
       location: account?.location || '',
-      productSummary: 'Handcrafted products and professional services.',
+      productSummary: 'Premium lifestyle products and quality customer services.',
       brandColor: '#e1306c',
       logoUrl: '',
     };
@@ -249,10 +254,20 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
   };
 
-  const currentDisplayName =
-    account?.brandName || pendingProfile?.brandName || 'My Brand';
+  // Naye user ke liye clean brand identity logic
+  const hasConfiguredBrand = Boolean(
+    (account?.brandName && !account.brandName.toLowerCase().includes('glamflow')) ||
+    pendingProfile?.brandName
+  );
+
+  const currentDisplayName = hasConfiguredBrand
+    ? account?.brandName || pendingProfile?.brandName || 'My Brand'
+    : 'Brand Setup';
+
   const currentHandle =
-    account?.username || pendingMetaAccount?.username || null;
+    account?.username && !account.username.toLowerCase().includes('glamflow')
+      ? account.username
+      : pendingMetaAccount?.username || null;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-rose-500 selection:text-white">
@@ -294,21 +309,25 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-sm">
-              {currentDisplayName.charAt(0).toUpperCase()}
+              {hasConfiguredBrand ? currentDisplayName.charAt(0).toUpperCase() : <Store className="w-5 h-5 text-white" />}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
                   {currentDisplayName}
                 </h1>
-                {currentHandle && (
+                {currentHandle ? (
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
                     @{currentHandle.replace('@', '')}
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                    Step 1: Connect
                   </span>
                 )}
               </div>
               <p className="text-xs text-slate-500">
-                {activeTab === 'wizard' ? 'Configure your brand & channels' : '30-Day Growth Pipeline'}
+                {activeTab === 'wizard' ? 'Setup your 30-day autonomous strategy' : '30-Day Growth Pipeline'}
               </p>
             </div>
           </div>
