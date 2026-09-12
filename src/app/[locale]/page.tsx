@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   ArrowRight,
   CheckCircle2,
-  Lock,
   Star,
   Zap,
   TrendingUp,
@@ -33,9 +32,6 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroDesc: "Generate 30 days of high-converting graphics, viral captions, and 3-tier hashtags. We scrape your top competitors and publish directly via Meta's official Graph API.",
     startGrowthPlan: 'Start 30-Day Growth Plan',
     viewPricing: 'View Pricing & Features (50% Off)',
-    officialApi: 'Official Meta Graph API v21.0',
-    stripeEncrypted: '256-Bit Encrypted Payments',
-    moneyBack: '100% Money-Back Guarantee',
     calendarTitle: 'INSTASK • 30-Day Autonomous Calendar',
     autopilotActive: 'Autopilot: ACTIVE',
     stepPill: 'Zero-Friction Engine',
@@ -52,7 +48,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     pricingSubheading: 'Cancel anytime in 1 click. Zero lock-in contracts.',
     planName: 'Pro Growth Plan',
     planDesc: 'Autonomous Instagram growth engine',
-    firstMonthBadge: 'for month 1 with FIRST50',
+    firstMonthBadge: '50% off first month',
     claimDiscountBtn: 'Claim 50% Off & Activate Now',
     f1: '30 AI-generated visual templates (1:1 & 4:5 aspect ratio)',
     f2: '5 Competitor intelligence scraping with 2s safety limits',
@@ -75,9 +71,6 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroDesc: 'Genera 30 días de gráficos de alta conversión, subtítulos virales y hashtags. Analizamos a tus competidores y publicamos con la API oficial de Meta.',
     startGrowthPlan: 'Comenzar Plan de 30 Días',
     viewPricing: 'Ver Precios y Planes (-50%)',
-    officialApi: 'API Oficial Meta Graph v21.0',
-    stripeEncrypted: 'Pagos Seguros Encriptados',
-    moneyBack: 'Garantía 100% de Devolución',
     calendarTitle: 'INSTASK • Calendario Autónomo de 30 Días',
     autopilotActive: 'Piloto Automático: ACTIVO',
     stepPill: 'Motor Sin Fricción',
@@ -94,7 +87,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     pricingSubheading: 'Cancela cuando quieras en 1 clic.',
     planName: 'Plan Pro Growth',
     planDesc: 'Motor autónomo de crecimiento para Instagram',
-    firstMonthBadge: 'para el mes 1 con FIRST50',
+    firstMonthBadge: '50% de descuento primer mes',
     claimDiscountBtn: 'Obtén 50% Descuento y Activa Ahora',
     f1: '30 plantillas visuales generadas por IA (1:1 y 4:5)',
     f2: 'Análisis inteligente de 5 competidores',
@@ -117,9 +110,6 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroDesc: '30 दिनों के वायरल ग्राफिक्स, आकर्षक कैप्शन और 3-स्तरीय हैशटैग बनाएं। हम आपके प्रतिस्पर्धियों का विश्लेषण करते हैं और सीधे मेटा के आधिकारिक API से पोस्ट करते हैं।',
     startGrowthPlan: '30-दिवसीय ग्रोथ प्लान शुरू करें',
     viewPricing: 'प्लान एवं कीमत देखें (50% छूट)',
-    officialApi: 'आधिकारिक मेटा ग्राफ API v21.0',
-    stripeEncrypted: '256-बिट सुरक्षित भुगतान',
-    moneyBack: '100% धन वापसी गारंटी',
     calendarTitle: 'INSTASK • 30-दिवसीय स्वचालित कैलेंडर',
     autopilotActive: 'ऑटोपायलट: सक्रिय',
     stepPill: 'सरल एवं तीव्र इंजन',
@@ -136,7 +126,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     pricingSubheading: 'कभी भी 1 क्लिक में रद्द करें। कोई अनुबंध नहीं।',
     planName: 'प्रो ग्रोथ प्लान',
     planDesc: 'स्वचालित इंस्टाग्राम ग्रोथ इंजन',
-    firstMonthBadge: 'FIRST50 कूपन के साथ पहले महीने के लिए',
+    firstMonthBadge: 'पहले महीने पर 50% छूट',
     claimDiscountBtn: '50% छूट प्राप्त करें और अभी सक्रिय करें',
     f1: '30 AI-जनरेटेड विज़ुअल टेम्प्लेट्स (1:1 और 4:5 अनुपात)',
     f2: '5 प्रतिस्पर्धियों का सुरक्षित डेटा विश्लेषण',
@@ -166,7 +156,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
       dir={isRTL ? 'rtl' : 'ltr'}
       className="min-h-screen bg-[#FAFAFC] flex flex-col font-sans selection:bg-rose-500 selection:text-white"
     >
-      {/* 1. Clean Sleek Header: Only Language & Clean Sign In button */}
+      {/* 1. Header */}
       <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-2.5">
@@ -188,10 +178,9 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
 
           <div className="flex items-center gap-2">
             <LanguageSwitcher currentLocale={activeLocale} />
-            
             <Link
               href={`/${activeLocale}/login`}
-              className="text-xs font-bold text-slate-700 hover:text-slate-900 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs"
+              className="text-xs font-bold text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs"
             >
               {t.signIn}
             </Link>
@@ -199,31 +188,27 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </header>
 
-      {/* 2. Hero Section: Minimal, Focused, High Conversion */}
-      <section className="relative pt-6 pb-12 sm:pt-16 sm:pb-20 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 sm:space-y-5">
+      {/* 2. Hero Section */}
+      <section className="relative pt-6 pb-8 sm:pt-14 sm:pb-16 overflow-hidden">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-4">
           
-          {/* Welcome Offer Pill */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-[11px] sm:text-xs font-bold shadow-2xs">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-[11px] font-bold shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-rose-600 shrink-0" />
             <span>{t.welcomeOffer}</span>
           </div>
 
-          {/* Title */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight max-w-3xl mx-auto leading-[1.16]">
+          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-[1.18]">
             {t.heroTitle1}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 block sm:inline">
               {t.heroTitleHighlight}
             </span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-slate-500 text-xs sm:text-base max-w-lg mx-auto font-normal leading-relaxed">
+          <p className="text-slate-500 text-xs sm:text-sm max-w-md mx-auto font-normal leading-relaxed">
             {t.heroDesc}
           </p>
 
-          {/* Single Focused Primary CTA & Subtle Secondary Link */}
-          <div className="pt-2 space-y-2.5 max-w-sm mx-auto w-full">
+          <div className="pt-1 space-y-2 max-w-sm mx-auto w-full">
             <Link
               href={`/${activeLocale}/login`}
               className="w-full py-3.5 px-6 bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 hover:opacity-95 active:scale-98 text-white rounded-2xl font-bold text-xs sm:text-sm shadow-md shadow-rose-500/20 flex items-center justify-center gap-2 transition cursor-pointer"
@@ -234,18 +219,18 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
 
             <Link
               href={`/${activeLocale}/pricing`}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 transition py-1"
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800 transition py-0.5"
             >
-              <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+              <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
               <span>{t.viewPricing}</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
           {/* Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 max-w-3xl mx-auto pt-3">
-            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-left shadow-2xs">
-              <span className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-1">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 text-left">
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 shadow-2xs">
+              <span className="text-sm font-black text-slate-900 flex items-center gap-1">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 +420–680
               </span>
@@ -254,8 +239,8 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
               </span>
             </div>
 
-            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-left shadow-2xs">
-              <span className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-1">
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 shadow-2xs">
+              <span className="text-sm font-black text-slate-900 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-rose-500" />
                 32 Hours
               </span>
@@ -264,8 +249,8 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
               </span>
             </div>
 
-            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-left shadow-2xs">
-              <span className="text-sm sm:text-lg font-black text-purple-600 flex items-center gap-1">
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 shadow-2xs">
+              <span className="text-sm font-black text-purple-600 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 v21.0
               </span>
@@ -274,8 +259,8 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
               </span>
             </div>
 
-            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-left shadow-2xs">
-              <span className="text-sm sm:text-lg font-black text-amber-600 flex items-center gap-1">
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 shadow-2xs">
+              <span className="text-sm font-black text-amber-600 flex items-center gap-1">
                 <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                 100% Safe
               </span>
@@ -285,48 +270,40 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
             </div>
           </div>
 
-          {/* Horizontal Snap-Scroll Visual Preview */}
-          <div className="pt-4 sm:pt-6 max-w-4xl mx-auto">
-            <div className="rounded-3xl border border-slate-200/80 bg-white shadow-lg p-3 sm:p-5 overflow-hidden">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          {/* Compact Preview Card */}
+          <div className="pt-2">
+            <div className="rounded-2xl border border-slate-200/80 bg-white shadow-sm p-3 text-left overflow-hidden">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 text-[11px]">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-rose-400" />
-                  <div className="w-2 h-2 rounded-full bg-amber-400" />
-                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <span className="mx-1.5 text-[11px] font-bold text-slate-700">
-                    {t.calendarTitle}
-                  </span>
+                  <span className="w-2 h-2 rounded-full bg-rose-400" />
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="font-bold text-slate-700 ml-1">{t.calendarTitle}</span>
                 </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                   {t.autopilotActive}
                 </span>
               </div>
 
-              <div className="flex md:grid md:grid-cols-4 gap-2.5 pt-3 overflow-x-auto snap-x snap-mandatory pb-1 text-left -mx-1 px-1">
+              <div className="flex gap-2 pt-2.5 overflow-x-auto snap-x snap-mandatory pb-1 text-left">
                 {[
-                  { day: 'Day 1', theme: 'Problem-Solution', hook: 'Tired of generic beauty quality? Try us.', status: 'Published' },
-                  { day: 'Day 2', theme: 'Behind The Scenes', hook: 'The secret organic extraction process', status: 'Published' },
+                  { day: 'Day 1', theme: 'Problem-Solution', hook: 'Tired of generic quality? Try us.', status: 'Published' },
+                  { day: 'Day 2', theme: 'Behind Scenes', hook: 'The secret organic extraction process', status: 'Published' },
                   { day: 'Day 3', theme: 'Social Proof', hook: 'Voted neighborhood favorite in 2026', status: 'Scheduled' },
-                  { day: 'Day 4', theme: 'Educational Tips', hook: '3 signs your routine is actually working', status: 'Scheduled' },
+                  { day: 'Day 4', theme: 'Tips', hook: '3 signs your routine is actually working', status: 'Scheduled' },
                 ].map((post, i) => (
                   <div
                     key={i}
-                    className="w-[72vw] sm:w-[40vw] md:w-auto shrink-0 snap-center p-3 rounded-xl bg-slate-50 border border-slate-200/60 space-y-1"
+                    className="w-[62vw] sm:w-44 shrink-0 snap-center p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1"
                   >
                     <div className="flex items-center justify-between text-[9px] font-bold">
                       <span className="text-slate-400">{post.day}</span>
-                      <span
-                        className={`px-1.5 py-0.2 rounded-full ${
-                          post.status === 'Published'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-rose-100 text-rose-800'
-                        }`}
-                      >
+                      <span className={`px-1.5 py-0.2 rounded-full ${post.status === 'Published' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
                         {post.status}
                       </span>
                     </div>
-                    <p className="text-xs font-bold text-slate-800 line-clamp-2 leading-snug">{post.hook}</p>
-                    <span className="text-[9px] font-medium text-slate-400 block">{post.theme}</span>
+                    <p className="text-[11px] font-bold text-slate-800 line-clamp-2 leading-snug">{post.hook}</p>
+                    <span className="text-[9px] text-slate-400 block">{post.theme}</span>
                   </div>
                 ))}
               </div>
@@ -337,88 +314,86 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
       </section>
 
       {/* 3. 3-Step Flow */}
-      <section className="py-12 sm:py-16 bg-white border-y border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
-              {t.stepPill}
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-2">
-              {t.stepHeading}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1.5">
-              {t.stepSubheading}
-            </p>
-          </div>
+      <section className="py-10 bg-white border-y border-slate-200">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
+            {t.stepPill}
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
+            {t.stepHeading}
+          </h2>
+          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+            {t.stepSubheading}
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-2.5">
-              <span className="w-7 h-7 rounded-xl bg-rose-500 text-white font-black text-xs flex items-center justify-center shadow-xs">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-6 text-left">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-4 space-y-1.5">
+              <span className="w-6 h-6 rounded-lg bg-rose-500 text-white font-black text-xs flex items-center justify-center">
                 1
               </span>
-              <h3 className="font-extrabold text-slate-900 text-base">{t.step1Title}</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{t.step1Title}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">{t.step1Desc}</p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-2.5">
-              <span className="w-7 h-7 rounded-xl bg-purple-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-4 space-y-1.5">
+              <span className="w-6 h-6 rounded-lg bg-purple-600 text-white font-black text-xs flex items-center justify-center">
                 2
               </span>
-              <h3 className="font-extrabold text-slate-900 text-base">{t.step2Title}</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{t.step2Title}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">{t.step2Desc}</p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-2.5">
-              <span className="w-7 h-7 rounded-xl bg-amber-500 text-white font-black text-xs flex items-center justify-center shadow-xs">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-4 space-y-1.5">
+              <span className="w-6 h-6 rounded-lg bg-amber-500 text-white font-black text-xs flex items-center justify-center">
                 3
               </span>
-              <h3 className="font-extrabold text-slate-900 text-base">{t.step3Title}</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{t.step3Title}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">{t.step3Desc}</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. Pricing Teaser */}
-      <section className="py-12 sm:py-16 bg-[#FAFAFC]">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-5">
+      {/* 4. Pricing Section */}
+      <section className="py-10 bg-[#FAFAFC]">
+        <div className="max-w-xl mx-auto px-4 text-center space-y-4">
           <div>
             <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
               {t.pricingPill}
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
+            <h2 className="text-2xl font-black text-slate-900 mt-2">
               {t.pricingHeading}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               {t.pricingSubheading}
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl border border-rose-200/80 p-5 sm:p-7 shadow-sm max-w-lg mx-auto text-left space-y-4">
-            <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-3xl border border-rose-200/80 p-5 shadow-sm text-left space-y-3.5">
+            <div className="flex items-baseline justify-between border-b border-slate-100 pb-2.5">
               <div>
-                <h3 className="text-base sm:text-lg font-extrabold text-slate-900">{t.planName}</h3>
-                <p className="text-xs text-slate-400">{t.planDesc}</p>
+                <h3 className="text-base font-extrabold text-slate-900">{t.planName}</h3>
+                <p className="text-[11px] text-slate-400">{t.planDesc}</p>
               </div>
               <div className="text-right">
-                <span className="text-xs text-slate-400 line-through mr-1">$49</span>
-                <span className="text-2xl sm:text-3xl font-black text-slate-900">$24.50</span>
+                <span className="text-xs text-slate-400 line-through mr-1">₹3999</span>
+                <span className="text-2xl font-black text-slate-900">₹1999</span>
                 <span className="text-[10px] text-emerald-600 font-bold block">{t.firstMonthBadge}</span>
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {[t.f1, t.f2, t.f3, t.f4, t.f5].map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-xs text-slate-700">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span className="font-medium text-[11px] sm:text-xs text-slate-600">{item}</span>
+                  <span className="text-[11px] text-slate-600">{item}</span>
                 </div>
               ))}
             </div>
 
             <Link
-              href={`/${activeLocale}/pricing`}
-              className="w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 active:scale-98 text-white rounded-xl font-bold text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+              href={`/${activeLocale}/login`}
+              className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 active:scale-98 text-white rounded-xl font-bold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>{t.claimDiscountBtn}</span>
               <ArrowRight className={`w-4 h-4 text-rose-300 ${isRTL ? 'rotate-180' : ''}`} />
@@ -428,19 +403,15 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
       </section>
 
       {/* 5. Clean Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-800">Instask</span>
-            <span>•</span>
-            <span className="text-emerald-700 font-medium">Meta Graph API v21.0 Certified</span>
-          </div>
-          <div className="flex items-center gap-4 text-slate-500">
-            <Link href={`/${activeLocale}/pricing`} className="hover:text-slate-900">{t.pricingLink}</Link>
-            <Link href={`/${activeLocale}/terms`} className="hover:text-slate-900">{t.termsLink}</Link>
-            <Link href={`/${activeLocale}/refund-policy`} className="hover:text-slate-900">{t.refundLink}</Link>
-            <Link href={`/${activeLocale}/privacy`} className="hover:text-slate-900">{t.privacyLink}</Link>
-          </div>
+      <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-400 mt-auto text-center space-y-2">
+        <p className="text-slate-600 font-medium">
+          Instask • <span className="text-emerald-700 font-semibold">Meta Graph API v21.0 Certified</span>
+        </p>
+        <div className="flex items-center justify-center gap-4 text-[11px] text-slate-500">
+          <Link href={`/${activeLocale}/pricing`} className="hover:text-slate-800">{t.pricingLink}</Link>
+          <Link href={`/${activeLocale}/terms`} className="hover:text-slate-800">{t.termsLink}</Link>
+          <Link href={`/${activeLocale}/refund-policy`} className="hover:text-slate-800">{t.refundLink}</Link>
+          <Link href={`/${activeLocale}/privacy`} className="hover:text-slate-800">{t.privacyLink}</Link>
         </div>
       </footer>
 
