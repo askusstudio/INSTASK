@@ -32,7 +32,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroTitleHighlight: '3 Easy Clicks.',
     heroDesc: "Generate 30 days of high-converting graphics, viral captions, and 3-tier hashtags. We scrape your top competitors and publish directly via Meta's official Graph API.",
     startGrowthPlan: 'Start 30-Day Growth Plan',
-    viewPricing: 'View Pricing (50% Off)',
+    viewPricing: 'View Pricing & Features (50% Off)',
     officialApi: 'Official Meta Graph API v21.0',
     stripeEncrypted: '256-Bit Encrypted Payments',
     moneyBack: '100% Money-Back Guarantee',
@@ -74,7 +74,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroTitleHighlight: '3 Fáciles Clics.',
     heroDesc: 'Genera 30 días de gráficos de alta conversión, subtítulos virales y hashtags. Analizamos a tus competidores y publicamos con la API oficial de Meta.',
     startGrowthPlan: 'Comenzar Plan de 30 Días',
-    viewPricing: 'Ver Precios (-50% Descuento)',
+    viewPricing: 'Ver Precios y Planes (-50%)',
     officialApi: 'API Oficial Meta Graph v21.0',
     stripeEncrypted: 'Pagos Seguros Encriptados',
     moneyBack: 'Garantía 100% de Devolución',
@@ -116,7 +116,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     heroTitleHighlight: '3 आसान क्लिक में।',
     heroDesc: '30 दिनों के वायरल ग्राफिक्स, आकर्षक कैप्शन और 3-स्तरीय हैशटैग बनाएं। हम आपके प्रतिस्पर्धियों का विश्लेषण करते हैं और सीधे मेटा के आधिकारिक API से पोस्ट करते हैं।',
     startGrowthPlan: '30-दिवसीय ग्रोथ प्लान शुरू करें',
-    viewPricing: 'कीमत देखें (50% छूट)',
+    viewPricing: 'प्लान एवं कीमत देखें (50% छूट)',
     officialApi: 'आधिकारिक मेटा ग्राफ API v21.0',
     stripeEncrypted: '256-बिट सुरक्षित भुगतान',
     moneyBack: '100% धन वापसी गारंटी',
@@ -164,11 +164,11 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
   return (
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="min-h-screen bg-[#FAFAFC] flex flex-col font-sans selection:bg-rose-500 selection:text-white pb-20 md:pb-0"
+      className="min-h-screen bg-[#FAFAFC] flex flex-col font-sans selection:bg-rose-500 selection:text-white"
     >
-      {/* Minimal Glassmorphic Header */}
+      {/* 1. Clean Sleek Header: Only Language & Clean Sign In button */}
       <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-2.5">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[1.5px] shadow-2xs flex items-center justify-center shrink-0">
               <div className="w-full h-full bg-white rounded-[9px] flex items-center justify-center">
@@ -186,54 +186,47 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
+          <div className="flex items-center gap-2">
             <LanguageSwitcher currentLocale={activeLocale} />
             
-            {/* Sign in hidden on mobile to give room to Logo and flag */}
             <Link
               href={`/${activeLocale}/login`}
-              className="hidden sm:inline-flex text-xs font-bold text-slate-700 hover:text-slate-900 px-3 py-2 rounded-xl transition hover:bg-slate-100"
+              className="text-xs font-bold text-slate-700 hover:text-slate-900 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs"
             >
               {t.signIn}
-            </Link>
-            
-            <Link
-              href={`/${activeLocale}/login`}
-              className="text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl transition shadow-xs flex items-center gap-1 active:scale-95"
-            >
-              <span>{t.getStarted}</span>
-              <ArrowRight className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative pt-6 pb-12 sm:pt-16 sm:pb-24 overflow-hidden">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 sm:space-y-6">
+      {/* 2. Hero Section: Minimal, Focused, High Conversion */}
+      <section className="relative pt-6 pb-12 sm:pt-16 sm:pb-20 overflow-hidden">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 sm:space-y-5">
           
-          {/* Subtle Welcome Badge */}
+          {/* Welcome Offer Pill */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-[11px] sm:text-xs font-bold shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-rose-600 shrink-0" />
             <span>{t.welcomeOffer}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight max-w-3xl mx-auto leading-[1.18]">
+          {/* Title */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight max-w-3xl mx-auto leading-[1.16]">
             {t.heroTitle1}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 block sm:inline">
               {t.heroTitleHighlight}
             </span>
           </h1>
 
-          <p className="text-slate-500 text-xs sm:text-base max-w-xl mx-auto font-normal leading-relaxed">
+          {/* Subtitle */}
+          <p className="text-slate-500 text-xs sm:text-base max-w-lg mx-auto font-normal leading-relaxed">
             {t.heroDesc}
           </p>
 
-          {/* Action CTAs: High visual hierarchy */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2 sm:pt-4 max-w-md mx-auto w-full">
+          {/* Single Focused Primary CTA & Subtle Secondary Link */}
+          <div className="pt-2 space-y-2.5 max-w-sm mx-auto w-full">
             <Link
               href={`/${activeLocale}/login`}
-              className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 hover:opacity-95 text-white rounded-2xl font-bold text-xs sm:text-sm transition shadow-md shadow-rose-500/20 flex items-center justify-center gap-2 active:scale-98"
+              className="w-full py-3.5 px-6 bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 hover:opacity-95 active:scale-98 text-white rounded-2xl font-bold text-xs sm:text-sm shadow-md shadow-rose-500/20 flex items-center justify-center gap-2 transition cursor-pointer"
             >
               <span>{t.startGrowthPlan}</span>
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
@@ -241,61 +234,65 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
 
             <Link
               href={`/${activeLocale}/pricing`}
-              className="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-700 rounded-2xl font-bold text-xs sm:text-sm transition border border-slate-200/80 shadow-2xs flex items-center justify-center gap-1.5 active:scale-98"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 transition py-1"
             >
-              <Zap className="w-3.5 h-3.5 text-amber-500" />
+              <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
               <span>{t.viewPricing}</span>
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
           {/* Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 max-w-3xl mx-auto pt-4">
-            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-center shadow-2xs">
-              <span className="text-base sm:text-xl font-black text-slate-900 flex items-center justify-center gap-1">
-                <TrendingUp className="w-3.5 h-3.5 text-emerald-500 inline" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 max-w-3xl mx-auto pt-3">
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-left shadow-2xs">
+              <span className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 +420–680
               </span>
-              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium block mt-0.5">
+              <span className="text-[10px] text-slate-400 font-medium block mt-0.5">
                 New Target Followers/Mo
               </span>
             </div>
-            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-center shadow-2xs">
-              <span className="text-base sm:text-xl font-black text-slate-900 flex items-center justify-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-rose-500 inline" />
+
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-left shadow-2xs">
+              <span className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-rose-500" />
                 32 Hours
               </span>
-              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium block mt-0.5">
+              <span className="text-[10px] text-slate-400 font-medium block mt-0.5">
                 Time Saved Monthly
               </span>
             </div>
-            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-center shadow-2xs">
-              <span className="text-base sm:text-xl font-black text-purple-600 flex items-center justify-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 inline" />
+
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-left shadow-2xs">
+              <span className="text-sm sm:text-lg font-black text-purple-600 flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" />
                 v21.0
               </span>
-              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium block mt-0.5">
+              <span className="text-[10px] text-slate-400 font-medium block mt-0.5">
                 Official Meta Graph API
               </span>
             </div>
-            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-center shadow-2xs">
-              <span className="text-base sm:text-xl font-black text-amber-600 flex items-center justify-center gap-1">
-                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 inline" />
+
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-3 text-left shadow-2xs">
+              <span className="text-sm sm:text-lg font-black text-amber-600 flex items-center gap-1">
+                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                 100% Safe
               </span>
-              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium block mt-0.5">
+              <span className="text-[10px] text-slate-400 font-medium block mt-0.5">
                 Anti-Ban Stagger Limits
               </span>
             </div>
           </div>
 
-          {/* Horizontal Preview */}
-          <div className="pt-4 sm:pt-8 max-w-4xl mx-auto">
-            <div className="rounded-3xl border border-slate-200/80 bg-white shadow-xl p-3 sm:p-5 overflow-hidden">
+          {/* Horizontal Snap-Scroll Visual Preview */}
+          <div className="pt-4 sm:pt-6 max-w-4xl mx-auto">
+            <div className="rounded-3xl border border-slate-200/80 bg-white shadow-lg p-3 sm:p-5 overflow-hidden">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                  <div className="w-2 h-2 rounded-full bg-rose-400" />
+                  <div className="w-2 h-2 rounded-full bg-amber-400" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
                   <span className="mx-1.5 text-[11px] font-bold text-slate-700">
                     {t.calendarTitle}
                   </span>
@@ -339,7 +336,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </section>
 
-      {/* 3-Step Flow */}
+      {/* 3. 3-Step Flow */}
       <section className="py-12 sm:py-16 bg-white border-y border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
@@ -355,7 +352,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-3">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-2.5">
               <span className="w-7 h-7 rounded-xl bg-rose-500 text-white font-black text-xs flex items-center justify-center shadow-xs">
                 1
               </span>
@@ -363,7 +360,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
               <p className="text-xs text-slate-500 leading-relaxed">{t.step1Desc}</p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-3">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-2.5">
               <span className="w-7 h-7 rounded-xl bg-purple-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
                 2
               </span>
@@ -371,7 +368,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
               <p className="text-xs text-slate-500 leading-relaxed">{t.step2Desc}</p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-3">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-2.5">
               <span className="w-7 h-7 rounded-xl bg-amber-500 text-white font-black text-xs flex items-center justify-center shadow-xs">
                 3
               </span>
@@ -382,7 +379,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Pricing Teaser */}
+      {/* 4. Pricing Teaser */}
       <section className="py-12 sm:py-16 bg-[#FAFAFC]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-5">
           <div>
@@ -421,7 +418,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
 
             <Link
               href={`/${activeLocale}/pricing`}
-              className="w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 active:scale-98 text-white rounded-xl font-bold text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>{t.claimDiscountBtn}</span>
               <ArrowRight className={`w-4 h-4 text-rose-300 ${isRTL ? 'rotate-180' : ''}`} />
@@ -430,7 +427,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Clean Footer */}
+      {/* 5. Clean Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 mt-auto">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -447,22 +444,6 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </footer>
 
-      {/* Floating Bottom Bar (Mobile Only) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2 flex items-center justify-between shadow-lg">
-        <div>
-          <span className="text-[10px] text-emerald-700 font-bold block leading-none">50% Welcome Off</span>
-          <span className="text-xs font-black text-slate-900">
-            $24.50<span className="text-[10px] text-slate-400 font-normal">/mo</span>
-          </span>
-        </div>
-        <Link
-          href={`/${activeLocale}/login`}
-          className="py-2 px-4 bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1 active:scale-95 transition"
-        >
-          <span>Get Started</span>
-          <ArrowRight className="w-3 h-3" />
-        </Link>
-      </div>
     </div>
   );
 }
