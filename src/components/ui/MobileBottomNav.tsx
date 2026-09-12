@@ -11,14 +11,11 @@ import {
   X,
   Sparkles,
   HelpCircle,
-  Globe,
   ShieldCheck,
   Building2,
   ChevronRight,
-  TrendingUp,
 } from 'lucide-react';
 import { useGuidance } from '@/context/GuidanceContext';
-import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface MobileBottomNavProps {
   currentLocale: string;
@@ -62,22 +59,33 @@ export function MobileBottomNav({
     };
   }, [sheetOpen]);
 
+  const savedLocalBrand = typeof window !== 'undefined' ? localStorage.getItem('instask_brand_name') : null;
+  const savedLocalHandle = typeof window !== 'undefined' ? localStorage.getItem('instask_ig_handle') : null;
+
   const cleanBrandName =
     connectedAccount?.brandName && !connectedAccount.brandName.includes('Luna Artisan')
       ? connectedAccount.brandName
-      : 'Your Business Brand';
+      : savedLocalBrand || 'My Brand Setup';
 
   const cleanHandle =
     connectedAccount?.username && !connectedAccount.username.includes('artisan_luna')
       ? connectedAccount.username.replace(/^@+/, '')
+      : savedLocalHandle
+      ? savedLocalHandle.replace(/^@+/, '')
       : null;
+
+  const handleAutopilotClick = () => {
+    onToggleAutopilot(!autoPilotEnabled);
+    if (activeTab !== 'calendar') {
+      onSelectTab('calendar');
+    }
+  };
 
   return (
     <>
-      {/* Plixi-Style Floating Mobile Tab Bar */}
       <nav
         aria-label="Mobile Navigation Bar"
-        className="md:hidden fixed bottom-3 inset-x-3 z-40 bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-2xl py-1.5 px-2 transition-all duration-200"
+        className="md:hidden fixed bottom-3 inset-x-3 z-40 bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-xl py-1.5 px-2 transition-all duration-200"
       >
         <div className="grid grid-cols-4 items-center gap-1">
           {/* Tab 1: Calendar */}
@@ -98,7 +106,7 @@ export function MobileBottomNav({
             <span className="text-[10px] leading-none tracking-tight">Calendar</span>
           </button>
 
-          {/* Tab 2: New Plan Wizard */}
+          {/* Tab 2: Wizard */}
           <button
             type="button"
             onClick={() => {
@@ -114,25 +122,24 @@ export function MobileBottomNav({
           >
             <div className="relative">
               <Wand2 className={`w-4 h-4 ${activeTab === 'wizard' ? 'stroke-[2.5]' : ''}`} />
-              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping" />
             </div>
             <span className="text-[10px] leading-none tracking-tight">Wizard</span>
           </button>
 
-          {/* Tab 3: Autopilot Toggle */}
+          {/* Tab 3: Autopilot Toggle (Switches to Calendar on tap for immediate live view) */}
           <button
             type="button"
-            onClick={() => onToggleAutopilot(!autoPilotEnabled)}
+            onClick={handleAutopilotClick}
             className={`min-h-[46px] py-1 flex flex-col items-center justify-center gap-1 rounded-xl transition cursor-pointer ${
               autoPilotEnabled
                 ? 'bg-amber-50 text-amber-700 font-extrabold shadow-2xs'
-                : 'text-slate-400 hover:text-slate-700 font-medium'
+                : 'text-slate-500 hover:text-slate-700 font-medium'
             }`}
             aria-label={`Autopilot: ${autoPilotEnabled ? 'Active' : 'Paused'}`}
           >
             <Zap
               className={`w-4 h-4 ${
-                autoPilotEnabled ? 'text-amber-500 fill-amber-500 stroke-[2.5]' : ''
+                autoPilotEnabled ? 'text-amber-500 fill-amber-500 stroke-[2.5]' : 'text-slate-400'
               }`}
             />
             <span className="text-[10px] leading-none tracking-tight">
@@ -140,7 +147,7 @@ export function MobileBottomNav({
             </span>
           </button>
 
-          {/* Tab 4: More Menu */}
+          {/* Tab 4: Menu */}
           <button
             type="button"
             onClick={() => setSheetOpen(true)}
@@ -153,7 +160,7 @@ export function MobileBottomNav({
           >
             <div className="relative">
               <Menu className="w-4 h-4" />
-              <span className="absolute -top-1.5 -right-2 px-1 py-0.2 bg-rose-600 text-white text-[8px] font-black rounded-full shadow-2xs">
+              <span className="absolute -top-1.5 -right-2.5 px-1 py-0.2 bg-rose-600 text-white text-[8px] font-black rounded-full shadow-2xs">
                 {creditsBalance}
               </span>
             </div>
@@ -162,7 +169,7 @@ export function MobileBottomNav({
         </div>
       </nav>
 
-      {/* Plixi-Style Bottom Sheet Drawer */}
+      {/* Drawer */}
       {sheetOpen && (
         <div
           role="dialog"
@@ -170,19 +177,16 @@ export function MobileBottomNav({
           aria-label="Navigation Controls and Account Sheet"
           className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
         >
-          {/* Backdrop */}
           <div
             className="flex-1 w-full"
             onClick={() => setSheetOpen(false)}
             aria-label="Dismiss sheet"
           />
 
-          {/* Drawer Container */}
           <div className="bg-white rounded-t-3xl border-t border-slate-200 shadow-2xl p-5 pb-8 space-y-4 max-h-[85dvh] overflow-y-auto">
-            {/* Grab Handle */}
             <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto" />
 
-            {/* Profile Bar */}
+            {/* Profile Info */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-purple-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
@@ -196,7 +200,7 @@ export function MobileBottomNav({
                     </span>
                   </h3>
                   <p className="text-[11px] text-slate-500">
-                    {cleanHandle ? `@${cleanHandle}` : 'Connected Account'}
+                    {cleanHandle ? `@${cleanHandle}` : 'Account Connected'}
                   </p>
                 </div>
               </div>
@@ -211,7 +215,7 @@ export function MobileBottomNav({
               </button>
             </div>
 
-            {/* Plixi-Style Credit Card */}
+            {/* Credit Card */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white flex items-center justify-between shadow-md border border-slate-800">
               <div>
                 <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block">
@@ -270,13 +274,12 @@ export function MobileBottomNav({
               </button>
             </div>
 
-            {/* Controls */}
+            {/* Guidance Toggle */}
             <div className="space-y-2">
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider px-1">
                 Preferences
               </span>
 
-              {/* Guidance Mode Toggle */}
               <button
                 type="button"
                 onClick={toggleGuidance}
@@ -296,15 +299,6 @@ export function MobileBottomNav({
                   {guidanceEnabled ? 'ON' : 'OFF'}
                 </span>
               </button>
-
-              {/* Language Switcher */}
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white">
-                <div className="flex items-center gap-2.5">
-                  <Globe className="w-4 h-4 text-slate-500" />
-                  <span className="text-xs font-bold text-slate-800">Language</span>
-                </div>
-                <LanguageSwitcher currentLocale={currentLocale} />
-              </div>
             </div>
 
             {/* Quick Links */}
