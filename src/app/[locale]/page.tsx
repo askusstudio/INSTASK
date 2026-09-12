@@ -245,7 +245,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
             </Link>
           </div>
 
-          {/* Plixi-Style 2x2 Metric Badges (Mobile Optimized) */}
+          {/* Plixi-Style 2x2 Metric Badges */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 max-w-3xl mx-auto pt-4">
             <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-4 text-center shadow-2xs">
               <span className="text-lg sm:text-2xl font-black text-slate-900 flex items-center justify-center gap-1">
@@ -337,7 +337,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </section>
 
-      {/* 3-Step Architecture Flow */}
+      {/* 3-Step Architecture Flow with Aesthetic Visuals */}
       <section className="py-12 sm:py-16 bg-white border-y border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
@@ -352,30 +352,68 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
-            <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-rose-500 text-white font-black flex items-center justify-center text-sm shadow-2xs">
-                1
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            
+            {/* Step 1: Multi-Channel Connect */}
+            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+              <div className="h-44 w-full bg-gradient-to-tr from-rose-500/10 via-purple-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&auto=format&fit=crop&q=80" 
+                  alt="Multi-Channel Connect"
+                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                />
+                <span className="absolute top-4 left-4 w-7 h-7 rounded-full bg-rose-500 text-white font-black text-xs flex items-center justify-center shadow-md">
+                  1
+                </span>
               </div>
-              <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step1Title}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">{t.step1Desc}</p>
+              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step1Title}</h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">{t.step1Desc}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow-2xs">
-                2
+            {/* Step 2: Niche Intelligence Analysis */}
+            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+              <div className="h-44 w-full bg-gradient-to-tr from-purple-500/10 via-indigo-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80" 
+                  alt="Niche Intelligence Analysis"
+                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                />
+                <span className="absolute top-4 left-4 w-7 h-7 rounded-full bg-purple-600 text-white font-black text-xs flex items-center justify-center shadow-md">
+                  2
+                </span>
               </div>
-              <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step2Title}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">{t.step2Desc}</p>
+              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step2Title}</h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">{t.step2Desc}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-amber-500 text-white font-black flex items-center justify-center text-sm shadow-2xs">
-                3
+            {/* Step 3: Autopilot Publishing */}
+            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+              <div className="h-44 w-full bg-gradient-to-tr from-amber-500/10 via-orange-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80" 
+                  alt="Autopilot Publishing"
+                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                />
+                <span className="absolute top-4 left-4 w-7 h-7 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shadow-md">
+                  3
+                </span>
               </div>
-              <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step3Title}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">{t.step3Desc}</p>
+              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step3Title}</h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">{t.step3Desc}</p>
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
