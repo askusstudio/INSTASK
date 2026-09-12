@@ -180,7 +180,7 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
             <LanguageSwitcher currentLocale={activeLocale} />
             <Link
               href={`/${activeLocale}/login`}
-              className="text-xs font-bold text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs"
+              className="text-xs font-bold text-slate-700 hover:text-slate-900 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs"
             >
               {t.signIn}
             </Link>
@@ -313,43 +313,86 @@ export default function PublicLandingPage({ params }: LandingPageProps) {
         </div>
       </section>
 
-      {/* 3. 3-Step Flow */}
-      <section className="py-10 bg-white border-y border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
-            {t.stepPill}
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
-            {t.stepHeading}
-          </h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-            {t.stepSubheading}
-          </p>
+      {/* 3. 3-Step Flow with Contextual Visual Images */}
+      <section className="py-12 sm:py-16 bg-white border-y border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
+              {t.stepPill}
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-2">
+              {t.stepHeading}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1.5">
+              {t.stepSubheading}
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-6 text-left">
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-4 space-y-1.5">
-              <span className="w-6 h-6 rounded-lg bg-rose-500 text-white font-black text-xs flex items-center justify-center">
-                1
-              </span>
-              <h3 className="font-bold text-slate-900 text-sm">{t.step1Title}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">{t.step1Desc}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            
+            {/* Step 1: Multi-Channel Connect */}
+            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+              <div className="h-44 w-full bg-gradient-to-tr from-rose-500/10 via-purple-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-2.5">
+                <img 
+                  src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&auto=format&fit=crop&q=80" 
+                  alt="Multi-Channel Connect"
+                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <span className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-rose-600/90 backdrop-blur-xs text-white font-black text-[11px] shadow-md flex items-center gap-1">
+                  <span>Step 1</span>
+                </span>
+              </div>
+              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step1Title}</h3>
+                  <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">{t.step1Desc}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-4 space-y-1.5">
-              <span className="w-6 h-6 rounded-lg bg-purple-600 text-white font-black text-xs flex items-center justify-center">
-                2
-              </span>
-              <h3 className="font-bold text-slate-900 text-sm">{t.step2Title}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">{t.step2Desc}</p>
+            {/* Step 2: Niche Intelligence Analysis */}
+            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+              <div className="h-44 w-full bg-gradient-to-tr from-purple-500/10 via-indigo-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-2.5">
+                <img 
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80" 
+                  alt="Niche Intelligence Analysis"
+                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <span className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-purple-600/90 backdrop-blur-xs text-white font-black text-[11px] shadow-md flex items-center gap-1">
+                  <span>Step 2</span>
+                </span>
+              </div>
+              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step2Title}</h3>
+                  <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">{t.step2Desc}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-4 space-y-1.5">
-              <span className="w-6 h-6 rounded-lg bg-amber-500 text-white font-black text-xs flex items-center justify-center">
-                3
-              </span>
-              <h3 className="font-bold text-slate-900 text-sm">{t.step3Title}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">{t.step3Desc}</p>
+            {/* Step 3: Autopilot Publishing */}
+            <div className="group bg-slate-50 hover:bg-white rounded-3xl border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+              <div className="h-44 w-full bg-gradient-to-tr from-amber-500/10 via-orange-500/5 to-slate-100 relative overflow-hidden flex items-center justify-center p-2.5">
+                <img 
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80" 
+                  alt="Autopilot Publishing"
+                  className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <span className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-amber-600/90 backdrop-blur-xs text-white font-black text-[11px] shadow-md flex items-center gap-1">
+                  <span>Step 3</span>
+                </span>
+              </div>
+              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">{t.step3Title}</h3>
+                  <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">{t.step3Desc}</p>
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
