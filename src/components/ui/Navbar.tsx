@@ -35,11 +35,13 @@ export function Navbar({
     cleanUsername &&
     cleanUsername.length > 1 &&
     !cleanUsername.toLowerCase().includes('artisan_luna') &&
-    cleanUsername !== 'shop'
+    !cleanUsername.toLowerCase().includes('glamflow') &&
+    cleanUsername !== 'shop' &&
+    cleanUsername !== 'brand'
   );
 
   return (
-    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-xl border-b border-slate-100 transition-all">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-100 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Brand Identity */}
@@ -66,7 +68,7 @@ export function Navbar({
                       {tNav('connectedAs')} <strong className="text-rose-600">@{cleanUsername}</strong>
                     </span>
                   ) : (
-                    <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70 font-semibold">
+                    <span className="text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 font-semibold">
                       Account Setup in Progress
                     </span>
                   )}
@@ -77,11 +79,13 @@ export function Navbar({
 
           {/* Right Controls */}
           <div className="flex items-center gap-2 sm:gap-2.5">
-            {/* Credit Pill */}
-            <CreditBadge balance={creditsBalance} />
+            {/* Credit Pill: Mobile par hidden, desktop par visible */}
+            <div className="hidden md:flex items-center">
+              <CreditBadge balance={creditsBalance} />
+            </div>
 
             {/* Language Switcher on Mobile & Desktop */}
-            <div className="sm:hidden">
+            <div>
               <LanguageSwitcher currentLocale={currentLocale} />
             </div>
 
@@ -147,10 +151,6 @@ export function Navbar({
                     }`}
                   />
                 </button>
-              </div>
-
-              <div className="hidden sm:block">
-                <LanguageSwitcher currentLocale={currentLocale} />
               </div>
             </div>
           </div>
