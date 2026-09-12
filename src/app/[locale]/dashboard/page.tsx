@@ -148,10 +148,12 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
 
     const viewParam = searchParams.get('view');
-    if (viewParam === 'wizard' || !isActivated || posts.length === 0) {
+    if (viewParam === 'wizard') {
       setActiveTab('wizard');
-    } else {
+    } else if (viewParam === 'calendar' || isActivated) {
       setActiveTab('calendar');
+    } else if (posts.length === 0) {
+      setActiveTab('wizard');
     }
   }, [searchParams, fetchPosts, posts.length]);
 
@@ -227,10 +229,6 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   };
 
   const handleSelectTab = (tab: 'calendar' | 'wizard') => {
-    if (tab === 'calendar' && !isPaymentSuccess && posts.length === 0) {
-      router.push(`/${locale}/onboarding/payment?userId=usr_main&required=true`);
-      return;
-    }
     setActiveTab(tab);
   };
 
@@ -278,9 +276,9 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-6 pb-28 md:pb-8 flex-1 w-full space-y-4">
         
-        {/* Payment Confirmation Banner */}
+        {/* Payment Confirmation Banner - Desktop Only to prevent mobile clutter */}
         {isPaymentSuccess && (
-          <div className="bg-emerald-600 rounded-2xl p-4 text-white shadow-sm flex items-center justify-between gap-3">
+          <div className="hidden md:flex bg-emerald-600 rounded-2xl p-4 text-white shadow-sm items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                 <Sparkles className="w-5 h-5 text-amber-200" />
@@ -302,8 +300,8 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           </div>
         )}
 
-        {/* Clean Header Bar: Sirf Calendar Tab par ya Desktop par render hoga (Mobile wizard par hide) */}
-        <div className={`${activeTab === 'wizard' ? 'hidden md:flex' : 'flex'} flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4`}>
+        {/* Clean Header Bar: Sirf Desktop par render hoga taaki mobile screen poori tarah free rahe */}
+        <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-sm">
               {hasConfiguredBrand ? currentDisplayName.charAt(0).toUpperCase() : <Store className="w-5 h-5 text-white" />}
@@ -330,7 +328,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           </div>
 
           {/* Desktop Tab Selector */}
-          <div className="hidden md:flex items-center bg-slate-200/70 p-1 rounded-xl">
+          <div className="flex items-center bg-slate-200/70 p-1 rounded-xl">
             <button
               type="button"
               onClick={() => handleSelectTab('calendar')}
