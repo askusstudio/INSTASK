@@ -16,7 +16,6 @@ import {
   Calendar,
   Wand2,
   Sparkles,
-  Zap,
 } from 'lucide-react';
 
 const StepWizard = dynamic(
@@ -74,17 +73,18 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       const savedBrand = localStorage.getItem('instask_brand_name');
       const savedHandle = localStorage.getItem('instask_ig_handle');
       if (
-        (savedBrand && !savedBrand.includes('Luna Artisan')) ||
-        (savedHandle && !savedHandle.includes('artisan_luna'))
+        savedBrand &&
+        !savedBrand.includes('Luna Artisan') &&
+        !savedBrand.toLowerCase().includes('glamflow')
       ) {
         return {
-          brandName: savedBrand || 'GlamFlow',
-          username: savedHandle || 'glamflow.in',
+          brandName: savedBrand,
+          username: savedHandle || '',
           location: null,
         };
       }
     }
-    return { brandName: 'GlamFlow', username: 'glamflow.in', location: null };
+    return null;
   });
 
   const fetchPosts = useCallback(async () => {
@@ -95,12 +95,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
 
       if (data.success && Array.isArray(data.posts) && data.posts.length > 0) {
         setPosts(data.posts);
-        if (
-          data.account &&
-          data.account.username &&
-          !data.account.username.toLowerCase().includes('artisan_luna') &&
-          !data.account.brandName?.toLowerCase().includes('luna artisan')
-        ) {
+        if (data.account && data.account.username) {
           setAccount({
             brandName: data.account.brandName,
             username: data.account.username,
@@ -108,40 +103,13 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           });
           setAutoPilotEnabled(Boolean(data.account.autoPilotEnabled));
         }
-      } else {
-        const effectiveBrand =
-          account?.brandName ||
-          (typeof window !== 'undefined' ? localStorage.getItem('instask_brand_name') : null) ||
-          'GlamFlow';
-        const effectiveHandle =
-          account?.username ||
-          (typeof window !== 'undefined' ? localStorage.getItem('instask_ig_handle') : null) ||
-          'glamflow.in';
-
-        const planRes = await fetch('/api/generate-plan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            brandName: effectiveBrand,
-            industry: 'Beauty & Wellness',
-            productSummary: 'Curated beauty products, treatments, and aesthetics.',
-            brandColor: '#e1306c',
-            language: locale,
-            handle: effectiveHandle,
-            selectedTemplateId: 'template_quote',
-          }),
-        });
-        const planData = await planRes.json();
-        if (planData.success && Array.isArray(planData.posts)) {
-          setPosts(planData.posts);
-        }
       }
     } catch (err) {
-      console.error('Failed to fetch/populate posts:', err);
+      console.error('Failed to fetch posts:', err);
     } finally {
       setLoading(false);
     }
-  }, [account?.brandName, account?.username, locale]);
+  }, []);
 
   useEffect(() => {
     fetchPosts();
@@ -177,12 +145,12 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
 
     const viewParam = searchParams.get('view');
-    if (viewParam === 'wizard' && !isActivated) {
+    if (viewParam === 'wizard' || (!isActivated && posts.length === 0)) {
       setActiveTab('wizard');
     } else {
       setActiveTab('calendar');
     }
-  }, [searchParams, fetchPosts]);
+  }, [searchParams, fetchPosts, posts.length]);
 
   const handleStrategyReady = (
     blueprint: StrategyBlueprint,
@@ -204,15 +172,15 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     dismissAllGuidance();
 
     const profile = pendingProfile || {
-      brandName: account?.brandName || 'GlamFlow',
-      industry: 'Beauty & Wellness',
+      brandName: account?.brandName || 'My Brand',
+      industry: 'Business & Retail',
       location: account?.location || '',
-      productSummary: 'Curated beauty products, treatments, and aesthetics.',
+      productSummary: 'Handcrafted products and professional services.',
       brandColor: '#e1306c',
       logoUrl: '',
     };
 
-    const handle = pendingMetaAccount?.username || account?.username || 'glamflow.in';
+    const handle = pendingMetaAccount?.username || account?.username || 'brand';
     const igUserId = pendingMetaAccount?.igUserId || `ig_${Date.now()}`;
 
     if (typeof window !== 'undefined') {
@@ -256,7 +224,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   };
 
   const handleSelectTab = (tab: 'calendar' | 'wizard') => {
-    if (tab === 'calendar' && !isPaymentSuccess) {
+    if (tab === 'calendar' && !isPaymentSuccess && posts.length === 0) {
       router.push(`/${locale}/onboarding/payment?userId=usr_main&required=true`);
       return;
     }
@@ -282,9 +250,9 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   };
 
   const currentDisplayName =
-    account?.brandName && !account.brandName.includes('Luna Artisan')
-      ? account.brandName
-      : pendingProfile?.brandName || 'GlamFlow';
+    account?.brandName || pendingProfile?.brandName || 'My Brand';
+  const currentHandle =
+    account?.username || pendingMetaAccount?.username || null;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-rose-500 selection:text-white">
@@ -333,12 +301,14 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
                 <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
                   {currentDisplayName}
                 </h1>
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
-                  @{account?.username || 'brand'}
-                </span>
+                {currentHandle && (
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
+                    @{currentHandle.replace('@', '')}
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-500">
-                30-Day Growth Pipeline
+                {activeTab === 'wizard' ? 'Configure your brand & channels' : '30-Day Growth Pipeline'}
               </p>
             </div>
           </div>
