@@ -15,6 +15,7 @@ export async function POST(request: Request) {
       brandName,
       location,
       productSummary,
+      industry = 'General Business',
       brandColor = '#e1306c',
       logoUrl,
       competitors = [],
@@ -22,8 +23,10 @@ export async function POST(request: Request) {
       handle = 'yourbrand',
       igUserId,
       userId = 'usr_main',
+      selectedTemplateId,
     } = body;
 
+    // Step 1: Validate Brand Information
     if (!brandName || !productSummary) {
       return NextResponse.json(
         { error: 'Brand name and product summary are required.' },
@@ -31,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Safe Credit Deduction: attempt deduction without blocking initial onboarding generation
+    // Safe Credit Deduction
     try {
       await deductCredits(
         userId,
@@ -40,13 +43,13 @@ export async function POST(request: Request) {
         `Monthly Strategy & 30-Day Copy generation for ${brandName}`
       );
     } catch (creditErr) {
-      console.warn('Credit deduction warning (bypassed for onboarding generation):', creditErr);
+      console.warn('Credit deduction warning (bypassed for trial generation):', creditErr);
     }
 
-    // Step A: Competitor Intelligence Ingestion
+    // Step 2: Competitor Intelligence & Current Trend Research
     const competitorInsights = await scrapeCompetitorInstagram(competitors);
 
-    // Step B: Gemini 2.5 Flash Strategy & Multilingual Copywriting
+    // Generate trend-aware 30-day strategy using Gemini
     const generatedItems = await generate30DayGrowthPlan({
       brandName,
       location,
@@ -55,40 +58,66 @@ export async function POST(request: Request) {
       language,
     });
 
-    // Step C: Parallel Asset Rendering via Creatomate (Strict 1:1 & 4:5 ratios + SVG fallback)
-    const renderPromises = generatedItems.map(async (item) => {
-      const renderResult = await renderPostAsset({
-        templateId: item.template_id,
-        aspectRatio: item.aspect_ratio,
-        brandName,
-        brandColor,
-        handle,
-        headline: item.headline,
-        bullets: item.body_bullets,
-        theme: item.theme,
-        dayNumber: item.day,
-        logoUrl,
-      });
+    // Step 3: Exact Graphic Rendering for Every Calendar Post (Industry & Brand Aware)
+    const renderPromises = generatedItems.map(async (item: any) => {
+      const templateId = selectedTemplateId || item.template_id || 'tpl_minimal_editorial';
+      const aspectRatio = item.aspect_ratio || '1:1';
 
-      return {
-        ...item,
-        mediaUrl: renderResult.mediaUrl,
-        mediaAspectRatio: renderResult.aspectRatio,
-        isFallbackAsset: renderResult.isFallback,
-      };
+      try {
+        const renderResult = await renderPostAsset({
+          templateId,
+          aspectRatio,
+          brandName,
+          industry,
+          brandColor,
+          handle,
+          headline: item.headline,
+          bullets: item.body_bullets || [],
+          theme: item.theme,
+          dayNumber: item.day,
+          logoUrl,
+        });
+
+        return {
+          ...item,
+          mediaUrl: renderResult.mediaUrl,
+          mediaAspectRatio: renderResult.aspectRatio || aspectRatio,
+          isFallbackAsset: renderResult.isFallback || false,
+        };
+      } catch (renderErr) {
+        console.warn(`Render retry triggered for Day ${item.day}:`, renderErr);
+        
+        // Re-call directly to obtain clean non-duplicating indexed fallback
+        const recoveryAsset = await renderPostAsset({
+          aspectRatio,
+          brandName,
+          industry,
+          handle,
+          headline: item.headline,
+          bullets: item.body_bullets || [],
+          theme: item.theme,
+          dayNumber: item.day,
+        });
+
+        return {
+          ...item,
+          mediaUrl: recoveryAsset.mediaUrl,
+          mediaAspectRatio: aspectRatio,
+          isFallbackAsset: true,
+        };
+      }
     });
 
     const renderedPosts = await Promise.all(renderPromises);
 
-    // Step D: Persistence in Prisma / Supabase (with resilient memory fallback)
+    // Step 4: Storage Setup
     const accountId = 'acc_user_main';
     const now = new Date();
 
-    // Store in memoryStore first to guarantee immediate availability
     memoryStore.accounts.set(accountId, {
       id: accountId,
-      userId: 'usr_main',
-      igUserId: igUserId || '17841400000000000',
+      userId,
+      igUserId: igUserId || 'pending_meta_auth',
       username: handle,
       brandName,
       city: location,
@@ -102,7 +131,7 @@ export async function POST(request: Request) {
       updatedAt: now,
     });
 
-    // Save competitors
+    // Save competitor metrics
     for (const comp of competitorInsights) {
       const compId = `comp_${comp.handle}_${Date.now()}`;
       memoryStore.competitors.set(compId, {
@@ -119,12 +148,12 @@ export async function POST(request: Request) {
       });
     }
 
-    // Save posts
-    const createdPosts: PostRecord[] = [];
-    // Clear old posts for this account in demo memory store
+    // Clean old drafts and map new posts
     for (const [id, post] of Array.from(memoryStore.posts.entries())) {
       if (post.accountId === accountId) memoryStore.posts.delete(id);
     }
+
+    const createdPosts: PostRecord[] = [];
 
     for (const post of renderedPosts) {
       const postId = `post_day_${post.day}_${Date.now()}`;
@@ -132,13 +161,13 @@ export async function POST(request: Request) {
         id: postId,
         accountId,
         dayNumber: post.day,
-        scheduledTime: new Date(post.scheduled_time),
+        scheduledTime: new Date(post.scheduled_time || Date.now() + post.day * 86400000),
         theme: post.theme,
         headline: post.headline,
-        bodyBullets: post.body_bullets,
+        bodyBullets: post.body_bullets || [],
         caption: post.caption,
-        hashtags: post.hashtags,
-        templateId: post.template_id,
+        hashtags: post.hashtags || [],
+        templateId: post.template_id || 'tpl_minimal_editorial',
         mediaType: 'IMAGE',
         mediaUrl: post.mediaUrl,
         mediaAspectRatio: post.mediaAspectRatio,
@@ -151,7 +180,7 @@ export async function POST(request: Request) {
       createdPosts.push(postRecord);
     }
 
-    // Also attempt PostgreSQL persistence if Prisma client is connected
+    // Postgres persistence fallback
     if (prisma) {
       try {
         await prisma.account.upsert({
@@ -167,7 +196,7 @@ export async function POST(request: Request) {
           },
           create: {
             id: accountId,
-            userId: 'usr_main',
+            userId,
             brandName,
             city: location,
             productSummary,
@@ -177,7 +206,6 @@ export async function POST(request: Request) {
           },
         });
 
-        // Batch insert or replace posts
         await prisma.post.deleteMany({ where: { accountId } });
         await prisma.post.createMany({
           data: createdPosts.map((p) => ({
@@ -198,13 +226,13 @@ export async function POST(request: Request) {
           })),
         });
       } catch (dbErr) {
-        console.warn('Postgres database write skipped, served from memory store:', dbErr);
+        console.warn('Postgres write bypassed, serving live memory store:', dbErr);
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: '30-day autonomous growth plan generated successfully.',
+      message: '30-day autonomous growth plan and exact post graphics generated successfully.',
       competitorInsightsCount: competitorInsights.length,
       postsCount: createdPosts.length,
       posts: createdPosts,

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -29,6 +29,11 @@ export function Navbar({
   const t = useTranslations('common');
   const tNav = useTranslations('nav');
   const { guidanceEnabled, toggleGuidance } = useGuidance();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const cleanUsername = connectedAccount?.username?.replace(/^@+/, '').trim();
   const isConnected = Boolean(
@@ -62,13 +67,15 @@ export function Navbar({
                     Meta v21.0
                   </span>
                 </div>
-                <div className="hidden md:block text-[11px] font-medium">
-                  {isConnected ? (
-                    <span className="text-slate-700 font-semibold">
+
+                {/* Hydration-safe Account Status */}
+                <div className="hidden md:block text-[11px] font-medium" suppressHydrationWarning>
+                  {mounted && isConnected ? (
+                    <span className="text-slate-700 font-semibold" suppressHydrationWarning>
                       {tNav('connectedAs')} <strong className="text-rose-600">@{cleanUsername}</strong>
                     </span>
                   ) : (
-                    <span className="text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 font-semibold">
+                    <span className="text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 font-semibold" suppressHydrationWarning>
                       Account Setup in Progress
                     </span>
                   )}

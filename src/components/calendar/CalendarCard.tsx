@@ -25,27 +25,30 @@ interface CalendarCardProps {
 }
 
 const THEME_STYLES: Record<string, { bg: string; text: string; border: string }> = {
-  'Problem-Solution': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
-  'Behind the Scenes': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  'Social Proof': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-  'Educational Tips': { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
-  'Community & Memes': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  'Problem-Solution': { bg: 'bg-rose-600/90', text: 'text-white', border: 'border-rose-400/50' },
+  'Behind the Scenes': { bg: 'bg-amber-600/90', text: 'text-white', border: 'border-amber-400/50' },
+  'Social Proof': { bg: 'bg-emerald-600/90', text: 'text-white', border: 'border-emerald-400/50' },
+  'Educational Tips': { bg: 'bg-sky-600/90', text: 'text-white', border: 'border-sky-400/50' },
+  'Community & Memes': { bg: 'bg-purple-600/90', text: 'text-white', border: 'border-purple-400/50' },
 };
+
+const DEFAULT_FALLBACK_IMG =
+  'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1080&auto=format&fit=crop&q=80';
 
 export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
   const t = useTranslations('common');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [currentMedia, setCurrentMedia] = useState<string | null>(post.mediaUrl || null);
+  const [currentMedia, setCurrentMedia] = useState<string>(post.mediaUrl || DEFAULT_FALLBACK_IMG);
   const [isVideo, setIsVideo] = useState(false);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const themeStyle = THEME_STYLES[post.theme] || {
-    bg: 'bg-slate-50',
-    text: 'text-slate-700',
-    border: 'border-slate-200',
+    bg: 'bg-slate-900/90',
+    text: 'text-white',
+    border: 'border-white/20',
   };
 
   const formattedTime = new Date(post.scheduledTime).toLocaleTimeString([], {
@@ -82,7 +85,6 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
         throw new Error('Payment gateway failed to load. Please check internet connection.');
       }
 
-      // Order creation
       const res = await fetch('/api/billing/razorpay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -108,7 +110,6 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
         description: 'Unlock Custom Gallery Upload (+₹2,000)',
         order_id: data.orderId,
         handler: function () {
-          // PAYMENT COMPLETE: Sirf yahan aane par hi gallery open hogi
           setShowPaywallModal(false);
           setIsProcessingPayment(false);
           setTimeout(() => {
@@ -167,15 +168,16 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
 
       <div
         onClick={onClick}
-        className="group relative bg-white rounded-2xl border border-slate-200 hover:border-slate-300 shadow-soft hover:shadow-soft-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer transform hover:-translate-y-0.5 gpu-layer touch-manipulation active:scale-[0.99]"
+        className="group relative bg-white rounded-2xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer transform hover:-translate-y-0.5 gpu-layer touch-manipulation active:scale-[0.99]"
       >
-        <div className="p-3 pb-2 flex items-center justify-between border-b border-slate-100">
+        {/* Top Header Time Bar */}
+        <div className="px-3 py-2 flex items-center justify-between border-b border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-1.5">
-            <span className="w-6 h-6 rounded-lg bg-slate-900 text-white text-[11px] font-extrabold flex items-center justify-center">
+            <span className="w-5 h-5 rounded-md bg-slate-900 text-white text-[10px] font-extrabold flex items-center justify-center shrink-0">
               {post.dayNumber}
             </span>
             <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-              <Clock className="w-3 h-3 text-slate-400" />
+              <Clock className="w-3 h-3 text-slate-400 shrink-0" />
               {formattedTime}
             </span>
           </div>
@@ -194,7 +196,7 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
               </span>
             )}
             {isDraft && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-200/80 text-slate-700">
                 {t('draft')}
               </span>
             )}
@@ -207,100 +209,118 @@ export function CalendarCard({ post, onClick, onApprove }: CalendarCardProps) {
           </div>
         </div>
 
-        <div className="relative aspect-square w-full bg-slate-900 overflow-hidden">
-          {currentMedia ? (
-            isVideo ? (
-              <video
-                src={currentMedia}
-                className="w-full h-full object-cover"
-                controls={false}
-                autoPlay
-                muted
-                loop
-              />
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={currentMedia}
-                alt={post.headline}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
-                decoding="async"
-              />
-            )
+        {/* Visual Graphic Area */}
+        <div className="relative aspect-square w-full bg-slate-900 overflow-hidden select-none">
+          {isVideo ? (
+            <video
+              src={currentMedia}
+              className="w-full h-full object-cover"
+              controls={false}
+              autoPlay
+              muted
+              loop
+            />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">
-              No image
-            </div>
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={currentMedia}
+              alt={post.headline}
+              onError={() => setCurrentMedia(DEFAULT_FALLBACK_IMG)}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 filter brightness-[0.95]"
+              loading="lazy"
+              decoding="async"
+            />
           )}
 
-          <div className="absolute top-2 left-2">
+          {/* Vignette Gradients for Text Contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/20 to-slate-950/60 pointer-events-none" />
+
+          {/* Top Graphic Controls */}
+          <div className="absolute top-2 inset-x-2 flex items-center justify-between gap-1 z-10">
             <span
-              className={`px-2 py-0.5 rounded-md text-[10px] font-bold border backdrop-blur-md shadow-sm ${themeStyle.bg} ${themeStyle.text} ${themeStyle.border}`}
+              className={`max-w-[55%] truncate px-2 py-0.5 rounded-md text-[9px] font-extrabold tracking-wider uppercase border backdrop-blur-md shadow-xs ${themeStyle.bg} ${themeStyle.text} ${themeStyle.border}`}
             >
               {post.theme}
             </span>
-          </div>
 
-          <button
-            type="button"
-            onClick={handleReplaceClick}
-            className="absolute top-2 right-2 min-h-[36px] px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 active:scale-95 text-white backdrop-blur-md border border-white/20 text-[10px] font-bold flex items-center gap-1 shadow-sm transition touch-manipulation cursor-pointer"
-            title="Replace AI media with custom gallery media (+₹2,000)"
-          >
-            <ImagePlus className="w-3.5 h-3.5 text-rose-400" />
-            <span>Replace</span>
-            <Lock className="w-2.5 h-2.5 text-amber-400 ml-0.5" />
-          </button>
-        </div>
-
-        <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
-          <div>
-            <h4 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-rose-600 transition">
-              {post.headline}
-            </h4>
-            <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
-              {post.caption}
-            </p>
-          </div>
-
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
             <button
               type="button"
               onClick={handleReplaceClick}
-              className="min-h-[44px] text-[11px] font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition touch-manipulation cursor-pointer"
+              className="min-h-[26px] px-2 py-0.5 rounded-lg bg-slate-900/85 hover:bg-slate-900 active:scale-95 text-white backdrop-blur-md border border-white/20 text-[10px] font-bold flex items-center gap-1 shadow-sm transition touch-manipulation cursor-pointer shrink-0"
+              title="Replace with custom upload (+₹2,000)"
             >
-              <ImagePlus className="w-3.5 h-3.5 text-rose-500" />
-              <span>Gallery</span>
-              <span className="text-[9px] font-extrabold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300">
-                +₹2,000
-              </span>
+              <ImagePlus className="w-3 h-3 text-rose-400" />
+              <span>Replace</span>
+              <Lock className="w-2.5 h-2.5 text-amber-400 ml-0.5" />
             </button>
+          </div>
 
-            <div className="flex items-center gap-1.5">
+          {/* Hook Headline Overlay */}
+          <div className="absolute bottom-2 inset-x-2.5 z-10 pointer-events-none">
+            <span className="text-[9px] font-extrabold text-rose-400 tracking-wider uppercase block mb-0.5">
+              Day {post.dayNumber} Hook
+            </span>
+            <p className="text-white font-black text-[11px] leading-snug drop-shadow-md line-clamp-2">
+              {post.headline}
+            </p>
+          </div>
+        </div>
+
+        {/* Post Actions and Caption Area */}
+        <div className="p-2.5 flex-1 flex flex-col justify-between space-y-2">
+          <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed min-h-[30px]">
+            {post.caption}
+          </p>
+
+          <div className="pt-2 border-t border-slate-100 flex flex-col gap-1.5 w-full">
+            {/* Top row: Gallery Addon Trigger */}
+            <div className="flex items-center justify-between gap-1">
+              <button
+                type="button"
+                onClick={handleReplaceClick}
+                className="w-full h-7 text-[10.5px] font-bold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 border border-slate-200/80 rounded-lg flex items-center justify-between px-2 transition touch-manipulation cursor-pointer"
+              >
+                <div className="flex items-center gap-1">
+                  <ImagePlus className="w-3 h-3 text-rose-500" />
+                  <span>Gallery</span>
+                </div>
+                <span className="text-[9px] font-black bg-amber-100 text-amber-900 px-1.5 py-0.2 rounded border border-amber-300">
+                  +₹2,000
+                </span>
+              </button>
+            </div>
+
+            {/* Bottom row: View & Approve Buttons */}
+            <div className="grid grid-cols-2 gap-1.5 w-full">
               <button
                 type="button"
                 onClick={onClick}
-                className="min-h-[44px] text-[11px] font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 touch-manipulation px-2 rounded-lg cursor-pointer"
+                className="h-7 text-[10.5px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100/70 hover:bg-slate-100 rounded-lg flex items-center justify-center gap-1 transition touch-manipulation cursor-pointer"
               >
-                <Edit3 className="w-3.5 h-3.5 text-slate-400" />
-                <span>{t('viewDetails')}</span>
+                <Edit3 className="w-3 h-3 text-slate-500" />
+                <span>View</span>
               </button>
 
-              {isDraft && (
+              {isDraft ? (
                 <button
                   type="button"
                   onClick={onApprove}
-                  className="min-h-[44px] text-[11px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 px-3 py-1.5 rounded-xl transition touch-manipulation flex items-center justify-center cursor-pointer"
+                  className="h-7 text-[10.5px] font-bold text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 rounded-lg transition touch-manipulation flex items-center justify-center cursor-pointer shadow-xs whitespace-nowrap"
                 >
-                  {t('approve')}
+                  Approve
                 </button>
+              ) : (
+                <div className="h-7 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 rounded-lg flex items-center justify-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <span>Ready</span>
+                </div>
               )}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Paywall Add-on Modal */}
       {showPaywallModal && (
         <div
           onClick={(e) => {

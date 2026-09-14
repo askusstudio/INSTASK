@@ -9,6 +9,23 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const accountId = url.searchParams.get('accountId') || 'acc_user_main';
+    const isReset = url.searchParams.get('reset') === 'true';
+
+    // Fresh setup wipe trigger (clears cached test runs for dynamic client demos)
+    if (isReset) {
+      memoryStore.accounts.delete(accountId);
+      for (const [id, post] of Array.from(memoryStore.posts.entries())) {
+        if (post.accountId === accountId) {
+          memoryStore.posts.delete(id);
+        }
+      }
+      return NextResponse.json({
+        success: true,
+        count: 0,
+        posts: [],
+        account: null,
+      });
+    }
 
     let posts: PostRecord[] = [];
 
@@ -47,10 +64,16 @@ export async function GET(request: Request) {
 
     posts.sort((a, b) => a.dayNumber - b.dayNumber);
 
-    // Only return the user's actual registered account; do not fall back to acc_demo_001
     let account = memoryStore.accounts.get(accountId) || null;
 
-    if (account && (account.username?.includes('artisan_luna') || account.brandName?.includes('Luna Artisan'))) {
+    // Filter out dummy/stale cache entries
+    if (
+      account &&
+      (account.username?.includes('artisan_luna') ||
+        account.brandName?.includes('Luna Artisan') ||
+        account.username === 'brand' ||
+        account.username === 'yourbrand')
+    ) {
       account = null;
     }
 

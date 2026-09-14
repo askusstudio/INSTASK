@@ -53,6 +53,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   const { dismissAllGuidance } = useGuidance();
   const searchParams = useSearchParams();
 
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<'calendar' | 'wizard'>('wizard');
   const [posts, setPosts] = useState<PostRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,6 +89,8 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     return null;
   });
 
+  const isSetupMode = activeTab === 'wizard' || searchParams.get('setup') === 'required';
+
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
@@ -97,12 +100,19 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
       if (data.success && Array.isArray(data.posts) && data.posts.length > 0) {
         setPosts(data.posts);
         if (data.account && data.account.username) {
-          setAccount({
-            brandName: data.account.brandName,
-            username: data.account.username,
-            location: data.account.city,
-          });
-          setAutoPilotEnabled(Boolean(data.account.autoPilotEnabled));
+          // Do not overwrite account state if user is deliberately configuring fresh setup
+          const isFreshSetupRequested =
+            typeof window !== 'undefined' &&
+            (window.location.search.includes('setup=required') || window.location.search.includes('view=wizard'));
+
+          if (!isFreshSetupRequested) {
+            setAccount({
+              brandName: data.account.brandName,
+              username: data.account.username,
+              location: data.account.city,
+            });
+            setAutoPilotEnabled(Boolean(data.account.autoPilotEnabled));
+          }
         }
       } else {
         setPosts([]);
@@ -115,6 +125,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
   }, []);
 
   useEffect(() => {
+    setMounted(true);
     fetchPosts();
 
     const fetchCredits = async () => {
@@ -148,7 +159,9 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
 
     const viewParam = searchParams.get('view');
-    if (viewParam === 'wizard') {
+    const setupParam = searchParams.get('setup');
+
+    if (setupParam === 'required' || viewParam === 'wizard') {
       setActiveTab('wizard');
     } else if (viewParam === 'calendar' || isActivated) {
       setActiveTab('calendar');
@@ -250,19 +263,22 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
     }
   };
 
+  // When on wizard setup mode, show clean setup placeholders
   const hasConfiguredBrand = Boolean(
-    (account?.brandName && !account.brandName.toLowerCase().includes('glamflow')) ||
-    pendingProfile?.brandName
+    !isSetupMode &&
+    ((account?.brandName && !account.brandName.toLowerCase().includes('glamflow')) ||
+    pendingProfile?.brandName)
   );
 
   const currentDisplayName = hasConfiguredBrand
-    ? account?.brandName || pendingProfile?.brandName || 'My Brand'
+    ? pendingProfile?.brandName || account?.brandName || 'My Brand'
     : 'Brand Setup';
 
-  const currentHandle =
-    account?.username && !account.username.toLowerCase().includes('glamflow')
+  const currentHandle = !isSetupMode
+    ? account?.username && !account.username.toLowerCase().includes('glamflow')
       ? account.username
-      : pendingMetaAccount?.username || null;
+      : pendingMetaAccount?.username || null
+    : null;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-rose-500 selection:text-white">
@@ -271,12 +287,12 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         autoPilotEnabled={autoPilotEnabled}
         onToggleAutopilot={handleToggleAutopilot}
         creditsBalance={creditsBalance}
-        connectedAccount={account}
+        connectedAccount={isSetupMode ? null : account}
       />
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-6 pb-28 md:pb-8 flex-1 w-full space-y-4">
         
-        {/* Payment Confirmation Banner - Desktop Only to prevent mobile clutter */}
+        {/* Payment Confirmation Banner */}
         {isPaymentSuccess && (
           <div className="hidden md:flex bg-emerald-600 rounded-2xl p-4 text-white shadow-sm items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -300,19 +316,26 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
           </div>
         )}
 
-        {/* Clean Header Bar: Sirf Desktop par render hoga taaki mobile screen poori tarah free rahe */}
+        {/* Clean Header Bar */}
         <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-sm">
-              {hasConfiguredBrand ? currentDisplayName.charAt(0).toUpperCase() : <Store className="w-5 h-5 text-white" />}
+          <div className="flex items-center gap-3" suppressHydrationWarning>
+            <div
+              suppressHydrationWarning
+              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-sm"
+            >
+              {mounted && hasConfiguredBrand ? (
+                currentDisplayName.charAt(0).toUpperCase()
+              ) : (
+                <Store className="w-5 h-5 text-white" />
+              )}
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
-                  {currentDisplayName}
+              <div className="flex items-center gap-2" suppressHydrationWarning>
+                <h1 suppressHydrationWarning className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
+                  {mounted ? currentDisplayName : 'Brand Setup'}
                 </h1>
-                {currentHandle ? (
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
+                {mounted && currentHandle ? (
+                  <span suppressHydrationWarning className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
                     @{currentHandle.replace('@', '')}
                   </span>
                 ) : (
@@ -339,7 +362,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>{tNav('calendar')} ({posts.length})</span>
+              <span suppressHydrationWarning>{tNav('calendar')} ({posts.length})</span>
             </button>
 
             <button
@@ -420,7 +443,7 @@ export default function DashboardPage({ params: { locale } }: DashboardPageProps
         autoPilotEnabled={autoPilotEnabled}
         onToggleAutopilot={handleToggleAutopilot}
         creditsBalance={creditsBalance}
-        connectedAccount={account}
+        connectedAccount={isSetupMode ? null : account}
       />
     </div>
   );
