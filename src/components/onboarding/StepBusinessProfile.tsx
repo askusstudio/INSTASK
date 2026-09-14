@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { GuidanceTooltip } from '../ui/GuidanceTooltip';
 import {
@@ -13,6 +13,7 @@ import {
   X,
   Check,
   Link as LinkIcon,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 export interface BusinessProfileData {
@@ -22,6 +23,7 @@ export interface BusinessProfileData {
   productSummary: string;
   brandColor: string;
   logoUrl: string;
+  referenceImages?: string[];
 }
 
 interface StepBusinessProfileProps {
@@ -87,6 +89,9 @@ const PRESET_COLORS = ['#e1306c', '#6366f1', '#059669', '#d97706', '#8b5cf6', '#
 export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusinessProfileProps) {
   const t = useTranslations('onboarding.step2');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const refImagesInputRef = useRef<HTMLInputElement>(null);
+
+  const [referenceImages, setReferenceImages] = useState<string[]>(data.referenceImages || []);
 
   const isValid =
     data.brandName?.trim().length > 1 &&
@@ -126,6 +131,38 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleReferenceImagesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newImages: string[] = [];
+    const maxFiles = 5 - referenceImages.length;
+
+    for (let i = 0; i < Math.min(files.length, maxFiles); i++) {
+      const file = files[i];
+      if (file.size > 3 * 1024 * 1024) continue; // skip if > 3MB
+      
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        if (uploadEvent.target?.result) {
+          const resultStr = uploadEvent.target.result as string;
+          setReferenceImages((prev) => {
+            const updated = [...prev, resultStr].slice(0, 5);
+            onChange({ referenceImages: updated });
+            return updated;
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeReferenceImage = (index: number) => {
+    const updated = referenceImages.filter((_, i) => i !== index);
+    setReferenceImages(updated);
+    onChange({ referenceImages: updated });
   };
 
   return (
@@ -307,7 +344,59 @@ export function StepBusinessProfile({ data, onChange, onNext, onBack }: StepBusi
           />
         </div>
 
-        {/* Step 5: Brand Color Accent */}
+        {/* Step 5: Reference Images (Upto 5) */}
+        <div className="space-y-2 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <ImageIcon className="w-3.5 h-3.5 text-slate-500" />
+              <label className="block text-xs font-bold text-slate-800">
+                5. Brand Reference Images (Upto 5)
+              </label>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium">
+              {referenceImages.length}/5 uploaded
+            </span>
+          </div>
+          
+          <input
+            ref={refImagesInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleReferenceImagesUpload}
+            className="hidden"
+          />
+
+          <div className="grid grid-cols-5 gap-2">
+            {referenceImages.map((img, idx) => (
+              <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100 group">
+                <img src={img} alt={`Reference ${idx + 1}`} className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeReferenceImage(idx)}
+                  className="absolute top-1 right-1 w-5 h-5 bg-slate-900/80 text-white rounded-full text-[10px] flex items-center justify-center hover:bg-rose-600 transition"
+                  title="Remove image"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+
+            {referenceImages.length < 5 && (
+              <button
+                type="button"
+                onClick={() => refImagesInputRef.current?.click()}
+                className="aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-rose-500 flex flex-col items-center justify-center cursor-pointer bg-slate-50 transition text-slate-400 hover:text-rose-600 group"
+                title="Upload Reference Image"
+              >
+                <span className="text-lg font-bold">+</span>
+                <span className="text-[9px] font-semibold mt-0.5">Upload</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Step 6: Brand Color Accent */}
         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
           <div className="flex items-center gap-1.5">
             <Palette className="w-3.5 h-3.5 text-slate-500" />
