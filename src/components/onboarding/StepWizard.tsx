@@ -6,7 +6,7 @@ import { StepBusinessProfile, BusinessProfileData } from './StepBusinessProfile'
 import { StepCompetitors } from './StepCompetitors';
 import { StepConnectMeta } from './StepConnectMeta';
 import { StrategyBlueprint } from '@/lib/recommendations';
-import { Store, TrendingUp, Instagram, CheckCircle2 } from 'lucide-react';
+import { Instagram, Store, TrendingUp, CheckCircle2 } from 'lucide-react';
 
 interface StepWizardProps {
   onStrategyReady: (
@@ -28,6 +28,7 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
     productSummary: '',
     brandColor: '#e1306c',
     logoUrl: '',
+    referenceImages: [],
   });
 
   const [competitors, setCompetitors] = useState<string[]>([]);
@@ -81,6 +82,7 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
         language: currentLocale,
         handle: finalHandle,
         igUserId: finalIgUserId,
+        referenceImages: businessProfile.referenceImages || [],
       }),
     });
 
@@ -93,10 +95,11 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
     }
   };
 
+  // Reordered Steps: 1. Instagram Auth, 2. Brand Info & Reference Images, 3. Trends & Competitors
   const steps = [
-    { num: 1, label: '1. Brand Info', icon: Store },
-    { num: 2, label: '2. Trends & Competitors', icon: TrendingUp },
-    { num: 3, label: '3. Meta Connect', icon: Instagram },
+    { num: 1, label: '1. Meta Connect', icon: Instagram },
+    { num: 2, label: '2. Brand Info', icon: Store },
+    { num: 3, label: '3. Trends & Competitors', icon: TrendingUp },
   ];
 
   return (
@@ -146,8 +149,22 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
 
       {/* Step Views */}
       <div className="transition-all duration-200">
-        {/* Step 1: Brand Information */}
+        {/* Step 1: Meta / Instagram Connect */}
         {currentStep === 1 && (
+          <StepConnectMeta
+            onConnected={(acc) => {
+              setMetaAccount(acc);
+              if (acc.username && typeof window !== 'undefined') {
+                localStorage.setItem('instask_ig_handle', acc.username);
+              }
+              setCurrentStep(2);
+            }}
+            onNext={() => setCurrentStep(2)}
+          />
+        )}
+
+        {/* Step 2: Brand Information & Reference Images */}
+        {currentStep === 2 && (
           <StepBusinessProfile
             data={businessProfile}
             onChange={(patch) => {
@@ -159,34 +176,20 @@ export function StepWizard({ onStrategyReady, currentLocale }: StepWizardProps) 
                 return updated;
               });
             }}
-            onNext={() => setCurrentStep(2)}
-            onBack={() => {}}
+            onNext={() => setCurrentStep(3)}
+            onBack={() => setCurrentStep(1)}
           />
         )}
 
-        {/* Step 2: Trends & Competitors Research */}
-        {currentStep === 2 && (
+        {/* Step 3: Trends & Competitors Research & Final Generation */}
+        {currentStep === 3 && (
           <StepCompetitors
             handles={competitors}
             onChange={(h) => setCompetitors(h)}
-            onBack={() => setCurrentStep(1)}
+            onBack={() => setCurrentStep(2)}
             onSubmit={async () => {
-              setCurrentStep(3);
+              await handleFinalSubmit();
             }}
-          />
-        )}
-
-        {/* Step 3: Meta Account Connect & Plan Activation */}
-        {currentStep === 3 && (
-          <StepConnectMeta
-            onConnected={(acc) => {
-              setMetaAccount(acc);
-              if (acc.username && typeof window !== 'undefined') {
-                localStorage.setItem('instask_ig_handle', acc.username);
-              }
-              handleFinalSubmit(acc);
-            }}
-            onNext={() => handleFinalSubmit()}
           />
         )}
       </div>
