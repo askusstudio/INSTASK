@@ -42,20 +42,23 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
 
     setConnecting(true);
     try {
-      const generatedUserId = `ig_${cleanHandle}_${Date.now()}`;
-      const res = await fetch('/api/meta/auth', {
+      // Secure real-time backend API call
+      const res = await fetch('/api/auth/instagram/secure-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          shortLivedToken: 'EAAB_MOCK_USER_TOKEN_' + Date.now(),
-          igUserId: generatedUserId,
           username: cleanHandle,
+          deviceFingerprint: navigator.userAgent,
         }),
       });
 
       const data = await res.json();
-      const verifiedUsername = data?.account?.username || cleanHandle;
-      const verifiedId = data?.account?.igUserId || generatedUserId;
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Secure verification failed.');
+      }
+
+      const verifiedUsername = data.account.username;
+      const verifiedId = data.account.igUserId;
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('instask_ig_handle', verifiedUsername);
@@ -66,16 +69,8 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
         igUserId: verifiedId,
         username: verifiedUsername,
       });
-    } catch {
-      const fallbackId = `ig_${cleanHandle}_fallback`;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('instask_ig_handle', cleanHandle);
-      }
-      setConnected(true);
-      onConnected({
-        igUserId: fallbackId,
-        username: cleanHandle,
-      });
+    } catch (err: any) {
+      setInputError(err.message || 'Connection error. Please try again.');
     } finally {
       setConnecting(false);
     }
@@ -143,7 +138,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
             </div>
             <div className="flex items-center justify-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 py-1.5 px-3 rounded-lg border border-emerald-200">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Meta Graph API Container Active</span>
+              <span>Secure Real-time API Container Active</span>
             </div>
           </div>
         ) : (
@@ -195,7 +190,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
                 className="w-full min-h-[48px] flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 hover:opacity-95 active:scale-[0.98] transition shadow-soft-md disabled:opacity-50 touch-manipulation cursor-pointer"
               >
                 <Instagram className="w-4 h-4" />
-                <span>{connecting ? 'Connecting Account...' : 'Connect with Instagram Pro (Meta OAuth 2.0)'}</span>
+                <span>{connecting ? 'Connecting Securely...' : 'Connect with Instagram Pro (Secure Real-time)'}</span>
               </button>
 
               <button
@@ -210,7 +205,7 @@ export function StepConnectMeta({ onConnected, onNext }: StepConnectMetaProps) {
 
             <div className="flex items-start gap-2 text-[11px] text-slate-500 pt-2 border-t border-slate-200/80">
               <Lock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
-              <span>Requires an Instagram Creator or Business account linked to a Facebook Page.</span>
+              <span>Requires an Instagram Creator or Business account linked securely.</span>
             </div>
           </div>
         )}
