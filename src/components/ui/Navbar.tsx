@@ -108,9 +108,9 @@ export function Navbar({
               </a>
 
               <a
-                href={`/${currentLocale}/auth`}
+                href={`/${currentLocale}/dashboard?view=wizard&setup=required`}
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
-                title="Multi-channel Account Sign In & Brand Setup"
+                title="Manage Account & Brand Setup Wizard"
               >
                 <span>Account</span>
               </a>
