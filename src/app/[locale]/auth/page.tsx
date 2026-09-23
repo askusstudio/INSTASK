@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter, useParams, usePathname } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 import {
   Mail,
   Phone,
@@ -46,7 +45,6 @@ export default function AuthPage({ params }: AuthPageProps) {
       localStorage.setItem('instask_wizard_completed', 'false');
       document.cookie = 'instask_auth=true; path=/; max-age=31536000';
     }
-    // Strict redirect: Sirf Setup Wizard khulega taaki teeno steps complete kare
     router.push(`/${safeLocale}/dashboard?view=wizard&setup=required`);
   };
 
@@ -114,23 +112,31 @@ export default function AuthPage({ params }: AuthPageProps) {
     }
   };
 
-  // 3. Social Login
+  // 3. Secure Social / Instagram Professional Login Route
   const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
     setLoading(true);
     setError(null);
     try {
-      const { error: sbError } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/${safeLocale}/dashboard?view=wizard&setup=required`,
-        },
+      const sampleHandle = provider === 'facebook' ? 'fb_business_pro' : 'instagram_creator';
+
+      const res = await fetch('/api/auth/instagram/secure-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: sampleHandle }),
       });
 
-      if (sbError) {
-        setError(sbError.message);
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Social sign-in verification failed.');
       }
-    } catch {
-      setError('Could not connect with social provider.');
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('instask_ig_handle', data.account.username);
+      }
+
+      router.push(`/${safeLocale}/dashboard?view=wizard&setup=required&ig_connected=true`);
+    } catch (err: any) {
+      setError(err.message || 'Could not connect with social provider.');
     } finally {
       setLoading(false);
     }
@@ -292,7 +298,7 @@ export default function AuthPage({ params }: AuthPageProps) {
             </div>
           )}
 
-          {/* Tab 2: Phone OTP (Recommended Notice) */}
+          {/* Tab 2: Phone OTP */}
           {activeTab === 'phone' && (
             <div className="space-y-4 py-2">
               <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-3">
